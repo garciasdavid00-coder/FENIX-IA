@@ -118,7 +118,7 @@ function sendMessage(desdeVistaChat){
   fetch(BACKEND_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ mensaje: texto, historial: historialParaAPI })
+    body: JSON.stringify({ mensaje: texto, historial: historialParaAPI, modelo: modeloSeleccionado })
   })
     .then(res => {
       if (!res.ok) throw new Error('Error del servidor');
@@ -405,6 +405,55 @@ function filtrarRecientes(){
   const valor = document.getElementById('buscarInput').value;
   renderizarRecientes(valor);
 }
+
+/* ======================
+   SELECTOR DE MODELO DE IA
+====================== */
+let modeloSeleccionado = 'groq'; // 'groq' o 'deepseek'
+
+function toggleMenuModelo(e){
+  e.stopPropagation();
+  const yaAbierto = document.getElementById('menuModeloDropdown');
+  cerrarMenusAbiertos();
+  if(yaAbierto) return;
+
+  const btn = document.getElementById('modeloSelectBtn');
+  const menu = document.createElement('div');
+  menu.className = 'dropdown-menu';
+  menu.id = 'menuModeloDropdown';
+  menu.style.left = '0';
+  menu.style.right = 'auto';
+  menu.style.minWidth = '220px';
+
+  menu.innerHTML = `
+    <div class="dropdown-item" data-modelo="groq">Groq (Llama 3.3)</div>
+    <div class="dropdown-item" data-modelo="deepseek">DeepSeek</div>
+    <div class="dropdown-item" data-modelo="gemini">Gemini</div>
+  `;
+
+  menu.querySelectorAll('[data-modelo]').forEach(item => {
+    item.onclick = (ev) => {
+      ev.stopPropagation();
+      seleccionarModelo(item.getAttribute('data-modelo'));
+      cerrarMenusAbiertos();
+    };
+  });
+
+  btn.parentElement.appendChild(menu);
+}
+
+function seleccionarModelo(modelo){
+  modeloSeleccionado = modelo;
+  const nombres = { groq: 'Groq (Llama 3.3)', deepseek: 'DeepSeek', gemini: 'Gemini' };
+  document.getElementById('modeloTextoActual').textContent = nombres[modelo] || modelo;
+}
+
+document.addEventListener('click', function(e){
+  if(!e.target.closest('#modeloSelectBtn') && !e.target.closest('#menuModeloDropdown')){
+    const menu = document.getElementById('menuModeloDropdown');
+    if(menu) menu.remove();
+  }
+});
 
 /* ======================
    AUTENTICACIÓN CON GOOGLE
