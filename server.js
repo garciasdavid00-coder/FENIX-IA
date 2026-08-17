@@ -205,6 +205,16 @@ const data = await respuestaIA.json();
 });
 
 // Sirve el front-end (HTML, CSS, JS) — deben estar en la misma carpeta que este archivo
+// El service worker y el manifest no se cachean en el navegador para que las
+// actualizaciones de la app se propaguen rápido.
+app.use('/sw.js', (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store');
+  next();
+});
+app.use('/manifest.json', (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store');
+  next();
+});
 app.use(express.static(path.join(__dirname)));
 
 // Si alguien entra a la raíz o a cualquier ruta no reconocida, manda el index.html

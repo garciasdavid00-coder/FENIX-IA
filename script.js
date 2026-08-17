@@ -97,6 +97,50 @@ document.addEventListener('click', function(e){
 });
 
 /* ======================
+   PWA: INSTALAR APP
+====================== */
+let promptInstalacion = null;
+const esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  promptInstalacion = e;
+  mostrarBotonInstalar();
+});
+
+window.addEventListener('appinstalled', function(){
+  promptInstalacion = null;
+  ocultarBotonInstalar();
+});
+
+function mostrarBotonInstalar(){
+  const el = document.getElementById('navInstalar');
+  if(el) el.style.display = 'flex';
+}
+
+function ocultarBotonInstalar(){
+  const el = document.getElementById('navInstalar');
+  if(el) el.style.display = 'none';
+}
+
+function instalarApp(){
+  if(promptInstalacion){
+    promptInstalacion.prompt();
+    promptInstalacion.userChoice.then(function(res){
+      // si el usuario cancela, dejamos el botón disponible para reintentar
+      if(res.outcome === 'accepted') ocultarBotonInstalar();
+    });
+  } else if(esIOS){
+    alert('Para instalar Fenix en iPhone:\n\n1. Toca el botón Compartir (cuadro con flecha arriba)\n2. Pulsa "Añadir a pantalla de inicio"\n3. Pulsa "Añadir"');
+  } else {
+    alert('Para instalar Fenix:\n\nAbre el menú ⋮ del navegador y toca "Instalar app" o "Agregar a pantalla de inicio".');
+  }
+}
+
+// En iOS no existe beforeinstallprompt, así que mostramos el botón con instrucciones
+if(esIOS) mostrarBotonInstalar();
+
+/* ======================
    AUTO-CRECER TEXTAREAS
 ====================== */
 function autoGrow(el){
