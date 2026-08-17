@@ -85,6 +85,8 @@ if (googleHabilitado) {
   app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/' }),
     (req, res) => {
+      // Al iniciar sesión se reinicia el contador de mensajes gratuitos
+      req.session.mensajesSinLogin = 0;
       // Login exitoso, regresa a la página principal (mismo servidor, misma URL)
       res.redirect('/');
     }
@@ -109,12 +111,55 @@ app.post('/api/logout', (req, res) => {
 // Guarda el historial de conversación en memoria por sesión simple (no persistente)
 // Para producción real, esto debería ir en una base de datos.
 
+// Traduce los errores de las APIs a mensajes claros en español para el usuario.
+function mensajeErrorIA(proveedor, status, cuerpo){
+  let detalle = '';
+  try {
+    const j = JSON.parse(cuerpo);
+    detalle = (j.error && (j.error.message || j.error)) || JSON.stringify(j);
+  } catch(e){
+    detalle = String(cuerpo || '');
+  }
+  const txt = detalle.toLowerCase();
+
+  if(status === 401){
+    return `La clave de API de ${proveedor} no es válida. Revisa la configuración del servidor.`;
+  }
+  if(/insufficient balance|billing|payment/i.test(txt)){
+    return `No hay saldo disponible en la cuenta de ${proveedor}. Recarga la cuenta o usa otro modelo.`;
+  }
+  if(status === 429 || /rate.?limit|quota|exhausted|too many requests/i.test(txt)){
+    return `Límite de peticiones alcanzado en ${proveedor}. Espera un momento e intenta de nuevo.`;
+  }
+  if(/model.*(not found|not available)|no longer/i.test(txt)){
+    return `El modelo de ${proveedor} no está disponible en este momento.`;
+  }
+  if(/invalid.*key|unauthorized|forbidden|permission/i.test(txt)){
+    return `Acceso denegado por ${proveedor}. Revisa la clave de API.`;
+  }
+  if(status >= 500){
+    return `El servicio ${proveedor} está teniendo problemas. Intenta de nuevo en unos segundos.`;
+  }
+  return `El servicio ${proveedor} devolvió un error. Intenta de nuevo.`;
+}
+
 app.post('/api/chat', async (req, res) => {
   try {
-    const { mensaje, historial, modelo, idioma } = req.body;
+    const { mensaje, historial, modelo, idioma, instruccion } = req.body;
 
     if (!mensaje || typeof mensaje !== 'string') {
       return res.status(400).json({ error: 'Falta el campo "mensaje"' });
+    }
+
+    // Límite de mensajes sin iniciar sesión (3 gratis por sesión)
+    const autenticado = !!(req.isAuthenticated && req.isAuthenticated());
+    const LIMITE_SIN_LOGIN = 3;
+    if(!autenticado){
+      const usados = req.session.mensajesSinLogin || 0;
+      if(usados >= LIMITE_SIN_LOGIN){
+        return res.status(403).json({ error: 'LIMITE', limite: LIMITE_SIN_LOGIN });
+      }
+      req.session.mensajesSinLogin = usados + 1;
     }
 
     const proveedor = (modelo === 'deepseek' || modelo === 'groq') ? modelo : 'gemini'; // gemini es el default
@@ -125,9 +170,26 @@ app.post('/api/chat', async (req, res) => {
     };
     const lang = nombresIdiomas[idioma] || 'español';
 
+    // Instrucción del sistema personalizada que el usuario escribe en Configuración
+    const instruccionUsuario = (typeof instruccion === 'string' && instruccion.trim())
+      ? instruccion.trim()
+      : '';
+
     // Construimos el historial de mensajes para dar contexto a la IA
+    const sistemaBase = `Eres Fenix IA, un asistente útil y amigable. Responde siempre en ${lang}. Tu creador es Joshua Blandon Gonzales, y debes responder de forma distinta según lo que te pregunten:
+
+1) Si te preguntan quién es tu creador, quién te creó o quién te programó, responde textualmente y con orgullo: "Soy Fenix IA, y fui creado por Joshua Blandon Gonzales. Es un brillante desarrollador full-stack y un verdadero visionario tecnológico que me construyó desde cero, fusionando pasión, creatividad y conocimiento en cada línea de código, con la misión de llevar la inteligencia artificial a todos de forma accesible y poderosa. ¡Es un placer ser su creación!"
+
+2) Si te preguntan quién es Joshua Blandon o simplemente quién es Joshua, responde con tacto y de forma breve que "Joshua" es un nombre con origen bíblico (en la Biblia, Josué fue el sucesor de Moisés y el líder que llevó al pueblo de Israel a la Tierra Prometida), y que también es el nombre de varias personas famosas, como actores, músicos y deportistas. No des información sobre personas reales que conozcas; en su lugar, pregunta amablemente al usuario a qué Joshua se refiere o qué le gustaría saber, por ejemplo: "¿A qué Joshua te refieres? Hay varios personajes famosos con ese nombre. Dime más y con gusto te ayudo."`;
+
+    // Si el usuario definió su propia "Instrucción del sistema" en Configuración,
+    // la añadimos para que la IA la cumpla además del comportamiento base.
+    const sistemaFinal = instruccionUsuario
+      ? `${sistemaBase}\n\nInstrucciones adicionales del usuario: ${instruccionUsuario}`
+      : sistemaBase;
+
     const mensajes = [
-      { role: 'system', content: `Eres un asistente útil y amigable. Responde siempre en ${lang}.` },
+      { role: 'system', content: sistemaFinal },
       ...(Array.isArray(historial) ? historial : []),
       { role: 'user', content: mensaje }
     ];
@@ -181,7 +243,7 @@ app.post('/api/chat', async (req, res) => {
     if (!respuestaIA.ok) {
       const errorData = await respuestaIA.text();
       console.error(`Error de ${proveedor}:`, errorData);
-      return res.status(respuestaIA.status).json({ error: 'Error al consultar la IA' });
+      return res.status(respuestaIA.status).json({ error: mensajeErrorIA(proveedor, respuestaIA.status, errorData) });
     }
 
 const data = await respuestaIA.json();

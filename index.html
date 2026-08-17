@@ -31,31 +31,31 @@
 
     <div class="nav-item" onclick="nuevoChat()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Nuevo chat
+      <span data-i18n="nav.nuevoChat">Nuevo chat</span>
     </div>
     <div class="nav-item" onclick="toggleBuscar()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      Buscar
+      <span data-i18n="nav.buscar">Buscar</span>
     </div>
     <div class="nav-item" onclick="mostrarVistaProyectos()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
-      Proyectos
+      <span data-i18n="nav.proyectos">Proyectos</span>
     </div>
     <div class="nav-item" onclick="mostrarVistaBiblioteca()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
-      Biblioteca
+      <span data-i18n="nav.biblioteca">Biblioteca</span>
     </div>
 
     <div class="nav-item" id="navInstalar" onclick="instalarApp()" style="display:none;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Instalar app
+      <span data-i18n="nav.instalar">Instalar app</span>
     </div>
 
     <div class="divider"></div>
 
-    <input type="text" id="buscarInput" class="buscar-input" placeholder="Buscar en el historial..." style="display:none;" oninput="filtrarRecientes()">
+    <input type="text" id="buscarInput" class="buscar-input" placeholder="Buscar en el historial..." style="display:none;" oninput="filtrarRecientes()" data-i18n-placeholder="buscar.placeholder">
 
-    <div class="recent-label">Recientes</div>
+    <div class="recent-label" data-i18n="nav.recientes">Recientes</div>
     <div id="recentesList" class="sidebar-scroll-area"></div>
 
     <!-- Sección de usuario fija abajo -->
@@ -65,48 +65,48 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
         <div class="sidebar-user-info">
-          <div class="sidebar-user-name" id="sidebarUserName">Invitado</div>
+          <div class="sidebar-user-name" id="sidebarUserName" data-i18n="usuario.invitado">Invitado</div>
           <div class="sidebar-user-email" id="sidebarUserEmail"></div>
         </div>
         <svg class="sidebar-user-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
       <div class="sidebar-user-menu" id="sidebarUserMenu">
-        <div class="sidebar-user-menu-item" onclick="irAConfiguracion()">
-          <span class="sidebar-menu-emoji">👤</span> Cuenta
+        <div class="sidebar-user-menu-item" onclick="irACuenta()">
+          <span class="sidebar-menu-emoji">👤</span> <span data-i18n="usuario.cuenta">Cuenta</span>
         </div>
         <div class="sidebar-user-menu-item" onclick="irAConfiguracion()">
-          <span class="sidebar-menu-emoji">⚙️</span> Configuración
+          <span class="sidebar-menu-emoji">⚙️</span> <span data-i18n="usuario.configuracion">Configuración</span>
         </div>
         <div class="sidebar-user-menu-divider"></div>
         <div class="sidebar-user-menu-item" onclick="irAVistaIdioma()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z"/></svg>
-          Idioma
-        </div>
-        <div class="sidebar-user-menu-item" onclick="irAConfiguracion()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          Obtener ayuda
+          <span data-i18n="usuario.idioma">Idioma</span>
         </div>
         <div class="sidebar-user-menu-divider"></div>
-        <div class="sidebar-user-menu-item" onclick="irAConfiguracion()">
+        <div class="sidebar-user-menu-item" onclick="abrirAyuda()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span data-i18n="usuario.ayuda">Obtener ayuda</span>
+        </div>
+        <div class="sidebar-user-menu-item" onclick="mostrarMejorarPlan()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="18 15 12 9 6 15"/></svg>
-          Mejorar plan
+          <span data-i18n="usuario.mejorarPlan">Mejorar plan</span>
         </div>
-        <div class="sidebar-user-menu-item" onclick="irAConfiguracion()">
+        <div class="sidebar-user-menu-item" onclick="mostrarApps()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="6 9 12 15 18 9"/></svg>
-          Obtener aplicaciones y extensiones
+          <span data-i18n="usuario.aplicaciones">Obtener aplicaciones y extensiones</span>
         </div>
-        <div class="sidebar-user-menu-item" onclick="irAConfiguracion()">
+        <div class="sidebar-user-menu-item" onclick="mostrarInfo()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          Más información
+          <span data-i18n="usuario.info">Más información</span>
         </div>
         <div class="sidebar-user-menu-divider"></div>
         <div class="sidebar-user-menu-item sidebar-user-menu-danger" id="sidebarUserLogout" onclick="cerrarSesion()" style="display:none;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Cerrar sesión
+          <span data-i18n="usuario.cerrarSesion">Cerrar sesión</span>
         </div>
         <div class="sidebar-user-menu-item" id="sidebarUserLogin" onclick="iniciarSesionConGoogle()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-          Iniciar sesión con Google
+          <span data-i18n="usuario.iniciarGoogle">Iniciar sesión con Google</span>
         </div>
       </div>
     </div>
@@ -131,10 +131,10 @@
 
     <!-- Vista inicial (saludo + input grande) -->
     <div class="center-content" id="vistaInicial">
-      <h1 class="greeting">Vamos con todo, Usuario</h1>
+      <h1 class="greeting" id="greetingText">Vamos con todo, Usuario</h1>
 
       <div class="chat-box">
-        <textarea class="chat-input" placeholder="Cuando quieras..." rows="1" id="chatInput"></textarea>
+        <textarea class="chat-input" placeholder="Cuando quieras..." rows="1" id="chatInput" data-i18n-placeholder="input.placeholder"></textarea>
         <div class="chat-actions">
           <button class="plus-btn" onclick="alert('Aquí abrirías el selector de archivos para adjuntar.')">+</button>
           <div class="right-actions">
@@ -149,13 +149,13 @@
       </div>
 
       <div class="pills">
-        <div class="pill" onclick="usarPill('Ayúdame a crear un documento sobre: ')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Documentos</div>
-        <div class="pill" onclick="usarPill('Ayúdame a crear una hoja de cálculo para: ')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Hojas</div>
-        <div class="pill" onclick="usarPill('Ayúdame a crear una presentación sobre: ')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><line x1="3" y1="20" x2="21" y2="20"/></svg>Presentaciones</div>
-        <div class="pill" onclick="usarPill('Genera una imagen de: ')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Imágenes</div>
-        <div class="pill" onclick="usarPill('Ayúdame a escribir: ')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg>Escritura</div>
-        <div class="pill" onclick="usarPill('Hazme un resumen de: ')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>Resumen</div>
-        <div class="pill" onclick="usarPill('Búscame información sobre: ')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z"/></svg>Sitios</div>
+        <div class="pill" onclick="usarPill(t('pill.docsPrompt'))"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span data-i18n="pill.documentos">Documentos</span></div>
+        <div class="pill" onclick="usarPill(t('pill.hojasPrompt'))"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg><span data-i18n="pill.hojas">Hojas</span></div>
+        <div class="pill" onclick="usarPill(t('pill.presentacionesPrompt'))"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><line x1="3" y1="20" x2="21" y2="20"/></svg><span data-i18n="pill.presentaciones">Presentaciones</span></div>
+        <div class="pill" onclick="usarPill(t('pill.imagenesPrompt'))"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span data-i18n="pill.imagenes">Imágenes</span></div>
+        <div class="pill" onclick="usarPill(t('pill.escrituraPrompt'))"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg><span data-i18n="pill.escritura">Escritura</span></div>
+        <div class="pill" onclick="usarPill(t('pill.resumenPrompt'))"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg><span data-i18n="pill.resumen">Resumen</span></div>
+        <div class="pill" onclick="usarPill(t('pill.sitiosPrompt'))"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z"/></svg><span data-i18n="pill.sitios">Sitios</span></div>
       </div>
     </div>
 
@@ -164,7 +164,7 @@
       <div class="messages" id="messages"></div>
 
       <div class="chat-box chat-box-bottom">
-        <textarea class="chat-input" placeholder="Cuando quieras..." rows="1" id="chatInput2"></textarea>
+        <textarea class="chat-input" placeholder="Cuando quieras..." rows="1" id="chatInput2" data-i18n-placeholder="input.placeholder"></textarea>
         <div class="chat-actions">
           <button class="plus-btn" onclick="alert('Aquí abrirías el selector de archivos para adjuntar.')">+</button>
           <div class="right-actions">
@@ -182,8 +182,8 @@
     <!-- Vista de Proyectos -->
     <div class="panel-view" id="vistaProyectos" style="display:none;">
       <div class="panel-header">
-        <h2>Proyectos</h2>
-        <button class="btn-primario" onclick="crearProyecto()">+ Nuevo proyecto</button>
+        <h2 data-i18n="proyectos.titulo">Proyectos</h2>
+        <button class="btn-primario" onclick="crearProyecto()"><span data-i18n="proyectos.nuevo">+ Nuevo proyecto</span></button>
       </div>
       <div class="panel-grid" id="proyectosList"></div>
     </div>
@@ -191,9 +191,9 @@
     <!-- Vista de un Proyecto específico -->
     <div class="panel-view" id="vistaProyectoDetalle" style="display:none;">
       <div class="panel-header">
-        <button class="btn-volver" onclick="mostrarVistaProyectos()">← Proyectos</button>
+        <button class="btn-volver" onclick="mostrarVistaProyectos()" data-i18n="proyectos.volver">← Proyectos</button>
         <h2 id="proyectoDetalleNombre"></h2>
-        <button class="btn-primario" onclick="nuevoChatEnProyecto()">+ Nuevo chat aquí</button>
+        <button class="btn-primario" onclick="nuevoChatEnProyecto()"><span data-i18n="proyectos.nuevoChatAqui">+ Nuevo chat aquí</span></button>
       </div>
       <div class="panel-grid" id="proyectoDetalleChats"></div>
     </div>
@@ -201,9 +201,9 @@
     <!-- Vista de Biblioteca -->
     <div class="panel-view" id="vistaBiblioteca" style="display:none;">
       <div class="panel-header">
-        <h2>Biblioteca</h2>
+        <h2 data-i18n="biblioteca.titulo">Biblioteca</h2>
         <label class="btn-primario" style="cursor:pointer;">
-          + Subir archivo
+          <span data-i18n="biblioteca.subir">+ Subir archivo</span>
           <input type="file" id="inputArchivo" style="display:none;" multiple onchange="subirArchivo(event)">
         </label>
       </div>
@@ -217,12 +217,12 @@
         <div class="config-section">
           <div class="config-section-header">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            <h3>Apariencia</h3>
+            <h3 data-i18n="config.apariencia">Apariencia</h3>
           </div>
           <div class="config-row">
             <div class="config-info">
-              <div class="config-label">Tema</div>
-              <div class="config-desc">Cambia entre el tema claro y oscuro</div>
+              <div class="config-label" data-i18n="config.tema">Tema</div>
+              <div class="config-desc" data-i18n="config.temaDesc">Cambia entre el tema claro y oscuro</div>
             </div>
             <div class="toggle-switch" id="toggleTema" onclick="alternarTema()">
               <div class="toggle-track">
@@ -236,12 +236,12 @@
         <div class="config-section">
           <div class="config-section-header">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M12 6v6l4 2"/></svg>
-            <h3>Modelo de IA</h3>
+            <h3 data-i18n="config.modeloIA">Modelo de IA</h3>
           </div>
           <div class="config-row">
             <div class="config-info">
-              <div class="config-label">Modelo predeterminado</div>
-              <div class="config-desc">Selecciona qué modelo de IA usar para las conversaciones</div>
+              <div class="config-label" data-i18n="config.modeloPredeterminado">Modelo predeterminado</div>
+              <div class="config-desc" data-i18n="config.modeloDesc">Selecciona qué modelo de IA usar para las conversaciones</div>
             </div>
             <div class="config-select-wrap">
               <select class="config-select" id="configModelo" onchange="seleccionarModeloConfig(this.value)">
@@ -256,19 +256,19 @@
         <div class="config-section">
           <div class="config-section-header">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-            <h3>Asistente</h3>
+            <h3 data-i18n="config.asistente">Asistente</h3>
           </div>
           <div class="config-row config-row-col">
             <div class="config-info">
-              <div class="config-label">Instrucción del sistema</div>
-              <div class="config-desc">Define el comportamiento base de la IA en todas las conversaciones</div>
+              <div class="config-label" data-i18n="config.instruccion">Instrucción del sistema</div>
+              <div class="config-desc" data-i18n="config.instruccionDesc">Define el comportamiento base de la IA en todas las conversaciones</div>
             </div>
-            <textarea class="config-textarea" id="configSystemPrompt" rows="3" placeholder="Eres un asistente útil y amigable..."></textarea>
+            <textarea class="config-textarea" id="configSystemPrompt" rows="3" placeholder="Eres un asistente útil y amigable..." data-i18n-placeholder="config.instruccionPlaceholder"></textarea>
           </div>
           <div class="config-row">
             <div class="config-info">
-              <div class="config-label">Idioma</div>
-              <div class="config-desc">Idioma en el que la IA responderá</div>
+              <div class="config-label" data-i18n="config.idioma">Idioma</div>
+              <div class="config-desc" data-i18n="config.idiomaDesc">Idioma en el que la IA responderá</div>
             </div>
             <div class="config-select-wrap">
               <select class="config-select" id="configIdioma">
@@ -288,12 +288,12 @@
         <div class="config-section">
           <div class="config-section-header">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <h3>Datos y Privacidad</h3>
+            <h3 data-i18n="config.datos">Datos y Privacidad</h3>
           </div>
           <div class="config-row">
             <div class="config-info">
-              <div class="config-label">Guardar historial</div>
-              <div class="config-desc">Guarda tus conversaciones localmente en el navegador</div>
+              <div class="config-label" data-i18n="config.guardarHistorial">Guardar historial</div>
+              <div class="config-desc" data-i18n="config.guardarHistorialDesc">Guarda tus conversaciones localmente en el navegador</div>
             </div>
             <div class="toggle-switch" id="toggleHistorial" onclick="toggleGuardarHistorial()">
               <div class="toggle-track">
@@ -303,10 +303,10 @@
           </div>
           <div class="config-row">
             <div class="config-info">
-              <div class="config-label">Borrar todos los chats</div>
-              <div class="config-desc">Elimina todo el historial de conversaciones guardado</div>
+              <div class="config-label" data-i18n="config.borrarChats">Borrar todos los chats</div>
+              <div class="config-desc" data-i18n="config.borrarChatsDesc">Elimina todo el historial de conversaciones guardado</div>
             </div>
-            <button class="config-btn-danger" onclick="borrarTodoElHistorial()">Borrar datos</button>
+            <button class="config-btn-danger" onclick="borrarTodoElHistorial()" data-i18n="config.borrarDatos">Borrar datos</button>
           </div>
         </div>
 
@@ -316,59 +316,128 @@
     <!-- Vista de Idioma -->
     <div class="panel-view" id="vistaIdioma" style="display:none;">
       <div class="lang-container">
-        <button class="btn-volver" onclick="mostrarVistaConfiguracion()">← Volver</button>
+        <button class="btn-volver" onclick="mostrarVistaConfiguracion()" data-i18n="config.volver">← Volver</button>
         <div class="lang-header">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z"/></svg>
-          <h2>Idioma</h2>
-          <p class="lang-subtitle">Selecciona el idioma en el que la IA responderá</p>
+          <h2 data-i18n="config.idioma">Idioma</h2>
+          <p class="lang-subtitle" data-i18n="config.idiomaSubtitle">Selecciona el idioma en el que la IA responderá</p>
         </div>
         <div class="lang-grid" id="langGrid">
-          <div class="lang-card" data-lang="es" onclick="seleccionarIdioma('es')">
+          <div class="lang-card" data-lang="es" onclick="seleccionarIdiomaVista('es')">
             <span class="lang-flag">🇪🇸</span>
             <span class="lang-name">Español</span>
             <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <div class="lang-card" data-lang="en" onclick="seleccionarIdioma('en')">
+          <div class="lang-card" data-lang="en" onclick="seleccionarIdiomaVista('en')">
             <span class="lang-flag">🇺🇸</span>
             <span class="lang-name">English</span>
             <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <div class="lang-card" data-lang="pt" onclick="seleccionarIdioma('pt')">
+          <div class="lang-card" data-lang="pt" onclick="seleccionarIdiomaVista('pt')">
             <span class="lang-flag">🇧🇷</span>
             <span class="lang-name">Português</span>
             <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <div class="lang-card" data-lang="fr" onclick="seleccionarIdioma('fr')">
+          <div class="lang-card" data-lang="fr" onclick="seleccionarIdiomaVista('fr')">
             <span class="lang-flag">🇫🇷</span>
             <span class="lang-name">Français</span>
             <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <div class="lang-card" data-lang="de" onclick="seleccionarIdioma('de')">
+          <div class="lang-card" data-lang="de" onclick="seleccionarIdiomaVista('de')">
             <span class="lang-flag">🇩🇪</span>
             <span class="lang-name">Deutsch</span>
             <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <div class="lang-card" data-lang="ja" onclick="seleccionarIdioma('ja')">
+          <div class="lang-card" data-lang="ja" onclick="seleccionarIdiomaVista('ja')">
             <span class="lang-flag">🇯🇵</span>
             <span class="lang-name">日本語</span>
             <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <div class="lang-card" data-lang="zh" onclick="seleccionarIdioma('zh')">
+          <div class="lang-card" data-lang="zh" onclick="seleccionarIdiomaVista('zh')">
             <span class="lang-flag">🇨🇳</span>
             <span class="lang-name">中文</span>
             <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <div class="lang-card" data-lang="ar" onclick="seleccionarIdioma('ar')">
+          <div class="lang-card" data-lang="ar" onclick="seleccionarIdiomaVista('ar')">
             <span class="lang-flag">🇸🇦</span>
             <span class="lang-name">العربية</span>
             <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
         </div>
+        <button class="btn-primario lang-aceptar" onclick="confirmarIdioma()" data-i18n="config.aceptar">Aceptar</button>
       </div>
     </div>
   </div>
 
 <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+<!-- Modal de límite de mensajes sin iniciar sesión -->
+<div class="modal-overlay" id="modalLimite" onclick="if(event.target===this)cerrarModalLimite()" style="display:none;">
+  <div class="modal">
+    <h3 class="modal-title" data-i18n="modal.limiteTitulo">Límite de mensajes alcanzado</h3>
+    <p class="modal-text" data-i18n="modal.limiteTexto" data-i18n-html>Has usado tus <strong>3 mensajes gratuitos</strong> sin iniciar sesión. Inicia sesión con Google para seguir chateando sin límites.</p>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-primary" onclick="iniciarSesionConGoogle()" data-i18n="usuario.iniciarGoogle">Iniciar sesión con Google</button>
+      <button class="modal-btn" onclick="cerrarModalLimite()" data-i18n="modal.ahoraNo">Ahora no</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal genérico reutilizable -->
+<div class="modal-overlay" id="modalGenerico" onclick="if(event.target===this)cerrarModalGenerico()" style="display:none;">
+  <div class="modal">
+    <h3 class="modal-title" id="modalGenericoTitulo"></h3>
+    <p class="modal-text" id="modalGenericoTexto"></p>
+    <div class="modal-actions" id="modalGenericoAcciones"></div>
+  </div>
+</div>
+
+<!-- Modal de planes y precios -->
+<div class="modal-overlay" id="modalPlan" onclick="if(event.target===this)cerrarModalPlan()" style="display:none;">
+  <div class="modal modal-plan">
+    <h3 class="modal-title" data-i18n="plan.titulo">Mejorar plan</h3>
+    <p class="modal-text" data-i18n="plan.subtitulo">Elige el plan que mejor se adapte a ti</p>
+    <div class="plan-grid">
+      <div class="plan-card">
+        <div class="plan-name" data-i18n="plan.gratisNombre">Gratis</div>
+        <div class="plan-precio">$0<span class="plan-periodo" data-i18n="plan.mensual">/mes</span></div>
+        <ul class="plan-features">
+          <li data-i18n="plan.gratisF1">3 mensajes gratis sin iniciar sesión</li>
+          <li data-i18n="plan.gratisF2">Todos los modelos de IA</li>
+          <li data-i18n="plan.gratisF3">Historial local en el navegador</li>
+        </ul>
+        <button class="plan-btn" disabled data-i18n="plan.actual">Plan actual</button>
+      </div>
+      <div class="plan-card plan-card-destacado">
+        <div class="plan-badge" data-i18n="plan.masPopular">Más popular</div>
+        <div class="plan-name" data-i18n="plan.proNombre">Pro</div>
+        <div class="plan-precio">$6<span class="plan-periodo" data-i18n="plan.mensual">/mes</span></div>
+        <ul class="plan-features">
+          <li data-i18n="plan.proF1">Mensajes ilimitados</li>
+          <li data-i18n="plan.proF2">Todos los modelos de IA</li>
+          <li data-i18n="plan.proF3">Historial ilimitado guardado</li>
+          <li data-i18n="plan.proF4">Soporte prioritario</li>
+        </ul>
+        <button class="plan-btn plan-btn-primario" onclick="elegirPlan('pro')" data-i18n="plan.elegir">Elegir plan</button>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name" data-i18n="plan.ultraNombre">Ultra</div>
+        <div class="plan-precio">$15<span class="plan-periodo" data-i18n="plan.mensual">/mes</span></div>
+        <ul class="plan-features">
+          <li data-i18n="plan.ultraF1">Todo lo de Pro</li>
+          <li data-i18n="plan.ultraF2">Respuestas más rápidas</li>
+          <li data-i18n="plan.ultraF3">Proyectos y biblioteca ilimitados</li>
+          <li data-i18n="plan.ultraF4">Nuevas funciones antes que nadie</li>
+        </ul>
+        <button class="plan-btn" onclick="elegirPlan('ultra')" data-i18n="plan.elegir">Elegir plan</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="cerrarModalPlan()" data-i18n="modal.ahoraNo">Ahora no</button>
+    </div>
+  </div>
+</div>
+
 <script src="script.js"></script>
 <script>
   if('serviceWorker' in navigator){
