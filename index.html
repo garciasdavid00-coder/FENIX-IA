@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Fenix IA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -105,7 +105,7 @@
   <div class="main">
     <div class="topbar">
       <div class="topbar-left">
-        <button class="toggle-btn-topbar" id="toggleTopbar" onclick="toggleSidebar()" style="display:none;">
+        <button class="toggle-btn-topbar" id="toggleTopbar" onclick="toggleSidebar()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20c4-1 6-5 6-9s2-8 6-9M4 20c2-4 2-9 6-13"/></svg>
         </button>
       </div>
@@ -287,6 +287,18 @@
             <div class="toggle-switch" id="toggleHistorial" onclick="toggleGuardarHistorial()">
               <div class="toggle-track">
                 <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+          <div class="config-row">
+            <div class="config-info">
+              <div class="config-label">Borrar todos los chats</div>
+              <div class="config-desc">Elimina todo el historial de conversaciones guardado</div>
+            </div>
+            <button class="config-btn-danger" onclick="borrarTodoElHistorial()">Borrar datos</button>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -344,19 +356,8 @@
       </div>
     </div>
   </div>
-          <div class="config-row">
-            <div class="config-info">
-              <div class="config-label">Borrar todos los chats</div>
-              <div class="config-desc">Elimina todo el historial de conversaciones guardado</div>
-            </div>
-            <button class="config-btn-danger" onclick="borrarTodoElHistorial()">Borrar datos</button>
-          </div>
-        </div>
 
-      </div>
-    </div>
-  </div>
-
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
 <script src="script.js"></script>
 </body>
 </html>

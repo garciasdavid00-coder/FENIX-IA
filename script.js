@@ -49,12 +49,52 @@ let idiomaSeleccionado = localStorage.getItem('fenixIdioma') || 'es';
 /* ======================
    SIDEBAR
 ====================== */
+function esMovil(){
+  return window.innerWidth <= 768;
+}
+
 function toggleSidebar(){
   const sidebar = document.getElementById('sidebar');
-  sidebar.classList.toggle('collapsed');
-  const colapsado = sidebar.classList.contains('collapsed');
-  document.getElementById('toggleTopbar').style.display = colapsado ? 'inline-flex' : 'none';
+  const backdrop = document.getElementById('sidebarBackdrop');
+  if(esMovil()){
+    // Modo teléfono: cajón lateral deslizante + fondo oscuro
+    const abrir = !sidebar.classList.contains('mobile-open');
+    sidebar.classList.toggle('mobile-open', abrir);
+    if(backdrop) backdrop.classList.toggle('show', abrir);
+  } else {
+    // Modo escritorio: colapsar el sidebar a ancho 0
+    sidebar.classList.toggle('collapsed');
+  }
 }
+
+function cerrarSidebarMovil(){
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  if(esMovil()){
+    sidebar.classList.remove('mobile-open');
+    if(backdrop) backdrop.classList.remove('show');
+  }
+}
+
+/* Al girar o cambiar de tamaño, si volvemos a escritorio limpiamos el drawer */
+window.addEventListener('resize', function(){
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  if(!esMovil()){
+    sidebar.classList.remove('mobile-open');
+    if(backdrop) backdrop.classList.remove('show');
+  }
+});
+
+/* Al hacer clic en cualquier elemento de navegación del sidebar en móvil,
+   cerramos el cajón automáticamente (excepto el bloque de usuario) */
+document.addEventListener('click', function(e){
+  if(!esMovil()) return;
+  const sidebar = document.getElementById('sidebar');
+  if(!sidebar.classList.contains('mobile-open')) return;
+  if(e.target.closest('#sidebarUser')) return;
+  if(e.target.closest('.sidebar')) cerrarSidebarMovil();
+});
 
 /* ======================
    AUTO-CRECER TEXTAREAS

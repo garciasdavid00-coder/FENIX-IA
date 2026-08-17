@@ -111,17 +111,23 @@ app.post('/api/logout', (req, res) => {
 
 app.post('/api/chat', async (req, res) => {
   try {
-    const { mensaje, historial, modelo } = req.body;
+    const { mensaje, historial, modelo, idioma } = req.body;
 
     if (!mensaje || typeof mensaje !== 'string') {
       return res.status(400).json({ error: 'Falta el campo "mensaje"' });
     }
 
-    const proveedor = (modelo === 'deepseek' || modelo === 'gemini') ? modelo : 'groq'; // groq es el default
+    const proveedor = (modelo === 'deepseek' || modelo === 'groq') ? modelo : 'gemini'; // gemini es el default
+
+    const nombresIdiomas = {
+      es: 'español', en: 'inglés', pt: 'portugués', fr: 'francés',
+      de: 'alemán', ja: 'japonés', zh: 'chino', ar: 'árabe'
+    };
+    const lang = nombresIdiomas[idioma] || 'español';
 
     // Construimos el historial de mensajes para dar contexto a la IA
     const mensajes = [
-      { role: 'system', content: 'Eres un asistente útil y amigable que responde en español.' },
+      { role: 'system', content: `Eres un asistente útil y amigable. Responde siempre en ${lang}.` },
       ...(Array.isArray(historial) ? historial : []),
       { role: 'user', content: mensaje }
     ];
@@ -143,11 +149,24 @@ app.post('/api/chat', async (req, res) => {
       // funciona con la misma estructura de petición que Groq y DeepSeek.
       url = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions';
       apiKey = GEMINI_API_KEY;
-      modeloIA = 'gemini-3-flash-preview'; // modelo con capa gratuita confirmada (ago 2026); si Google lo renombra, actualiza este valor
+      modeloIA = 'gemini-3.6-flash';
     } else {
       url = 'https://api.groq.com/openai/v1/chat/completions';
       apiKey = GROQ_API_KEY;
-      modeloIA = 'llama-3.3-70b-versatile';
+      modeloIA = 'qwen/qwen3.6-27b';
+    }
+
+    const bodyIA = {
+      model: modeloIA,
+      messages: mensajes,
+      temperature: 0.7,
+      max_tokens: 1024
+    };
+
+    // Groq y DeepSeek soportan desactivar el razonamiento para responder más rápido;
+    // Gemini no acepta este parámetro, así que solo lo mandamos a los que lo soportan.
+    if (proveedor !== 'gemini') {
+      bodyIA.reasoning_effort = 'none';
     }
 
     const respuestaIA = await fetch(url, {
@@ -156,12 +175,7 @@ app.post('/api/chat', async (req, res) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
-      body: JSON.stringify({
-        model: modeloIA,
-        messages: mensajes,
-        temperature: 0.7,
-        max_tokens: 1024
-      })
+      body: JSON.stringify(bodyIA)
     });
 
     if (!respuestaIA.ok) {
@@ -170,8 +184,17 @@ app.post('/api/chat', async (req, res) => {
       return res.status(respuestaIA.status).json({ error: 'Error al consultar la IA' });
     }
 
-    const data = await respuestaIA.json();
-    const respuestaTexto = data.choices?.[0]?.message?.content || 'No se recibió respuesta.';
+const data = await respuestaIA.json();
+    let respuestaTexto = data.choices?.[0]?.message?.content || 'No se recibió respuesta.';
+
+    // Qwen 3.6 envía razonamiento dentro de  thinking... response; lo eliminamos
+    respuestaTexto = respuestaTexto.replace(/ thinking[\s\S]*?<\/think>/g, '').trim();
+
+    // Gemini a veces incluye el texto del pensamiento dentro de "thinking" en content
+    respuestaTexto = respuestaTexto.replace(/^thinking[\s\S]*?<\/thinking>/i, '').trim();
+    respuestaTexto = respuestaTexto.replace(/^thinking[\s\S]*?\./i, '').trim();
+
+    if (!respuestaTexto) respuestaTexto = 'No se recibió respuesta.';
 
     res.json({ respuesta: respuestaTexto });
 
