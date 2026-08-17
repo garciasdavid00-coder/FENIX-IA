@@ -25,6 +25,13 @@ function inicializarTema(){
 function actualizarTextoTemaEnMenu(tema){
   const el = document.getElementById('temaTextoActual');
   if(el) el.textContent = tema === 'dark' ? 'Oscuro' : 'Claro';
+  const elConfig = document.getElementById('temaTextoConfig');
+  if(elConfig) elConfig.textContent = tema === 'dark' ? 'Oscuro' : 'Claro';
+  const track = document.querySelector('#toggleTema .toggle-track');
+  if(track){
+    if(tema === 'dark') track.classList.add('on');
+    else track.classList.remove('on');
+  }
 }
 
 // Se activa apenas carga el script, para evitar parpadeo del tema incorrecto
@@ -222,6 +229,7 @@ function ocultarTodasLasVistas(){
   document.getElementById('vistaProyectos').style.display = 'none';
   document.getElementById('vistaProyectoDetalle').style.display = 'none';
   document.getElementById('vistaBiblioteca').style.display = 'none';
+  document.getElementById('vistaConfiguracion').style.display = 'none';
 }
 
 function mostrarVistaChat(){
@@ -489,7 +497,7 @@ function toggleMenuModelo(e){
   menu.style.minWidth = '220px';
 
   menu.innerHTML = `
-    <div class="dropdown-item" data-modelo="groq">Groq (Llama 3.3)</div>
+    <div class="dropdown-item" data-modelo="groq">Groq (Qwen 3.6)</div>
     <div class="dropdown-item" data-modelo="deepseek">DeepSeek</div>
     <div class="dropdown-item" data-modelo="gemini">Gemini</div>
   `;
@@ -507,7 +515,7 @@ function toggleMenuModelo(e){
 
 function seleccionarModelo(modelo){
   modeloSeleccionado = modelo;
-  const nombres = { groq: 'Groq (Llama 3.3)', deepseek: 'DeepSeek', gemini: 'Gemini' };
+  const nombres = { groq: 'Groq (Qwen 3.6)', deepseek: 'DeepSeek', gemini: 'Gemini' };
   document.getElementById('modeloTextoActual').textContent = nombres[modelo] || modelo;
 }
 
@@ -535,26 +543,64 @@ function cerrarSesion(){
     .catch(err => console.error('Error al cerrar sesión:', err));
 }
 
+/* ======================
+   MENÚ DE USUARIO EN SIDEBAR
+====================== */
+function toggleMenuUsuario(e){
+  e.stopPropagation();
+  const menu = document.getElementById('sidebarUserMenu');
+  const arrow = document.querySelector('.sidebar-user-arrow');
+  const abierto = menu.classList.contains('open');
+
+  if(abierto){
+    menu.classList.remove('open');
+    arrow.classList.remove('open');
+  } else {
+    menu.classList.add('open');
+    arrow.classList.add('open');
+  }
+}
+
+function cerrarMenuUsuario(){
+  const menu = document.getElementById('sidebarUserMenu');
+  const arrow = document.querySelector('.sidebar-user-arrow');
+  if(menu) menu.classList.remove('open');
+  if(arrow) arrow.classList.remove('open');
+}
+
+document.addEventListener('click', function(e){
+  if(!e.target.closest('#sidebarUser')){
+    cerrarMenuUsuario();
+  }
+});
+
+function irAConfiguracion(){
+  cerrarMenuUsuario();
+  mostrarVistaConfiguracion();
+}
+
 function revisarSesionActual(){
   fetch(`${BACKEND_URL_AUTH}/api/usuario-actual`, { credentials: 'include' })
     .then(res => res.json())
     .then(data => {
-      const authArea = document.getElementById('authArea');
       if(data.autenticado && data.usuario){
         const u = data.usuario;
-        authArea.innerHTML = `
-          <div class="user-conectado">
-            ${u.foto ? `<img class="user-avatar" src="${u.foto}" alt="${escaparHTML(u.nombre || '')}">` : ''}
-            <span class="user-nombre">${escaparHTML(u.nombre || 'Usuario')}</span>
-            <button class="btn-logout" onclick="cerrarSesion()">Cerrar sesión</button>
-          </div>
-        `;
+        const avatar = document.getElementById('sidebarUserAvatar');
+        const nombre = document.getElementById('sidebarUserName');
+        const email = document.getElementById('sidebarUserEmail');
+        const logoutBtn = document.getElementById('sidebarUserLogout');
+        const loginBtn = document.getElementById('sidebarUserLogin');
+
+        if(u.foto){
+          avatar.innerHTML = `<img src="${u.foto}" alt="${escaparHTML(u.nombre || '')}">`;
+        }
+        nombre.textContent = u.nombre || 'Usuario';
+        email.textContent = u.correo || '';
+        if(logoutBtn) logoutBtn.style.display = 'flex';
+        if(loginBtn) loginBtn.style.display = 'none';
       }
-      // Si no está autenticado, dejamos el botón "Continuar con Google" que ya está en el HTML
     })
-    .catch(() => {
-      // Si el backend no está corriendo, simplemente no hacemos nada (se queda el botón de Google)
-    });
+    .catch(() => {});
 }
 
 // Revisamos la sesión apenas carga la página
@@ -727,3 +773,98 @@ function escaparHTML(texto){
   div.textContent = texto;
   return div.innerHTML;
 }
+
+/* ======================
+   CONFIGURACIÓN
+====================== */
+function mostrarVistaConfiguracion(){
+  ocultarTodasLasVistas();
+  document.getElementById('vistaConfiguracion').style.display = 'block';
+  sincronizarConfigUI();
+}
+
+function sincronizarConfigUI(){
+  const tema = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  const track = document.querySelector('#toggleTema .toggle-track');
+  const label = document.getElementById('temaTextoConfig');
+  if(track){
+    if(tema === 'dark') track.classList.add('on');
+    else track.classList.remove('on');
+  }
+  if(label) label.textContent = tema === 'dark' ? 'Oscuro' : 'Claro';
+
+  document.getElementById('configModelo').value = modeloSeleccionado;
+
+  const guardarH = localStorage.getItem('fenixGuardarHistorial');
+  const histTrack = document.querySelector('#toggleHistorial .toggle-track');
+  if(guardarH !== 'no' && histTrack){
+    histTrack.classList.add('on');
+  } else if(histTrack){
+    histTrack.classList.remove('on');
+  }
+
+  const promptGuardado = localStorage.getItem('fenixSystemPrompt');
+  if(promptGuardado){
+    document.getElementById('configSystemPrompt').value = promptGuardado;
+  }
+
+  const idiomaGuardado = localStorage.getItem('fenixIdioma');
+  if(idiomaGuardado){
+    document.getElementById('configIdioma').value = idiomaGuardado;
+  }
+}
+
+function seleccionarModeloConfig(modelo){
+  modeloSeleccionado = modelo;
+  const nombres = { groq: 'Groq (Qwen 3.6)', deepseek: 'DeepSeek', gemini: 'Gemini' };
+  document.getElementById('modeloTextoActual').textContent = nombres[modelo] || modelo;
+  localStorage.setItem('fenixModelo', modelo);
+}
+
+function toggleGuardarHistorial(){
+  const actual = localStorage.getItem('fenixGuardarHistorial');
+  const nuevo = actual === 'no' ? 'si' : 'no';
+  localStorage.setItem('fenixGuardarHistorial', nuevo);
+  const track = document.querySelector('#toggleHistorial .toggle-track');
+  if(nuevo === 'no') track.classList.remove('on');
+  else track.classList.add('on');
+}
+
+function borrarTodoElHistorial(){
+  if(!confirm('¿Estás seguro? Se eliminarán todos los chats, proyectos y archivos guardados.')) return;
+  historial = [];
+  chatActualId = null;
+  proyectos = [];
+  proyectoActualId = null;
+  archivosBiblioteca = [];
+  renderizarRecientes();
+  nuevoChat();
+  alert('Historial eliminado.');
+}
+
+// Guardar prompt del sistema cuando cambia el textarea
+document.addEventListener('DOMContentLoaded', function(){
+  const ta = document.getElementById('configSystemPrompt');
+  if(ta){
+    ta.addEventListener('input', function(){
+      localStorage.setItem('fenixSystemPrompt', this.value);
+    });
+  }
+  const selIdioma = document.getElementById('configIdioma');
+  if(selIdioma){
+    selIdioma.addEventListener('change', function(){
+      localStorage.setItem('fenixIdioma', this.value);
+    });
+  }
+});
+
+// Cargar modelo guardado al iniciar
+(function cargarConfigInicial(){
+  const modeloGuardado = localStorage.getItem('fenixModelo');
+  if(modeloGuardado){
+    modeloSeleccionado = modeloGuardado;
+    const nombres = { groq: 'Groq (Qwen 3.6)', deepseek: 'DeepSeek', gemini: 'Gemini' };
+    const el = document.getElementById('modeloTextoActual');
+    if(el) el.textContent = nombres[modeloGuardado] || modeloGuardado;
+  }
+})();
