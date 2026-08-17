@@ -9,6 +9,8 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'cambia_esto_por_algo_secreto';
@@ -18,6 +20,14 @@ if (!GROQ_API_KEY) {
   console.error('ERROR: No se encontró GROQ_API_KEY en el archivo .env');
   console.error('Crea un archivo .env en esta carpeta con: GROQ_API_KEY=tu_clave_aqui');
   process.exit(1);
+}
+
+if (!DEEPSEEK_API_KEY) {
+  console.warn('AVISO: No configuraste DEEPSEEK_API_KEY en .env — la opción DeepSeek no va a funcionar hasta que la agregues.');
+}
+
+if (!GEMINI_API_KEY) {
+  console.warn('AVISO: No configuraste GEMINI_API_KEY en .env — la opción Gemini no va a funcionar hasta que la agregues.');
 }
 
 const googleHabilitado = !!(GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET);
@@ -101,11 +111,13 @@ app.post('/api/logout', (req, res) => {
 
 app.post('/api/chat', async (req, res) => {
   try {
-    const { mensaje, historial } = req.body;
+    const { mensaje, historial, modelo } = req.body;
 
     if (!mensaje || typeof mensaje !== 'string') {
       return res.status(400).json({ error: 'Falta el campo "mensaje"' });
     }
+
+    const proveedor = (modelo === 'deepseek' || modelo === 'gemini') ? modelo : 'groq'; // groq es el default
 
     // Construimos el historial de mensajes para dar contexto a la IA
     const mensajes = [
@@ -114,27 +126,51 @@ app.post('/api/chat', async (req, res) => {
       { role: 'user', content: mensaje }
     ];
 
-    const respuestaGroq = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    let url, apiKey, modeloIA;
+
+    if (proveedor === 'deepseek') {
+      if (!DEEPSEEK_API_KEY) {
+        return res.status(400).json({ error: 'DeepSeek no está configurado en el servidor todavía.' });
+      }
+      url = 'https://api.deepseek.com/chat/completions';
+      apiKey = DEEPSEEK_API_KEY;
+      modeloIA = 'deepseek-v4-flash'; // el nombre viejo "deepseek-chat" se retiró el 24 de julio de 2026
+    } else if (proveedor === 'gemini') {
+      if (!GEMINI_API_KEY) {
+        return res.status(400).json({ error: 'Gemini no está configurado en el servidor todavía.' });
+      }
+      // Google ofrece un endpoint compatible con el formato de OpenAI, así que
+      // funciona con la misma estructura de petición que Groq y DeepSeek.
+      url = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions';
+      apiKey = GEMINI_API_KEY;
+      modeloIA = 'gemini-3-flash-preview'; // modelo con capa gratuita confirmada (ago 2026); si Google lo renombra, actualiza este valor
+    } else {
+      url = 'https://api.groq.com/openai/v1/chat/completions';
+      apiKey = GROQ_API_KEY;
+      modeloIA = 'llama-3.3-70b-versatile';
+    }
+
+    const respuestaIA = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${GROQ_API_KEY}`
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: modeloIA,
         messages: mensajes,
         temperature: 0.7,
         max_tokens: 1024
       })
     });
 
-    if (!respuestaGroq.ok) {
-      const errorData = await respuestaGroq.text();
-      console.error('Error de Groq:', errorData);
-      return res.status(respuestaGroq.status).json({ error: 'Error al consultar la IA' });
+    if (!respuestaIA.ok) {
+      const errorData = await respuestaIA.text();
+      console.error(`Error de ${proveedor}:`, errorData);
+      return res.status(respuestaIA.status).json({ error: 'Error al consultar la IA' });
     }
 
-    const data = await respuestaGroq.json();
+    const data = await respuestaIA.json();
     const respuestaTexto = data.choices?.[0]?.message?.content || 'No se recibió respuesta.';
 
     res.json({ respuesta: respuestaTexto });

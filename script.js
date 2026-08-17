@@ -1,4 +1,35 @@
 /* ======================
+   TEMA (claro / oscuro)
+====================== */
+function aplicarTema(tema){
+  document.documentElement.setAttribute('data-theme', tema);
+  localStorage.setItem('fenixTema', tema);
+  actualizarTextoTemaEnMenu(tema);
+}
+
+function alternarTema(){
+  const actual = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  aplicarTema(actual === 'dark' ? 'light' : 'dark');
+}
+
+function inicializarTema(){
+  const guardado = localStorage.getItem('fenixTema');
+  if(guardado){
+    aplicarTema(guardado);
+    return;
+  }
+  const prefiereOscuro = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  aplicarTema(prefiereOscuro ? 'dark' : 'light');
+}
+
+function actualizarTextoTemaEnMenu(tema){
+  const el = document.getElementById('temaTextoActual');
+  if(el) el.textContent = tema === 'dark' ? 'Oscuro' : 'Claro';
+}
+
+// Se activa apenas carga el script, para evitar parpadeo del tema incorrecto
+inicializarTema();
+/* ======================
    ESTADO GENERAL
 ====================== */
 let historial = []; // [{id, titulo, mensajes: [], pinned: false, proyectoId: null}]
@@ -126,7 +157,8 @@ function sendMessage(desdeVistaChat){
     })
     .then(data => {
       typingEl.remove();
-      agregarMensaje('bot', data.respuesta);
+      const burbujaBot = agregarMensaje('bot', '');
+      escribirTexto(burbujaBot, data.respuesta);
       guardarMensajeEnHistorial('bot', data.respuesta);
     })
     .catch(err => {
@@ -148,6 +180,37 @@ function agregarMensaje(tipo, texto, esTyping){
   contenedor.appendChild(burbuja);
   contenedor.scrollTop = contenedor.scrollHeight;
   return burbuja;
+}
+
+/* Solo hace auto-scroll si el usuario ya estaba cerca del final,
+   para no interrumpirlo si subió a leer algo anterior */
+function estaCercaDelFinalDelChat(contenedor){
+  return contenedor.scrollHeight - contenedor.scrollTop - contenedor.clientHeight < 80;
+}
+
+/* Escribe el texto de la respuesta letra por letra dentro de una burbuja
+   ya existente (creada con agregarMensaje), con scroll que acompaña
+   sin saltar de golpe al final */
+function escribirTexto(burbuja, textoCompleto, callback){
+  const contenedor = document.getElementById('messages');
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor-escribiendo';
+
+  let i = 0;
+  function paso(){
+    const debeSeguir = estaCercaDelFinalDelChat(contenedor);
+    if(i <= textoCompleto.length){
+      burbuja.textContent = textoCompleto.slice(0, i);
+      burbuja.appendChild(cursor);
+      i++;
+      if(debeSeguir) contenedor.scrollTop = contenedor.scrollHeight;
+      setTimeout(paso, 15);
+    } else {
+      cursor.remove();
+      if(callback) callback();
+    }
+  }
+  paso();
 }
 
 /* ======================
