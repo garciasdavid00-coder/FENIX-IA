@@ -67,7 +67,7 @@
           <span class="sidebar-menu-emoji">⚙️</span> Configuración
         </div>
         <div class="sidebar-user-menu-divider"></div>
-        <div class="sidebar-user-menu-item" onclick="irAConfiguracion()">
+        <div class="sidebar-user-menu-item" onclick="irAVistaIdioma()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z"/></svg>
           Idioma
         </div>
@@ -111,7 +111,7 @@
       </div>
       <div class="topbar-center" style="position:relative;">
         <button class="model-select" id="modeloSelectBtn" onclick="toggleMenuModelo(event)">
-          <span id="modeloTextoActual">Groq (Qwen 3.6)</span>
+          <span id="modeloTextoActual">Fenix 2.0</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
       </div>
@@ -234,9 +234,9 @@
             </div>
             <div class="config-select-wrap">
               <select class="config-select" id="configModelo" onchange="seleccionarModeloConfig(this.value)">
-                <option value="groq">Groq (Qwen 3.6)</option>
-                <option value="deepseek">DeepSeek</option>
+                <option value="groq" selected>Fenix 2.0</option>
                 <option value="gemini">Gemini</option>
+                <option value="deepseek">DeepSeek</option>
               </select>
             </div>
           </div>
@@ -265,6 +265,10 @@
                 <option value="en">English</option>
                 <option value="pt">Português</option>
                 <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+                <option value="ja">日本語</option>
+                <option value="zh">中文</option>
+                <option value="ar">العربية</option>
               </select>
             </div>
           </div>
@@ -283,9 +287,63 @@
             <div class="toggle-switch" id="toggleHistorial" onclick="toggleGuardarHistorial()">
               <div class="toggle-track">
                 <div class="toggle-thumb"></div>
-              </div>
-            </div>
+      </div>
+    </div>
+
+    <!-- Vista de Idioma -->
+    <div class="panel-view" id="vistaIdioma" style="display:none;">
+      <div class="lang-container">
+        <button class="btn-volver" onclick="mostrarVistaConfiguracion()">← Volver</button>
+        <div class="lang-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z"/></svg>
+          <h2>Idioma</h2>
+          <p class="lang-subtitle">Selecciona el idioma en el que la IA responderá</p>
+        </div>
+        <div class="lang-grid" id="langGrid">
+          <div class="lang-card" data-lang="es" onclick="seleccionarIdioma('es')">
+            <span class="lang-flag">🇪🇸</span>
+            <span class="lang-name">Español</span>
+            <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
+          <div class="lang-card" data-lang="en" onclick="seleccionarIdioma('en')">
+            <span class="lang-flag">🇺🇸</span>
+            <span class="lang-name">English</span>
+            <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="lang-card" data-lang="pt" onclick="seleccionarIdioma('pt')">
+            <span class="lang-flag">🇧🇷</span>
+            <span class="lang-name">Português</span>
+            <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="lang-card" data-lang="fr" onclick="seleccionarIdioma('fr')">
+            <span class="lang-flag">🇫🇷</span>
+            <span class="lang-name">Français</span>
+            <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="lang-card" data-lang="de" onclick="seleccionarIdioma('de')">
+            <span class="lang-flag">🇩🇪</span>
+            <span class="lang-name">Deutsch</span>
+            <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="lang-card" data-lang="ja" onclick="seleccionarIdioma('ja')">
+            <span class="lang-flag">🇯🇵</span>
+            <span class="lang-name">日本語</span>
+            <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="lang-card" data-lang="zh" onclick="seleccionarIdioma('zh')">
+            <span class="lang-flag">🇨🇳</span>
+            <span class="lang-name">中文</span>
+            <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="lang-card" data-lang="ar" onclick="seleccionarIdioma('ar')">
+            <span class="lang-flag">🇸🇦</span>
+            <span class="lang-name">العربية</span>
+            <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
           <div class="config-row">
             <div class="config-info">
               <div class="config-label">Borrar todos los chats</div>

@@ -44,6 +44,7 @@ let chatActualId = null;
 let proyectos = []; // [{id, nombre}]
 let proyectoActualId = null; // para saber en qué proyecto estamos parados
 let archivosBiblioteca = []; // [{id, nombre, tipo, tamanoKB, url}]
+let idiomaSeleccionado = localStorage.getItem('fenixIdioma') || 'es';
 
 /* ======================
    SIDEBAR
@@ -145,18 +146,30 @@ function sendMessage(desdeVistaChat){
   // URL de tu backend local. Si lo subes a un servidor real, cambia esto por esa URL.
   const BACKEND_URL = '/api/chat';
 
-  // Armamos el historial en formato que espera la API (role/content)
-  const chat = historial.find(c => c.id === chatActualId);
-  const historialParaAPI = chat
-    ? chat.mensajes
-        .filter(m => m.texto !== texto) // evita duplicar el mensaje que acabamos de mandar
-        .map(m => ({ role: m.tipo === 'user' ? 'user' : 'assistant', content: m.texto }))
-    : [];
+  let historialParaAPI = [];
+  try {
+    // Armamos el historial en formato que espera la API (role/content)
+    const chat = historial.find(c => c.id === chatActualId);
+    historialParaAPI = chat
+      ? chat.mensajes
+          .filter(m => m.texto !== texto) // evita duplicar el mensaje que acabamos de mandar
+          .map(m => ({ role: m.tipo === 'user' ? 'user' : 'assistant', content: m.texto }))
+      : [];
+  } catch (err) {
+    console.error('Error al armar historial:', err);
+  }
+
+  const payload = {
+    mensaje: texto,
+    historial: historialParaAPI,
+    modelo: modeloSeleccionado,
+    idioma: idiomaSeleccionado
+  };
 
   fetch(BACKEND_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ mensaje: texto, historial: historialParaAPI, modelo: modeloSeleccionado })
+    body: JSON.stringify(payload)
   })
     .then(res => {
       if (!res.ok) throw new Error('Error del servidor');
@@ -230,6 +243,7 @@ function ocultarTodasLasVistas(){
   document.getElementById('vistaProyectoDetalle').style.display = 'none';
   document.getElementById('vistaBiblioteca').style.display = 'none';
   document.getElementById('vistaConfiguracion').style.display = 'none';
+  document.getElementById('vistaIdioma').style.display = 'none';
 }
 
 function mostrarVistaChat(){
@@ -480,7 +494,7 @@ function filtrarRecientes(){
 /* ======================
    SELECTOR DE MODELO DE IA
 ====================== */
-let modeloSeleccionado = 'groq'; // 'groq' o 'deepseek'
+let modeloSeleccionado = 'groq';
 
 function toggleMenuModelo(e){
   e.stopPropagation();
@@ -497,9 +511,9 @@ function toggleMenuModelo(e){
   menu.style.minWidth = '220px';
 
   menu.innerHTML = `
-    <div class="dropdown-item" data-modelo="groq">Groq (Qwen 3.6)</div>
-    <div class="dropdown-item" data-modelo="deepseek">DeepSeek</div>
+    <div class="dropdown-item" data-modelo="groq">Fenix 2.0</div>
     <div class="dropdown-item" data-modelo="gemini">Gemini</div>
+    <div class="dropdown-item" data-modelo="deepseek">DeepSeek</div>
   `;
 
   menu.querySelectorAll('[data-modelo]').forEach(item => {
@@ -515,7 +529,7 @@ function toggleMenuModelo(e){
 
 function seleccionarModelo(modelo){
   modeloSeleccionado = modelo;
-  const nombres = { groq: 'Groq (Qwen 3.6)', deepseek: 'DeepSeek', gemini: 'Gemini' };
+  const nombres = { groq: 'Fenix 2.0', deepseek: 'DeepSeek', gemini: 'Gemini' };
   document.getElementById('modeloTextoActual').textContent = nombres[modelo] || modelo;
 }
 
@@ -577,6 +591,11 @@ document.addEventListener('click', function(e){
 function irAConfiguracion(){
   cerrarMenuUsuario();
   mostrarVistaConfiguracion();
+}
+
+function irAVistaIdioma(){
+  cerrarMenuUsuario();
+  mostrarVistaIdioma();
 }
 
 function revisarSesionActual(){
@@ -808,15 +827,14 @@ function sincronizarConfigUI(){
     document.getElementById('configSystemPrompt').value = promptGuardado;
   }
 
-  const idiomaGuardado = localStorage.getItem('fenixIdioma');
-  if(idiomaGuardado){
-    document.getElementById('configIdioma').value = idiomaGuardado;
-  }
+  const idiomaGuardado = localStorage.getItem('fenixIdioma') || 'es';
+  document.getElementById('configIdioma').value = idiomaGuardado;
+  idiomaSeleccionado = idiomaGuardado;
 }
 
 function seleccionarModeloConfig(modelo){
   modeloSeleccionado = modelo;
-  const nombres = { groq: 'Groq (Qwen 3.6)', deepseek: 'DeepSeek', gemini: 'Gemini' };
+  const nombres = { groq: 'Fenix 2.0', deepseek: 'DeepSeek', gemini: 'Gemini' };
   document.getElementById('modeloTextoActual').textContent = nombres[modelo] || modelo;
   localStorage.setItem('fenixModelo', modelo);
 }
@@ -854,6 +872,7 @@ document.addEventListener('DOMContentLoaded', function(){
   if(selIdioma){
     selIdioma.addEventListener('change', function(){
       localStorage.setItem('fenixIdioma', this.value);
+      idiomaSeleccionado = this.value;
     });
   }
 });
@@ -863,8 +882,44 @@ document.addEventListener('DOMContentLoaded', function(){
   const modeloGuardado = localStorage.getItem('fenixModelo');
   if(modeloGuardado){
     modeloSeleccionado = modeloGuardado;
-    const nombres = { groq: 'Groq (Qwen 3.6)', deepseek: 'DeepSeek', gemini: 'Gemini' };
+    const nombres = { groq: 'Fenix 2.0', deepseek: 'DeepSeek', gemini: 'Gemini' };
     const el = document.getElementById('modeloTextoActual');
     if(el) el.textContent = nombres[modeloGuardado] || modeloGuardado;
   }
+  // Cargar idioma guardado
+  const langGuardado = localStorage.getItem('fenixIdioma');
+  if(langGuardado){
+    actualizarIdiomaActivo(langGuardado);
+  }
 })();
+
+/* ======================
+   SELECCIÓN DE IDIOMA
+====================== */
+const nombresIdiomas = {
+  es: 'Español', en: 'English', pt: 'Português', fr: 'Français',
+  de: 'Deutsch', ja: '日本語', zh: '中文', ar: 'العربية'
+};
+
+function mostrarVistaIdioma(){
+  ocultarTodasLasVistas();
+  document.getElementById('vistaIdioma').style.display = 'block';
+  actualizarIdiomaActivo(idiomaSeleccionado);
+}
+
+function seleccionarIdioma(lang){
+  idiomaSeleccionado = lang;
+  localStorage.setItem('fenixIdioma', lang);
+  actualizarIdiomaActivo(lang);
+}
+
+function actualizarIdiomaActivo(lang){
+  idiomaSeleccionado = lang;
+  document.querySelectorAll('.lang-card').forEach(card => {
+    if(card.getAttribute('data-lang') === lang){
+      card.classList.add('active');
+    } else {
+      card.classList.remove('active');
+    }
+  });
+}
