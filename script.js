@@ -168,6 +168,7 @@ const TRADUCCIONES = {
     'plan.ultraF2': 'Respuestas más rápidas',
     'plan.ultraF3': 'Proyectos y biblioteca ilimitados',
     'plan.ultraF4': 'Nuevas funciones antes que nadie',
+    'modelo.auto': 'Auto',
     'apps.tituloInstalar': 'Instala la app',
     'apps.textoInstalar': 'Fenix IA funciona como una app instalable. Ábrela desde la pantalla de inicio como una app normal, sin perder tu historial.',
     'apps.instalarAhora': 'Instalar ahora',
@@ -294,6 +295,7 @@ const TRADUCCIONES = {
     'plan.ultraF2': 'Faster responses',
     'plan.ultraF3': 'Unlimited projects and library',
     'plan.ultraF4': 'New features before everyone',
+    'modelo.auto': 'Auto',
     'apps.tituloInstalar': 'Install the app',
     'apps.textoInstalar': 'Fenix IA works as an installable app. Open it from your home screen like a normal app, without losing your history.',
     'apps.instalarAhora': 'Install now',
@@ -420,6 +422,7 @@ const TRADUCCIONES = {
     'plan.ultraF2': 'Respostas mais rápidas',
     'plan.ultraF3': 'Projetos e biblioteca ilimitados',
     'plan.ultraF4': 'Novas funções antes de todos',
+    'modelo.auto': 'Auto',
     'apps.tituloInstalar': 'Instalar o app',
     'apps.textoInstalar': 'O Fenix IA funciona como um app instalável. Abra pela tela inicial como um app normal, sem perder seu histórico.',
     'apps.instalarAhora': 'Instalar agora',
@@ -546,6 +549,7 @@ const TRADUCCIONES = {
     'plan.ultraF2': 'Réponses plus rapides',
     'plan.ultraF3': 'Projets et bibliothèque illimités',
     'plan.ultraF4': 'Nouvelles fonctionnalités en avant-première',
+    'modelo.auto': 'Auto',
     'apps.tituloInstalar': "Installer l'app",
     'apps.textoInstalar': 'Fenix IA fonctionne comme une app installable. Ouvrez-la depuis votre écran d\'accueil comme une app normale, sans perdre votre historique.',
     'apps.instalarAhora': 'Installer maintenant',
@@ -672,6 +676,7 @@ const TRADUCCIONES = {
     'plan.ultraF2': 'Schnellere Antworten',
     'plan.ultraF3': 'Unbegrenzte Projekte und Bibliothek',
     'plan.ultraF4': 'Neue Funktionen zuerst',
+    'modelo.auto': 'Auto',
     'apps.tituloInstalar': 'App installieren',
     'apps.textoInstalar': 'Fenix IA funktioniert als installierbare App. Öffne sie vom Startbildschirm wie eine normale App, ohne deinen Verlauf zu verlieren.',
     'apps.instalarAhora': 'Jetzt installieren',
@@ -798,6 +803,7 @@ const TRADUCCIONES = {
     'plan.ultraF2': 'より速い応答',
     'plan.ultraF3': '無制限のプロジェクトとライブラリ',
     'plan.ultraF4': '誰よりも早く新機能を利用',
+    'modelo.auto': '自動',
     'apps.tituloInstalar': 'アプリをインストール',
     'apps.textoInstalar': 'Fenix IAはインストール可能なアプリとして動作します。履歴を失わずに通常のアプリとしてホーム画面から開けます。',
     'apps.instalarAhora': '今すぐインストール',
@@ -924,6 +930,7 @@ const TRADUCCIONES = {
     'plan.ultraF2': '更快的响应',
     'plan.ultraF3': '无限项目和文库',
     'plan.ultraF4': '抢先使用新功能',
+    'modelo.auto': '自动',
     'apps.tituloInstalar': '安装应用',
     'apps.textoInstalar': 'Fenix IA 可作为可安装的应用运行。像普通应用一样从主屏幕打开，不丢失历史记录。',
     'apps.instalarAhora': '立即安装',
@@ -1050,6 +1057,7 @@ const TRADUCCIONES = {
     'plan.ultraF2': 'استجابات أسرع',
     'plan.ultraF3': 'مشاريع ومكتبة غير محدودة',
     'plan.ultraF4': 'ميزات جديدة قبل الجميع',
+    'modelo.auto': 'تلقائي',
     'apps.tituloInstalar': 'تثبيت التطبيق',
     'apps.textoInstalar': 'يعمل Fenix IA كتطبيق قابل للتثبيت. افتحه من الشاشة الرئيسية كتطبيق عادي دون فقدان سجلك.',
     'apps.instalarAhora': 'ثبّت الآن',
@@ -1721,6 +1729,11 @@ function filtrarRecientes(){
 ====================== */
 let modeloSeleccionado = 'groq';
 
+function nombreModelo(m){
+  const map = { groq: 'Fenix 2.0', deepseek: 'DeepSeek', gemini: 'Gemini', auto: t('modelo.auto') };
+  return map[m] || m;
+}
+
 function toggleMenuModelo(e){
   e.stopPropagation();
   const yaAbierto = document.getElementById('menuModeloDropdown');
@@ -1736,6 +1749,7 @@ function toggleMenuModelo(e){
   menu.style.minWidth = '220px';
 
   menu.innerHTML = `
+    <div class="dropdown-item" data-modelo="auto">${t('modelo.auto')}</div>
     <div class="dropdown-item" data-modelo="groq">Fenix 2.0</div>
     <div class="dropdown-item" data-modelo="gemini">Gemini</div>
     <div class="dropdown-item" data-modelo="deepseek">DeepSeek</div>
@@ -1755,8 +1769,7 @@ function toggleMenuModelo(e){
 function seleccionarModelo(modelo){
   modeloSeleccionado = modelo;
   localStorage.setItem('fenixModelo', modelo);
-  const nombres = { groq: 'Fenix 2.0', deepseek: 'DeepSeek', gemini: 'Gemini' };
-  document.getElementById('modeloTextoActual').textContent = nombres[modelo] || modelo;
+  document.getElementById('modeloTextoActual').textContent = nombreModelo(modelo);
 }
 
 document.addEventListener('click', function(e){
@@ -2207,8 +2220,7 @@ function sincronizarConfigUI(){
 
 function seleccionarModeloConfig(modelo){
   modeloSeleccionado = modelo;
-  const nombres = { groq: 'Fenix 2.0', deepseek: 'DeepSeek', gemini: 'Gemini' };
-  document.getElementById('modeloTextoActual').textContent = nombres[modelo] || modelo;
+  document.getElementById('modeloTextoActual').textContent = nombreModelo(modelo);
   localStorage.setItem('fenixModelo', modelo);
 }
 
@@ -2259,9 +2271,8 @@ document.addEventListener('DOMContentLoaded', function(){
   const modeloGuardado = localStorage.getItem('fenixModelo');
   if(modeloGuardado){
     modeloSeleccionado = modeloGuardado;
-    const nombres = { groq: 'Fenix 2.0', deepseek: 'DeepSeek', gemini: 'Gemini' };
     const el = document.getElementById('modeloTextoActual');
-    if(el) el.textContent = nombres[modeloGuardado] || modeloGuardado;
+    if(el) el.textContent = nombreModelo(modeloGuardado);
   }
   // Cargar idioma guardado
   const langGuardado = localStorage.getItem('fenixIdioma');

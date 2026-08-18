@@ -5,6 +5,8 @@ const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const path = require('path');
+const db = require('./db');
+const { selectModel } = require('./modelRouter');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -59,23 +61,57 @@ app.use(passport.session());
 
 // Guardamos solo lo básico del usuario en la sesión
 passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((user, done) => done(null, user));
+
+// Al recuperar la sesión, refrescamos el plan desde la base de datos
+// (si está disponible) para que los cambios se reflejen al instante.
+passport.deserializeUser(async (user, done) => {
+  try {
+    const usuarioBD = await db.obtenerUsuarioPorGoogleId(user.id);
+    if (usuarioBD) {
+      done(null, { ...user, plan: usuarioBD.plan, planDesde: usuarioBD.plan_desde, planHasta: usuarioBD.plan_hasta });
+    } else {
+      done(null, user);
+    }
+  } catch (e) {
+    done(null, user); // si la BD falla, seguimos con los datos de la sesión
+  }
+});
 
 if (googleHabilitado) {
   passport.use(new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
     callbackURL: '/auth/google/callback'
-  }, (accessToken, refreshToken, profile, done) => {
-    // Aquí en el futuro puedes guardar/buscar el usuario en una base de datos.
-    // Por ahora solo pasamos sus datos básicos de Google.
-    const usuario = {
-      id: profile.id,
-      nombre: profile.displayName,
-      correo: profile.emails?.[0]?.value || null,
-      foto: profile.photos?.[0]?.value || null
-    };
-    return done(null, usuario);
+  }, async (accessToken, refreshToken, profile, done) => {
+    try {
+      // Guardamos o actualizamos el usuario en la base de datos.
+      const usuarioBD = await db.obtenerOCrearUsuario(profile.id, {
+        nombre: profile.displayName,
+        correo: profile.emails?.[0]?.value || null,
+        foto: profile.photos?.[0]?.value || null
+      });
+      const usuario = {
+        id: profile.id,
+        nombre: profile.displayName,
+        correo: profile.emails?.[0]?.value || null,
+        foto: profile.photos?.[0]?.value || null,
+        plan: usuarioBD?.plan || 'gratis',
+        planDesde: usuarioBD?.plan_desde || null,
+        planHasta: usuarioBD?.plan_hasta || null
+      };
+      return done(null, usuario);
+    } catch (e) {
+      console.error('Error guardando el usuario en la BD:', e.message);
+      // Si la BD falla, seguimos con los datos básicos de Google
+      const usuario = {
+        id: profile.id,
+        nombre: profile.displayName,
+        correo: profile.emails?.[0]?.value || null,
+        foto: profile.photos?.[0]?.value || null,
+        plan: 'gratis'
+      };
+      return done(null, usuario);
+    }
   }));
 
   app.get('/auth/google', passport.authenticate('google', {
@@ -106,6 +142,44 @@ app.post('/api/logout', (req, res) => {
   req.logout(() => {
     res.json({ ok: true });
   });
+});
+
+// Plan del usuario conectado
+app.get('/api/mi-plan', (req, res) => {
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
+    return res.json({ autenticado: false, plan: 'gratis' });
+  }
+  res.json({
+    autenticado: true,
+    plan: req.user.plan || 'gratis',
+    planDesde: req.user.planDesde || null,
+    planHasta: req.user.planHasta || null
+  });
+});
+
+// Cambia el plan del usuario (se llamará cuando exista el pago real).
+// Por ahora lo dejamos listo para conectar con Stripe/PayPal después.
+app.post('/api/cambiar-plan', async (req, res) => {
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
+    return res.status(401).json({ error: 'Debes iniciar sesión para cambiar de plan.' });
+  }
+  const { plan } = req.body || {};
+  if (!['pro', 'ultra', 'gratis'].includes(plan)) {
+    return res.status(400).json({ error: 'Plan no válido.' });
+  }
+  try {
+    const usuarioBD = await db.actualizarPlan(req.user.id, plan, 1);
+    if (!usuarioBD) {
+      return res.status(500).json({ error: 'Base de datos no disponible.' });
+    }
+    req.user.plan = usuarioBD.plan;
+    req.user.planDesde = usuarioBD.plan_desde;
+    req.user.planHasta = usuarioBD.plan_hasta;
+    res.json({ ok: true, plan: usuarioBD.plan, planHasta: usuarioBD.plan_hasta });
+  } catch (e) {
+    console.error('Error al cambiar el plan:', e.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 });
 
 // Guarda el historial de conversación en memoria por sesión simple (no persistente)
@@ -162,7 +236,12 @@ app.post('/api/chat', async (req, res) => {
       req.session.mensajesSinLogin = usados + 1;
     }
 
-    const proveedor = (modelo === 'deepseek' || modelo === 'groq') ? modelo : 'gemini'; // gemini es el default
+    // Si el usuario eligió un modelo en el dropdown (groq/gemini/deepseek),
+    // respetamos su elección. Si mandó "auto" o no mandó nada, el router decide.
+    const MODELOS_MANUALES = ['groq', 'gemini', 'deepseek'];
+    const proveedor = MODELOS_MANUALES.includes(modelo)
+      ? modelo
+      : selectModel(mensaje, historial);
 
     const nombresIdiomas = {
       es: 'español', en: 'inglés', pt: 'portugués', fr: 'francés',
@@ -286,4 +365,5 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  db.inicializar();
 });
