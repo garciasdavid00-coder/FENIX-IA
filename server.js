@@ -7,7 +7,6 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const path = require('path');
 const db = require('./db');
 const { selectModel } = require('./modelRouter');
-const voiceRoutes = require('./routes/voice');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -177,8 +176,49 @@ app.post('/api/sincronizar', async (req, res) => {
   }
 });
 
-// Voz en tiempo real: token efímero para Gemini Live API
-app.use(voiceRoutes);
+// Voz en tiempo real: token efímero para Gemini Live API.
+// (Va directo aquí para no depender de carpetas extra en el repo.)
+app.post('/api/voice-token', async (req, res) => {
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  if (!GEMINI_API_KEY) {
+    return res.status(500).json({ error: 'Gemini no está configurado en el servidor.' });
+  }
+
+  const ahora = Date.now();
+  const expireTime = new Date(ahora + 30 * 60 * 1000).toISOString();      // 30 min
+  const newSessionExpireTime = new Date(ahora + 60 * 1000).toISOString(); // 1 min
+
+  try {
+    // Pide a Google un token efímero de uso único (v1alpha).
+    const respuesta = await fetch(
+      'https://generativelanguage.googleapis.com/v1alpha/auth_tokens',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': GEMINI_API_KEY
+        },
+        body: JSON.stringify({
+          uses: 1,
+          expireTime,
+          newSessionExpireTime
+        })
+      }
+    );
+
+    const data = await respuesta.json().catch(() => ({}));
+    if (!respuesta.ok) {
+      console.error('Error creando token efímero:', JSON.stringify(data));
+      return res.status(respuesta.status).json({ error: 'No se pudo crear el token de voz.' });
+    }
+
+    // El valor del token viene en data.name (p. ej. "auth_tokens/xxxx").
+    res.json({ token: data.name || data.token, expiresAt: expireTime });
+  } catch (e) {
+    console.error('Error en /api/voice-token:', e.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
 
 // Plan del usuario conectado
 app.get('/api/mi-plan', (req, res) => {
