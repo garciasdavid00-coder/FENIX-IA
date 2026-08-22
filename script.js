@@ -82,6 +82,9 @@ const TRADUCCIONES = {
     'pill.hojasPrompt': 'Ayúdame a crear una hoja de cálculo para: ',
     'pill.presentacionesPrompt': 'Ayúdame a crear una presentación sobre: ',
     'pill.imagenesPrompt': 'Genera una imagen de: ',
+    'imagen.generando': 'Generando imagen…',
+    'imagen.error': '⚠️ No se pudo generar la imagen. Inténtalo de nuevo.',
+    'chat.imagenLista': 'Aquí tienes tu imagen:',
     'pill.escrituraPrompt': 'Ayúdame a escribir: ',
     'pill.resumenPrompt': 'Hazme un resumen de: ',
     'pill.sitiosPrompt': 'Búscame información sobre: ',
@@ -218,6 +221,9 @@ const TRADUCCIONES = {
     'pill.hojasPrompt': 'Help me create a spreadsheet for: ',
     'pill.presentacionesPrompt': 'Help me create a presentation about: ',
     'pill.imagenesPrompt': 'Generate an image of: ',
+    'imagen.generando': 'Generating image…',
+    'imagen.error': '⚠️ Could not generate the image. Please try again.',
+    'chat.imagenLista': 'Here is your image:',
     'pill.escrituraPrompt': 'Help me write: ',
     'pill.resumenPrompt': 'Give me a summary of: ',
     'pill.sitiosPrompt': 'Search for information about: ',
@@ -354,6 +360,9 @@ const TRADUCCIONES = {
     'pill.hojasPrompt': 'Ajude-me a criar uma planilha para: ',
     'pill.presentacionesPrompt': 'Ajude-me a criar uma apresentação sobre: ',
     'pill.imagenesPrompt': 'Gere uma imagem de: ',
+    'imagen.generando': 'Gerando imagem…',
+    'imagen.error': '⚠️ Não foi possível gerar a imagem. Tente novamente.',
+    'chat.imagenLista': 'Aqui está a sua imagem:',
     'pill.escrituraPrompt': 'Ajude-me a escrever: ',
     'pill.resumenPrompt': 'Faça um resumo de: ',
     'pill.sitiosPrompt': 'Pesquise informações sobre: ',
@@ -490,6 +499,9 @@ const TRADUCCIONES = {
     'pill.hojasPrompt': "Aide-moi à créer une feuille de calcul pour : ",
     'pill.presentacionesPrompt': "Aide-moi à créer une présentation sur : ",
     'pill.imagenesPrompt': 'Génère une image de : ',
+    'imagen.generando': 'Génération de l\'image…',
+    'imagen.error': '⚠️ Impossible de générer l\'image. Veuillez réessayer.',
+    'chat.imagenLista': 'Voici votre image :',
     'pill.escrituraPrompt': "Aide-moi à écrire : ",
     'pill.resumenPrompt': 'Fais-moi un résumé de : ',
     'pill.sitiosPrompt': "Cherche-moi des informations sur : ",
@@ -626,6 +638,9 @@ const TRADUCCIONES = {
     'pill.hojasPrompt': 'Hilf mir, eine Tabelle zu erstellen für: ',
     'pill.presentacionesPrompt': 'Hilf mir, eine Präsentation zu erstellen über: ',
     'pill.imagenesPrompt': 'Erzeuge ein Bild von: ',
+    'imagen.generando': 'Bild wird erstellt…',
+    'imagen.error': '⚠️ Das Bild konnte nicht erstellt werden. Bitte versuche es erneut.',
+    'chat.imagenLista': 'Hier ist dein Bild:',
     'pill.escrituraPrompt': 'Hilf mir zu schreiben: ',
     'pill.resumenPrompt': 'Fass mir zusammen: ',
     'pill.sitiosPrompt': 'Suche nach Informationen über: ',
@@ -762,6 +777,9 @@ const TRADUCCIONES = {
     'pill.hojasPrompt': 'のためのスプレッドシートの作成を手伝ってください: ',
     'pill.presentacionesPrompt': 'についてのプレゼンテーションの作成を手伝ってください: ',
     'pill.imagenesPrompt': 'の画像を生成してください: ',
+    'imagen.generando': '画像を生成中…',
+    'imagen.error': '⚠️ 画像を生成できませんでした。もう一度お試しください。',
+    'chat.imagenLista': '画像ができあがりました：',
     'pill.escrituraPrompt': 'の執筆を手伝ってください: ',
     'pill.resumenPrompt': 'の要約を作ってください: ',
     'pill.sitiosPrompt': 'についての情報を検索してください: ',
@@ -898,6 +916,9 @@ const TRADUCCIONES = {
     'pill.hojasPrompt': '帮我为以下内容创建一个电子表格：',
     'pill.presentacionesPrompt': '帮我创建一个关于以下内容的演示文稿：',
     'pill.imagenesPrompt': '生成一张图片：',
+    'imagen.generando': '正在生成图片…',
+    'imagen.error': '⚠️ 无法生成图片，请重试。',
+    'chat.imagenLista': '这是你的图片：',
     'pill.escrituraPrompt': '帮我写：',
     'pill.resumenPrompt': '为我总结一下：',
     'pill.sitiosPrompt': '搜索关于以下内容的信息：',
@@ -1034,6 +1055,9 @@ const TRADUCCIONES = {
     'pill.hojasPrompt': 'ساعدني في إنشاء جدول بيانات لـ: ',
     'pill.presentacionesPrompt': 'ساعدني في إنشاء عرض تقديمي حول: ',
     'pill.imagenesPrompt': 'أنشئ صورة لـ: ',
+    'imagen.generando': 'جارٍ إنشاء الصورة…',
+    'imagen.error': '⚠️ تعذر إنشاء الصورة. حاول مرة أخرى.',
+    'chat.imagenLista': 'إليك صورتك:',
     'pill.escrituraPrompt': 'ساعدني في كتابة: ',
     'pill.resumenPrompt': 'أعطني ملخصًا عن: ',
     'pill.sitiosPrompt': 'ابحث لي عن معلومات حول: ',
@@ -1616,6 +1640,12 @@ function sendMessage(desdeVistaChat){
 
   const typingEl = agregarMensaje('bot', t('chat.escribiendo'), true);
 
+  // Pide una imagen: se va por /api/imagen (Pollinations) en vez del chat normal.
+  if(esPeticionImagen(texto)){
+    enviarPeticionImagen(texto, typingEl);
+    return;
+  }
+
   // URL de tu backend local. Si lo subes a un servidor real, cambia esto por esa URL.
   const BACKEND_URL = '/api/chat';
 
@@ -1695,7 +1725,9 @@ function sendMessage(desdeVistaChat){
           }
           if(typeof obj.texto === 'string' && obj.texto){
             textoAcumulado += obj.texto;
-            burbujaBot.textContent = textoAcumulado;
+            // Si el modelo pidió una imagen, no mostramos el marcador crudo.
+            const visible = textoAcumulado.replace(/\[GENERAR_IMAGEN\][\s\S]*$/i, '');
+            burbujaBot.textContent = visible.trim() ? visible : t('imagen.generando');
             burbujaBot.appendChild(cursor);
             if(estaCercaDelFinalDelChat(contenedor)) contenedor.scrollTop = contenedor.scrollHeight;
           }
@@ -1711,7 +1743,21 @@ function sendMessage(desdeVistaChat){
         if(errorStream){
           burbujaBot.textContent = '⚠️ ' + errorStream;
         } else if(textoAcumulado){
-          guardarMensajeEnHistorial('bot', textoAcumulado);
+          // El modelo puede responder con [GENERAR_IMAGEN]: descripcion
+          // para pedirnos que creemos la imagen.
+          const coincidencia = textoAcumulado.match(/\[GENERAR_IMAGEN\]\s*:?\s*([\s\S]+)/i);
+          if(coincidencia && coincidencia[1].trim()){
+            generarImagenEnBurbuja(burbujaBot, coincidencia[1].trim(), t('chat.imagenLista'));
+          } else {
+            // Marcador a medias (usuario detuvo la generación): limpiamos.
+            const limpio = textoAcumulado.replace(/\[GENERAR_IM[\s\S]*$/i, '').trim();
+            if(limpio){
+              burbujaBot.textContent = limpio;
+              guardarMensajeEnHistorial('bot', limpio);
+            } else {
+              burbujaBot.remove();
+            }
+          }
         } else {
           burbujaBot.textContent = '⚠️ ' + t('error.servidor');
         }
@@ -1760,13 +1806,94 @@ function sendMessage(desdeVistaChat){
 }
 
 /* ======================
+   GENERACIÓN DE IMÁGENES
+====================== */
+// Detecta si el mensaje pide crear una imagen (necesita verbo + objeto de imagen,
+// para no confundirse con preguntas que solo mencionan "imagen").
+function esPeticionImagen(texto){
+  if(!texto || texto.length > 300) return false;
+  // Quita acentos para cubrir francés/portugués/español con la misma regla.
+  const t = texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC');
+  // Pedir un dibujo/pintura ya es crear una imagen por sí solo.
+  const DIBUJO = /(dibuj|pint|desenh|draw|paint|zeichn)/;
+  if(DIBUJO.test(t)) return true;
+  const OBJETO = /(imagen|imagem|image|picture|photo|fotografia|foto|dibujo|ilustracion|illustration|drawing|retrato|portrait|logo|icono|icon|avatar|poster|sticker|wallpaper|bild)|画像|图片|照片|صورة/;
+  const ACCION = /(gener|crea|cria|gere|erzeug|hazme|muestr|mostra|show|quiero|dame)|生成|作成|أنشئ|صمم/;
+  return OBJETO.test(t) && ACCION.test(t);
+}
+
+let imagenEnCurso = false;
+
+async function enviarPeticionImagen(texto, typingEl){
+  if(imagenEnCurso) return;
+  imagenEnCurso = true;
+  try {
+    await generarImagenEnBurbuja(typingEl, texto, t('chat.imagenLista'));
+  } finally {
+    imagenEnCurso = false;
+  }
+}
+
+/* Pide la imagen al servidor y la pinta dentro de una burbuja ya creada
+   (la usan tanto los mensajes detectados en el cliente como el marcador
+   [GENERAR_IMAGEN] que puede devolver el propio modelo). */
+async function generarImagenEnBurbuja(burbuja, descripcion, pieTexto){
+  burbuja.className = 'msg msg-bot typing';
+  burbuja.textContent = t('imagen.generando');
+  try {
+    const res = await fetch('/api/imagen', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: descripcion })
+    });
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok || !data.url){
+      console.error('Error generando imagen:', data);
+      throw new Error(data.error || 'sin url');
+    }
+    burbuja.className = 'msg msg-bot';
+    agregarImagenABurbuja(burbuja, data.url, pieTexto || '');
+    guardarMensajeEnHistorial('bot', pieTexto || '', data.url);
+  } catch(err){
+    burbuja.className = 'msg msg-bot';
+    burbuja.textContent = t('imagen.error');
+    console.error(err);
+  }
+}
+
+/* Mete la imagen (y su pie de foto) dentro de una burbuja vacía. */
+function agregarImagenABurbuja(burbuja, imagenUrl, pieTexto){
+  burbuja.textContent = '';
+  const img = document.createElement('img');
+  img.src = imagenUrl;
+  img.alt = pieTexto || 'Imagen generada';
+  img.className = 'msg-imagen';
+  img.loading = 'lazy';
+  img.addEventListener('load', () => {
+    const c = document.getElementById('messages');
+    if(estaCercaDelFinalDelChat(c)) c.scrollTop = c.scrollHeight;
+  });
+  burbuja.appendChild(img);
+  if(pieTexto){
+    const pie = document.createElement('div');
+    pie.className = 'msg-pie';
+    pie.textContent = pieTexto;
+    burbuja.appendChild(pie);
+  }
+}
+
+/* ======================
    MOSTRAR MENSAJE EN PANTALLA
 ====================== */
-function agregarMensaje(tipo, texto, esTyping){
+function agregarMensaje(tipo, texto, esTyping, imagenUrl){
   const contenedor = document.getElementById('messages');
   const burbuja = document.createElement('div');
   burbuja.className = 'msg ' + (tipo === 'user' ? 'msg-user' : 'msg-bot') + (esTyping ? ' typing' : '');
-  burbuja.textContent = texto;
+  if(imagenUrl){
+    agregarImagenABurbuja(burbuja, imagenUrl, texto || '');
+  } else {
+    burbuja.textContent = texto;
+  }
   contenedor.appendChild(burbuja);
   contenedor.scrollTop = contenedor.scrollHeight;
   return burbuja;
@@ -1853,9 +1980,9 @@ function crearNuevoChatEnHistorial(primerMensaje){
   persistirDatos();
 }
 
-function guardarMensajeEnHistorial(tipo, texto){
+function guardarMensajeEnHistorial(tipo, texto, imagen){
   const chat = historial.find(c => c.id === chatActualId);
-  if(chat) chat.mensajes.push({ tipo, texto });
+  if(chat) chat.mensajes.push(imagen ? { tipo, texto, imagen } : { tipo, texto });
   persistirDatos();
 }
 
@@ -2051,7 +2178,7 @@ function abrirChat(id){
   chatActualId = id;
   mostrarVistaChat();
   document.getElementById('messages').innerHTML = '';
-  chat.mensajes.forEach(m => agregarMensaje(m.tipo, m.texto));
+  chat.mensajes.forEach(m => agregarMensaje(m.tipo, m.texto, false, m.imagen));
 }
 
 /* ======================

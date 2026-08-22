@@ -220,6 +220,88 @@ app.post('/api/voice-token', async (req, res) => {
   }
 });
 
+// Generación de imágenes con Pollinations.ai (gratis y sin API key).
+// Devolvemos la URL con semilla fija: la misma URL vuelve a dar la misma
+// imagen, así el historial guarda solo la dirección (no llena localStorage).
+app.post('/api/imagen', async (req, res) => {
+  try {
+    const prompt = ((req.body && req.body.prompt) || '').trim().slice(0, 500);
+    if (!prompt) {
+      return res.status(400).json({ error: 'Falta la descripción de la imagen.' });
+    }
+
+    const seed = Math.floor(Math.random() * 1e9);
+    // Devolvemos una ruta de NUESTRO servidor: el navegador nunca depende
+    // de terceros (adblockers ni redes que bloqueen pollinations).
+    const url = '/api/imagen-archivo?q=' + encodeURIComponent(prompt) + '&s=' + seed;
+
+    // Verificamos que la imagen se genera bien antes de responder al cliente.
+    const controlador = new AbortController();
+    const timeout = setTimeout(() => controlador.abort(), 90000);
+    let respuesta;
+    try {
+      respuesta = await fetch(
+        'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) +
+        '?width=1024&height=1024&nologo=true&seed=' + seed,
+        { signal: controlador.signal }
+      );
+    } finally {
+      clearTimeout(timeout);
+    }
+
+    const tipo = respuesta.headers.get('content-type') || '';
+    if (!respuesta.ok || !tipo.startsWith('image/')) {
+      console.error('Pollinations respondió', respuesta.status, tipo);
+      return res.status(502).json({ error: 'No se pudo generar la imagen. Intenta de nuevo.' });
+    }
+    // Consumimos el cuerpo para liberar la conexión (Pollinations la cachea
+    // y /api/imagen-archivo la volverá a pedir con la misma semilla).
+    await respuesta.arrayBuffer().catch(() => {});
+
+    res.json({ url });
+  } catch (e) {
+    console.error('Error en /api/imagen:', e.message);
+    res.status(502).json({ error: 'No se pudo generar la imagen. Intenta de nuevo.' });
+  }
+});
+
+// Sirve la imagen generada haciendo de intermediario (proxy).
+// Con la misma pregunta y semilla, Pollinations devuelve siempre la misma
+// imagen, así que podemos cachearla en el navegador sin miedo.
+app.get('/api/imagen-archivo', async (req, res) => {
+  try {
+    const prompt = ((req.query.q) || '').trim().slice(0, 500);
+    if (!prompt) return res.status(400).end();
+    const seed = /^\d{1,12}$/.test(req.query.s || '') ? req.query.s : '1';
+
+    const controlador = new AbortController();
+    const timeout = setTimeout(() => controlador.abort(), 90000);
+    let r;
+    try {
+      r = await fetch(
+        'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) +
+        '?width=1024&height=1024&nologo=true&seed=' + seed,
+        { signal: controlador.signal }
+      );
+    } finally {
+      clearTimeout(timeout);
+    }
+
+    const tipo = (r.headers.get('content-type') || '').split(';')[0];
+    if (!r.ok || !tipo.startsWith('image/')) {
+      console.error('Pollinations respondió', r.status, tipo, '(imagen-archivo)');
+      return res.status(502).end();
+    }
+    const bytes = Buffer.from(await r.arrayBuffer());
+    res.set('Content-Type', tipo);
+    res.set('Cache-Control', 'public, max-age=604800');
+    res.send(bytes);
+  } catch (e) {
+    console.error('Error en /api/imagen-archivo:', e.message);
+    res.status(502).end();
+  }
+});
+
 // Plan del usuario conectado
 app.get('/api/mi-plan', (req, res) => {
   if (!req.isAuthenticated || !req.isAuthenticated()) {
@@ -483,11 +565,29 @@ app.post('/api/chat', async (req, res) => {
       : '';
 
     // Construimos el historial de mensajes para dar contexto a la IA
-    const sistemaBase = `Eres Fenix IA, un asistente útil y amigable. Responde siempre en ${lang}. Tu creador es Joshua Blandon Gonzales, y debes responder de forma distinta según lo que te pregunten:
+    const sistemaBase = `Eres Fenix IA, un asistente útil y amigable. Responde siempre en ${lang}. Tu creador es Joshua Blandon Gonzales.
 
-1) Si te preguntan quién es tu creador, quién te creó o quién te programó, responde textualmente y con orgullo: "Soy Fenix IA, y fui creado por Joshua Blandon Gonzales. Es un brillante desarrollador full-stack y un verdadero visionario tecnológico que me construyó desde cero, fusionando pasión, creatividad y conocimiento en cada línea de código, con la misión de llevar la inteligencia artificial a todos de forma accesible y poderosa. ¡Es un placer ser su creación!"
+1) Si te preguntan quién es tu creador, quién te creó o quién te programó, responde: "Soy Fenix IA, y fui creado por Joshua Blandon Gonzales."
 
-2) Si te preguntan quién es Joshua Blandon o simplemente quién es Joshua, responde con tacto y de forma breve que "Joshua" es un nombre con origen bíblico (en la Biblia, Josué fue el sucesor de Moisés y el líder que llevó al pueblo de Israel a la Tierra Prometida), y que también es el nombre de varias personas famosas, como actores, músicos y deportistas. No des información sobre personas reales que conozcas; en su lugar, pregunta amablemente al usuario a qué Joshua se refiere o qué le gustaría saber, por ejemplo: "¿A qué Joshua te refieres? Hay varios personajes famosos con ese nombre. Dime más y con gusto te ayudo."`;
+2) Si te preguntan quién es Joshua Blandon o simplemente quién es Joshua, responde con tacto y de forma breve que "Joshua" es un nombre con origen bíblico (en la Biblia, Josué fue el sucesor de Moisés y el líder que llevó al pueblo de Israel a la Tierra Prometida), y que también es el nombre de varias personas famosas, como actores, músicos y deportistas. No des información sobre personas reales que conozcas; en su lugar, pregunta amablemente al usuario a qué Joshua se refiere o qué le gustaría saber, por ejemplo: "¿A qué Joshua te refieres? Hay varios personajes famosos con ese nombre. Dime más y con gusto te ayudo."
+
+3) Sé honesto/a y directo/a. Prioriza la verdad y la precisión sobre complacer al usuario. Nunca inventes información, datos, fuentes, resultados, capacidades o hechos. Si no sabes algo, díselo claramente. Si no tienes suficiente información, pide la aclaración o explica la limitación.
+
+4) No seas aduladora. No le des la razón al usuario automáticamente. No uses elogios innecesarios como "Tienes toda la razón", "Excelente pregunta", "Qué buena idea", "Exactamente", etc., a menos que realmente lo merezca.
+
+5) Si el usuario está equivocado, se amable pero claro. Explica brevemente cuál es el error y proporciona la información correcta.
+
+6) Practica el pensamiento crítico. Analiza las afirmaciones y propuestas del usuario. Si detectas una contradicción, error, mala suposición o una alternativa considerablemente mejor, Señálalo. No aceptes una premisa falsa simplemente porque el usuario la presenta como cierta.
+
+7) Cuando no tengas suficiente certeza, reconoce la incertidumbre. Diferencia entre hechos, estimaciones, inferencias y opiniones. Nunca presentes una suposición como un hecho.
+
+8) Responde de forma directa y natural. Responde primero a lo que el usuario preguntó. Evita relleno, frases genéricas y explicaciones innecesarias. Ser directa no significa ser grosera; puedes contradecir al usuario sin insultarlo, burlarte o tratarlo mal.
+
+9) Tu objetivo principal no es conseguir la aprobación del usuario. Tu objetivo es proporcionar la respuesta más útil, precisa y honesta posible.
+
+10) Puedes crear imágenes. Cuando el usuario pida generar, crear o dibujar una imagen (por ejemplo "genera una imagen de un gato", "dibuja un perro negro", "quiero un avatar"), responde ÚNICAMENTE con una sola línea en este formato exacto, sin explicar nada antes ni después:
+[GENERAR_IMAGEN]: <descripción breve y visual de la imagen, en inglés>
+No uses ese formato si solo preguntan sobre imágenes existentes o teoría; en ese caso responde normalmente.`;
 
     // Si el usuario definió su propia "Instrucción del sistema" en Configuración,
     // la añadimos para que la IA la cumpla además del comportamiento base.
