@@ -141,8 +141,14 @@
             <button class="mic-btn" onclick="usarMicrofono()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
             </button>
-            <button class="send-btn" onclick="sendMessage()">
+            <button class="mic-btn voz-btn" id="vozBtnInicial" title="Voz en vivo" onclick="toggleVozEnVivo()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><path d="M8 21h8"/></svg>
+            </button>
+            <button class="send-btn" id="sendBtnInicial" onclick="sendMessage()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+            </button>
+            <button class="send-btn stop-btn" id="stopBtnInicial" onclick="detenerGeneracion()" style="display:none;" title="Detener respuesta">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
             </button>
           </div>
         </div>
@@ -171,8 +177,14 @@
             <button class="mic-btn" onclick="usarMicrofono()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
             </button>
-            <button class="send-btn" onclick="sendMessage(true)">
+            <button class="mic-btn voz-btn" id="vozBtnChat" title="Voz en vivo" onclick="toggleVozEnVivo()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><path d="M8 21h8"/></svg>
+            </button>
+            <button class="send-btn" id="sendBtnChat" onclick="sendMessage(true)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+            </button>
+            <button class="send-btn stop-btn" id="stopBtnChat" onclick="detenerGeneracion()" style="display:none;" title="Detener respuesta">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
             </button>
           </div>
         </div>
@@ -439,13 +451,43 @@
   </div>
 </div>
 
-<script src="script.js"></script>
+<!-- Modal de voz en vivo (conversación hablada con la IA) -->
+<div class="modal-overlay" id="modalVoz" onclick="if(event.target===this)cerrarModalVoz()" style="display:none;">
+  <div class="modal modal-voz">
+    <div class="modal-voz-head">
+      <h3 class="modal-title" data-i18n="voz.titulo">Voz en vivo</h3>
+      <button class="modal-voz-close" onclick="cerrarModalVoz()" aria-label="Cerrar">×</button>
+    </div>
+    <div class="modal-voz-estado" id="vozEstado">
+      <span class="modal-voz-dot conectando" id="vozDot"></span>
+      <span id="vozEstadoTexto" data-i18n="voz.conectando">Conectando...</span>
+    </div>
+    <div class="modal-voz-transcript" id="vozTranscript"></div>
+    <div class="modal-voz-debug" id="vozDebug">mic: 0 | ia: 0</div>
+    <p class="modal-voz-sugerencia" data-i18n="voz.sugerencia">Toca el botón rojo para terminar.</p>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-peligro" onclick="cerrarModalVoz()" data-i18n="voz.terminar">Terminar</button>
+    </div>
+  </div>
+</div>
+
+<script src="voiceClient.js?v=7"></script>
+<script src="script.js?v=7"></script>
 <script>
   if('serviceWorker' in navigator){
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('/sw.js').catch(function(err){
-        console.error('Error al registrar el service worker:', err);
-      });
+      navigator.serviceWorker.register('/sw.js')
+        .then(function(reg){
+          // Fuerza revisar si hay una versión nueva del service worker
+          reg.update();
+          // Si un SW nuevo toma el control, recargamos para servir la versión fresca
+          navigator.serviceWorker.addEventListener('controllerchange', function(){
+            window.location.reload();
+          });
+        })
+        .catch(function(err){
+          console.error('Error al registrar el service worker:', err);
+        });
     });
   }
 </script>

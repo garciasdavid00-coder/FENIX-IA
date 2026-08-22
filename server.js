@@ -7,6 +7,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const path = require('path');
 const db = require('./db');
 const { selectModel } = require('./modelRouter');
+const voiceRoutes = require('./routes/voice');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -43,7 +44,7 @@ if (!googleHabilitado) {
 app.set('trust proxy', 1);
 
 app.use(cors({ credentials: true }));
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 
 app.use(session({
   secret: SESSION_SECRET,
@@ -144,6 +145,41 @@ app.post('/api/logout', (req, res) => {
   });
 });
 
+// Historial en la nube: devuelve los chats y proyectos de la cuenta logueada.
+app.get('/api/sincronizar', async (req, res) => {
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
+    return res.status(401).json({ error: 'Debes iniciar sesión.' });
+  }
+  try {
+    const datos = await db.obtenerDatos(req.user.id);
+    res.json(datos || { chats: [], proyectos: [] });
+  } catch (e) {
+    console.error('Error al leer historial:', e.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// Guarda el historial completo de la cuenta logueada (snapshot).
+app.post('/api/sincronizar', async (req, res) => {
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
+    return res.status(401).json({ error: 'Debes iniciar sesión.' });
+  }
+  const { chats, proyectos } = req.body || {};
+  if (!Array.isArray(chats) || !Array.isArray(proyectos)) {
+    return res.status(400).json({ error: 'Formato inválido.' });
+  }
+  try {
+    await db.sincronizarDatos(req.user.id, { chats, proyectos });
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('Error al guardar historial:', e.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// Voz en tiempo real: token efímero para Gemini Live API
+app.use(voiceRoutes);
+
 // Plan del usuario conectado
 app.get('/api/mi-plan', (req, res) => {
   if (!req.isAuthenticated || !req.isAuthenticated()) {
@@ -215,6 +251,158 @@ function mensajeErrorIA(proveedor, status, cuerpo){
     return `El servicio ${proveedor} está teniendo problemas. Intenta de nuevo en unos segundos.`;
   }
   return `El servicio ${proveedor} devolvió un error. Intenta de nuevo.`;
+}
+
+// Lee el stream SSE del proveedor (Groq/Gemini/DeepSeek) y llama onTexto
+// por cada fragmento de contenido nuevo que llega. Si opciones.esActivo()
+// devuelve false (cliente desconectado), corta la lectura para no gastar tokens.
+async function leerStreamSSE(respuestaIA, onTexto, opciones){
+  const reader = respuestaIA.body.getReader();
+  if(opciones && opciones.setLector) opciones.setLector(reader);
+  const dec = new TextDecoder();
+  let buffer = '';
+
+  function procesarLinea(linea){
+    const l = linea.trim();
+    if(!l.startsWith('data:')) return;
+    const data = l.slice(5).trim();
+    if(!data || data === '[DONE]') return;
+    try {
+      const json = JSON.parse(data);
+      const delta = json.choices?.[0]?.delta?.content;
+      if(delta) onTexto(delta);
+    } catch(e){ /* línea inválida, ignorar */ }
+  }
+
+  while(true){
+    if(opciones && opciones.esActivo && !opciones.esActivo()){
+      try { await reader.cancel(); } catch(e){}
+      break;
+    }
+    let r;
+    try {
+      r = await reader.read();
+    } catch(e){ break; } // lector cancelado o conexión rota
+    const { done, value } = r;
+    if(done) break;
+    buffer += dec.decode(value, { stream: true });
+    let idx;
+    while((idx = buffer.indexOf('\n')) !== -1){
+      procesarLinea(buffer.slice(0, idx));
+      buffer = buffer.slice(idx + 1);
+    }
+  }
+  if(buffer.trim()) procesarLinea(buffer);
+}
+
+// Filtra en tiempo real los bloques de "razonamiento" que mandan algunos modelos
+// (Qwen manda  thinking... response y Gemini "thinking..." al inicio).
+// Emite solo el texto visible, sin retractar lo que ya se mandó al cliente.
+function crearFiltroRazonamiento(){
+  const etiquetas = [
+    { abre: '<thinking>', cierra: '</thinking>' },
+    { abre: '<reasoning>', cierra: '</reasoning>' }
+  ];
+  const cierresSimples = [' response', ' response', '</thinking>', ' response', '.'];
+
+  let emitido = '';        // texto confirmado (monótono creciente)
+  let cola = '';           // caracteres en espera (lookahead para detectar aperturas)
+  let enBloque = false;
+  let bloque = '';
+  let bloqueCierres = [];
+  let emitioTextoNormal = false;
+
+  function pareceApertura(s){
+    for(const e of etiquetas){
+      const a = e.abre;
+      if(a.startsWith(s) || s.startsWith(a)) return true;
+    }
+    // "thinking" pelado (con o sin espacio) solo cuenta al inicio del texto
+    if(!emitioTextoNormal){
+      const sTrim = s.trimStart();
+      if('thinking'.startsWith(sTrim) || sTrim.startsWith('thinking')) return true;
+    }
+    return false;
+  }
+
+  function procesarNormal(){
+    while(cola.length){
+      let retenerDesde = -1;
+      for(let p = 0; p < cola.length; p++){
+        if(pareceApertura(cola.slice(p))){ retenerDesde = p; break; }
+      }
+      if(retenerDesde === -1){
+        emitido += cola;
+        cola = '';
+        if(emitido.trim()) emitioTextoNormal = true;
+        return;
+      }
+      if(retenerDesde > 0){
+        emitido += cola.slice(0, retenerDesde);
+        cola = cola.slice(retenerDesde);
+        if(emitido.trim()) emitioTextoNormal = true;
+      }
+
+      // ¿Apertura con etiqueta confirmada?
+      let apertura = null;
+      for(const e of etiquetas){
+        if(cola.startsWith(e.abre)){ apertura = e; break; }
+      }
+      if(apertura && (cola.length > apertura.abre.length || apertura.abre.endsWith('>'))){
+        // lo que sigue a la etiqueta es contenido del bloque de razonamiento
+        bloque = cola.slice(apertura.abre.length);
+        cola = '';
+        enBloque = true;
+        bloqueCierres = [apertura.cierra];
+        return;
+      }
+
+      // ¿"thinking" pelado confirmado (solo al inicio del texto)?
+      if(!emitioTextoNormal){
+        const sTrim = cola.trimStart();
+        const pos = cola.length - sTrim.length;
+        if(sTrim.startsWith('thinking') && cola.length > pos + 'thinking'.length){
+          cola = cola.slice(pos + 'thinking'.length);
+          enBloque = true;
+          bloque = '';
+          bloqueCierres = cierresSimples;
+          return;
+        }
+      }
+
+      // Es una apertura parcial sin confirmar: esperar más texto
+      return;
+    }
+  }
+
+  return {
+    push(chunk){
+      if(enBloque){
+        bloque += chunk;
+        for(const c of bloqueCierres){
+          const idx = bloque.indexOf(c);
+          if(idx !== -1){
+            bloque = bloque.slice(idx + c.length);
+            cola += bloque;
+            bloque = '';
+            enBloque = false;
+            procesarNormal();
+            break;
+          }
+        }
+        return emitido;
+      }
+      cola += chunk;
+      procesarNormal();
+      return emitido;
+    },
+    final(){
+      enBloque = false;         // descarta cualquier bloque sin cerrar
+      emitido += cola;          // emite lo que quedó pendiente
+      cola = '';
+      return emitido;
+    }
+  };
 }
 
 app.post('/api/chat', async (req, res) => {
@@ -301,7 +489,8 @@ app.post('/api/chat', async (req, res) => {
       model: modeloIA,
       messages: mensajes,
       temperature: 0.7,
-      max_tokens: 1024
+      max_tokens: 1024,
+      stream: true
     };
 
     // Groq y DeepSeek soportan desactivar el razonamiento para responder más rápido;
@@ -325,19 +514,62 @@ app.post('/api/chat', async (req, res) => {
       return res.status(respuestaIA.status).json({ error: mensajeErrorIA(proveedor, respuestaIA.status, errorData) });
     }
 
-const data = await respuestaIA.json();
-    let respuestaTexto = data.choices?.[0]?.message?.content || 'No se recibió respuesta.';
+    // Stream real (SSE): cada fragmento que llega del modelo se reenvía al navegador
+    // apenas se produce, para que la respuesta se vaya viendo en pantalla.
+    res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no'); // evita que proxies como nginx buffericen el stream
 
-    // Qwen 3.6 envía razonamiento dentro de  thinking... response; lo eliminamos
-    respuestaTexto = respuestaTexto.replace(/ thinking[\s\S]*?<\/think>/g, '').trim();
+    const filtro = crearFiltroRazonamiento();
+    let emitidoHasta = 0;
+    let primeraEmision = true;
 
-    // Gemini a veces incluye el texto del pensamiento dentro de "thinking" en content
-    respuestaTexto = respuestaTexto.replace(/^thinking[\s\S]*?<\/thinking>/i, '').trim();
-    respuestaTexto = respuestaTexto.replace(/^thinking[\s\S]*?\./i, '').trim();
+    function enviarTexto(texto){
+      if(!texto) return;
+      let nuevo = texto.slice(emitidoHasta);
+      emitidoHasta = texto.length;
+      if(!nuevo) return;
+      // El primer fragmento no debe empezar con espacios en blanco sobrantes
+      if(primeraEmision){
+        primeraEmision = false;
+        const limpio = nuevo.replace(/^\s+/, '');
+        if(!limpio) return; // era solo espacios en blanco
+        nuevo = limpio;
+      }
+      try {
+        res.write(`data: ${JSON.stringify({ texto: nuevo })}\n\n`);
+      } catch(e){ /* el cliente cerró la conexión */ }
+    }
 
-    if (!respuestaTexto) respuestaTexto = 'No se recibió respuesta.';
+    // Si el usuario cierra el chat, cortamos la petición al modelo para no gastar tokens.
+    let lectorAbortado = false;
+    let lector = null;
+    res.on('close', () => {
+      if(!res.writableEnded && lector && !lectorAbortado){
+        lectorAbortado = true;
+        lector.cancel().catch(() => {});
+      }
+    });
 
-    res.json({ respuesta: respuestaTexto });
+    try {
+      await leerStreamSSE(respuestaIA, delta => enviarTexto(filtro.push(delta)), {
+        esActivo: () => !lectorAbortado,
+        setLector: (r) => { lector = r; }
+      });
+      enviarTexto(filtro.final());
+      if(emitidoHasta === 0){
+        enviarTexto('No se recibió respuesta.');
+      }
+      res.write('data: [DONE]\n\n');
+      res.end();
+    } catch (e) {
+      console.error('Error durante el stream:', e.message);
+      if(!res.writableEnded){
+        res.write(`data: ${JSON.stringify({ error: 'Error interno del servidor' })}\n\n`);
+        res.end();
+      }
+    }
 
   } catch (error) {
     console.error('Error en /api/chat:', error);

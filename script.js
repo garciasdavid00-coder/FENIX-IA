@@ -138,6 +138,15 @@ const TRADUCCIONES = {
     'error.servidor': 'Ocurrió un error del servidor.',
     'error.sinMicrofono': 'Tu navegador no soporta reconocimiento de voz. Prueba en Chrome.',
     'error.audio': 'No se pudo captar el audio. Intenta de nuevo.',
+    'voz.titulo': 'Voz en vivo',
+    'voz.conectando': 'Conectando...',
+    'voz.escuchando': 'Te escucho, habla...',
+    'voz.procesando': 'Procesando...',
+    'voz.iaHablando': 'La IA está hablando',
+    'voz.desconectado': 'Desconectado',
+    'voz.error': 'Error de voz',
+    'voz.terminar': 'Terminar',
+    'voz.sugerencia': 'Toca el botón rojo para terminar.',
     'error.historialEliminado': 'Historial eliminado.',
     'instalar.ios': 'Para instalar Fenix en iPhone:\n\n1. Toca el botón Compartir (cuadro con flecha arriba)\n2. Pulsa "Añadir a pantalla de inicio"\n3. Pulsa "Añadir"',
     'instalar.otro': 'Para instalar Fenix:\n\nAbre el menú ⋮ del navegador y toca "Instalar app" o "Agregar a pantalla de inicio".',
@@ -265,6 +274,15 @@ const TRADUCCIONES = {
     'error.servidor': 'A server error occurred.',
     'error.sinMicrofono': 'Your browser does not support voice recognition. Try Chrome.',
     'error.audio': 'Could not capture audio. Try again.',
+    'voz.titulo': 'Live voice',
+    'voz.conectando': 'Connecting...',
+    'voz.escuchando': "I'm listening, speak...",
+    'voz.procesando': 'Processing...',
+    'voz.iaHablando': 'AI is speaking',
+    'voz.desconectado': 'Disconnected',
+    'voz.error': 'Voice error',
+    'voz.terminar': 'End',
+    'voz.sugerencia': 'Tap the red button to end.',
     'error.historialEliminado': 'History deleted.',
     'instalar.ios': 'To install Fenix on iPhone:\n\n1. Tap the Share button (square with up arrow)\n2. Tap "Add to Home Screen"\n3. Tap "Add"',
     'instalar.otro': 'To install Fenix:\n\nOpen the ⋮ menu in your browser and tap "Install app" or "Add to Home Screen".',
@@ -392,6 +410,15 @@ const TRADUCCIONES = {
     'error.servidor': 'Ocorreu um erro no servidor.',
     'error.sinMicrofono': 'Seu navegador não suporta reconhecimento de voz. Tente no Chrome.',
     'error.audio': 'Não foi possível captar o áudio. Tente novamente.',
+    'voz.titulo': 'Voz ao vivo',
+    'voz.conectando': 'Conectando...',
+    'voz.escuchando': 'Estou ouvindo, fale...',
+    'voz.procesando': 'Processando...',
+    'voz.iaHablando': 'A IA está falando',
+    'voz.desconectado': 'Desconectado',
+    'voz.error': 'Erro de voz',
+    'voz.terminar': 'Encerrar',
+    'voz.sugerencia': 'Toque no botão vermelho para encerrar.',
     'error.historialEliminado': 'Histórico excluído.',
     'instalar.ios': 'Para instalar o Fenix no iPhone:\n\n1. Toque no botão Compartilhar (quadrado com seta para cima)\n2. Toque em "Adicionar à Tela de Início"\n3. Toque em "Adicionar"',
     'instalar.otro': 'Para instalar o Fenix:\n\nAbra o menu ⋮ do navegador e toque em "Instalar app" ou "Adicionar à Tela de Início".',
@@ -519,6 +546,15 @@ const TRADUCCIONES = {
     'error.servidor': 'Une erreur serveur est survenue.',
     'error.sinMicrofono': 'Votre navigateur ne prend pas en charge la reconnaissance vocale. Essayez Chrome.',
     'error.audio': "Impossible de capturer l'audio. Réessayez.",
+    'voz.titulo': 'Voix en direct',
+    'voz.conectando': 'Connexion...',
+    'voz.escuchando': "Je t'écoute, parle...",
+    'voz.procesando': 'Traitement...',
+    'voz.iaHablando': "L'IA parle",
+    'voz.desconectado': 'Déconnecté',
+    'voz.error': 'Erreur vocale',
+    'voz.terminar': 'Terminer',
+    'voz.sugerencia': 'Touchez le bouton rouge pour terminer.',
     'error.historialEliminado': 'Historique supprimé.',
     'instalar.ios': "Pour installer Fenix sur iPhone :\n\n1. Touchez le bouton Partager (carré avec flèche vers le haut)\n2. Touchez \"Ajouter à l'écran d'accueil\"\n3. Touchez \"Ajouter\"",
     'instalar.otro': 'Pour installer Fenix :\n\nOuvrez le menu ⋮ du navigateur et touchez "Installer l\'app" ou "Ajouter à l\'écran d\'accueil".',
@@ -646,6 +682,15 @@ const TRADUCCIONES = {
     'error.servidor': 'Ein Serverfehler ist aufgetreten.',
     'error.sinMicrofono': 'Dein Browser unterstützt keine Spracherkennung. Versuch Chrome.',
     'error.audio': 'Audio konnte nicht erfasst werden. Versuch es erneut.',
+    'voz.titulo': 'Live-Sprache',
+    'voz.conectando': 'Verbinde...',
+    'voz.escuchando': 'Ich höre zu, sprich...',
+    'voz.procesando': 'Verarbeite...',
+    'voz.iaHablando': 'KI spricht',
+    'voz.desconectado': 'Getrennt',
+    'voz.error': 'Sprachfehler',
+    'voz.terminar': 'Beenden',
+    'voz.sugerencia': 'Tippe auf den roten Button zum Beenden.',
     'error.historialEliminado': 'Verlauf gelöscht.',
     'instalar.ios': 'So installierst du Fenix auf dem iPhone:\n\n1. Tippe auf die Teilen-Schaltfläche (Quadrat mit Pfeil nach oben)\n2. Tippe auf "Zum Home-Bildschirm"\n3. Tippe auf "Hinzufügen"',
     'instalar.otro': 'So installierst du Fenix:\n\nÖffne das ⋮-Menü des Browsers und tippe auf "App installieren" oder "Zum Home-Bildschirm".',
@@ -773,6 +818,15 @@ const TRADUCCIONES = {
     'error.servidor': 'サーバーエラーが発生しました。',
     'error.sinMicrofono': 'お使いのブラウザは音声認識に対応していません。Chromeをお試しください。',
     'error.audio': '音声を取得できませんでした。もう一度お試しください。',
+    'voz.titulo': 'ライブ音声',
+    'voz.conectando': '接続中...',
+    'voz.escuchando': '聞いています、話してください...',
+    'voz.procesando': '処理中...',
+    'voz.iaHablando': 'AIが話しています',
+    'voz.desconectado': '切断されました',
+    'voz.error': '音声エラー',
+    'voz.terminar': '終了',
+    'voz.sugerencia': '赤いボタンで終了します。',
     'error.historialEliminado': '履歴を削除しました。',
     'instalar.ios': 'iPhoneでFenixをインストールするには:\n\n1. 共有ボタン（上向き矢印の四角）をタップ\n2. 「ホーム画面に追加」をタップ\n3. 「追加」をタップ',
     'instalar.otro': 'Fenixをインストールするには:\n\nブラウザの⋮メニューを開き、「アプリをインストール」または「ホーム画面に追加」をタップ。',
@@ -900,6 +954,15 @@ const TRADUCCIONES = {
     'error.servidor': '发生服务器错误。',
     'error.sinMicrofono': '您的浏览器不支持语音识别。请尝试使用 Chrome。',
     'error.audio': '无法捕获音频。请重试。',
+    'voz.titulo': '实时语音',
+    'voz.conectando': '连接中...',
+    'voz.escuchando': '我在听，请说...',
+    'voz.procesando': '处理中...',
+    'voz.iaHablando': 'AI正在说话',
+    'voz.desconectado': '已断开',
+    'voz.error': '语音错误',
+    'voz.terminar': '结束',
+    'voz.sugerencia': '点击红色按钮结束。',
     'error.historialEliminado': '历史记录已删除。',
     'instalar.ios': '在 iPhone 上安装 Fenix：\n\n1. 点击分享按钮（带向上箭头的方框）\n2. 点击“添加到主屏幕”\n3. 点击“添加”',
     'instalar.otro': '安装 Fenix：\n\n打开浏览器的 ⋮ 菜单，点击“安装应用”或“添加到主屏幕”。',
@@ -1027,6 +1090,15 @@ const TRADUCCIONES = {
     'error.servidor': 'حدث خطأ في الخادم.',
     'error.sinMicrofono': 'متصفحك لا يدعم التعرف على الصوت. جرّب Chrome.',
     'error.audio': 'تعذر التقاط الصوت. حاول مرة أخرى.',
+    'voz.titulo': 'صوت مباشر',
+    'voz.conectando': 'جارٍ الاتصال...',
+    'voz.escuchando': 'أنا أستمع، تكلّم...',
+    'voz.procesando': 'جارٍ المعالجة...',
+    'voz.iaHablando': 'الذكاء الاصطناعي يتحدث',
+    'voz.desconectado': 'تم قطع الاتصال',
+    'voz.error': 'خطأ صوتي',
+    'voz.terminar': 'إنهاء',
+    'voz.sugerencia': 'اضغط على الزر الأحمر للإنهاء.',
     'error.historialEliminado': 'تم حذف السجل.',
     'instalar.ios': 'لتثبيت Fenix على iPhone:\n\n1. اضغط زر المشاركة (مربع به سهم لأعلى)\n2. اضغط "إضافة إلى الشاشة الرئيسية"\n3. اضغط "إضافة"',
     'instalar.otro': 'لتثبيت Fenix:\n\nافتح قائمة ⋮ في المتصفح واضغط "تثبيت التطبيق" أو "إضافة إلى الشاشة الرئيسية".',
@@ -1111,31 +1183,48 @@ function aplicarIdioma(){
 inicializarTema();
 
 /* ======================
-   PERSISTENCIA LOCAL (chats, proyectos)
-   Se guarda en localStorage; respeta el toggle "Guardar historial".
+   PERSISTENCIA (chats, proyectos)
+   - Sin sesión: se guarda en localStorage con claves genéricas.
+   - Con sesión: se guarda por cuenta en localStorage Y en el servidor,
+     de modo que cada cuenta Google tiene su propio historial.
+   Respeta el toggle "Guardar historial".
 ====================== */
 const CLAVE_HISTORIAL = 'fenixChats';
 const CLAVE_PROYECTOS = 'fenixProyectos';
 
+let usuarioGoogleId = null;   // id de Google del usuario logueado (null si invitado)
+let sincronizando = false;
+let sincronizacionPendiente = null;
+let hayCambiosPendientes = false;
+
+function claveHistorial(){
+  return usuarioGoogleId ? `fenixChats_${usuarioGoogleId}` : CLAVE_HISTORIAL;
+}
+
+function claveProyectos(){
+  return usuarioGoogleId ? `fenixProyectos_${usuarioGoogleId}` : CLAVE_PROYECTOS;
+}
+
 function persistirDatos(){
   if(localStorage.getItem('fenixGuardarHistorial') === 'no') return;
   try {
-    localStorage.setItem(CLAVE_HISTORIAL, JSON.stringify(historial));
-    localStorage.setItem(CLAVE_PROYECTOS, JSON.stringify(proyectos));
+    localStorage.setItem(claveHistorial(), JSON.stringify(historial));
+    localStorage.setItem(claveProyectos(), JSON.stringify(proyectos));
   } catch(e){
     console.error('Error al guardar datos locales:', e);
   }
+  programarSincronizacion();
 }
 
 function cargarDatosGuardados(){
   if(localStorage.getItem('fenixGuardarHistorial') === 'no') return;
   try {
-    const h = localStorage.getItem(CLAVE_HISTORIAL);
+    const h = localStorage.getItem(claveHistorial());
     if(h){
       const arr = JSON.parse(h);
       if(Array.isArray(arr)) historial = arr;
     }
-    const p = localStorage.getItem(CLAVE_PROYECTOS);
+    const p = localStorage.getItem(claveProyectos());
     if(p){
       const arr = JSON.parse(p);
       if(Array.isArray(arr)) proyectos = arr;
@@ -1143,6 +1232,79 @@ function cargarDatosGuardados(){
   } catch(e){
     console.error('Error al cargar datos locales:', e);
   }
+}
+
+/* ======================
+   SINCRONIZACIÓN CON EL SERVIDOR
+====================== */
+function programarSincronizacion(){
+  if(!usuarioGoogleId) return;
+  if(localStorage.getItem('fenixGuardarHistorial') === 'no') return;
+  hayCambiosPendientes = true;
+  clearTimeout(sincronizacionPendiente);
+  sincronizacionPendiente = setTimeout(enviarDatosAlServidor, 800);
+}
+
+function enviarDatosAlServidor(){
+  if(!usuarioGoogleId || sincronizando) return;
+  sincronizando = true;
+  hayCambiosPendientes = false;
+  const chats = historial;
+  const proys = proyectos;
+  fetch(`${BACKEND_URL_AUTH}/api/sincronizar`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chats, proyectos: proys })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if(data && data.error) console.error('Error de sincronización:', data.error);
+    })
+    .catch(err => console.error('Error de sincronización:', err))
+    .finally(() => {
+      sincronizando = false;
+      if(hayCambiosPendientes) programarSincronizacion();
+    });
+}
+
+// Al iniciar sesión: carga el historial de ESA cuenta desde el servidor.
+// Si la cuenta no tiene nada guardado pero el dispositivo tiene chats de
+// invitado, los importa automáticamente para no perderlos.
+function cargarDatosDeServidor(){
+  if(localStorage.getItem('fenixGuardarHistorial') === 'no') return;
+  fetch(`${BACKEND_URL_AUTH}/api/sincronizar`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      if(!data || !Array.isArray(data.chats) || !Array.isArray(data.proyectos)) return;
+
+      const legado = localStorage.getItem(CLAVE_HISTORIAL);
+      if(data.chats.length === 0 && data.proyectos.length === 0 && legado){
+        let arr = [];
+        try { arr = JSON.parse(legado); } catch(e){ arr = []; }
+        if(Array.isArray(arr) && arr.length){
+          historial = arr;
+          try {
+            proyectos = JSON.parse(localStorage.getItem(CLAVE_PROYECTOS) || '[]');
+          } catch(e){ proyectos = []; }
+          persistirDatos(); // guarda por cuenta y sube al servidor
+        } else {
+          historial = [];
+          proyectos = [];
+        }
+      } else {
+        historial = data.chats;
+        proyectos = data.proyectos;
+        try {
+          localStorage.setItem(claveHistorial(), JSON.stringify(historial));
+          localStorage.setItem(claveProyectos(), JSON.stringify(proyectos));
+        } catch(e){}
+      }
+      renderizarRecientes();
+      renderizarProyectos();
+      actualizarSaludo();
+    })
+    .catch(err => console.error('Error al cargar historial del servidor:', err));
 }
 
 /* ======================
@@ -1311,8 +1473,131 @@ function usarMicrofono(){
 }
 
 /* ======================
+   VOZ EN VIVO (Gemini Live API)
+   Conversación hablada con la IA en una ventana flotante.
+   No sustituye al reconocimiento del navegador (usarMicrofono).
+====================== */
+let vozEnVivo = null;
+let textoVozBuffer = '';
+let vozDebugTimer = null;
+
+function toggleVozEnVivo(){
+  if(vozEnVivo && vozEnVivo.estaActivo()){
+    cerrarModalVoz();
+    return;
+  }
+  abrirModalVoz();
+  if(!vozEnVivo){
+    vozEnVivo = new VoiceClient({
+      callbacks: {
+        onEstado: (estado) => actualizarEstadoVoz(estado),
+        // La transcripción de la IA llega por fragmentos; se acumula hasta el turno completo.
+        onTexto: (t) => { textoVozBuffer += t; },
+        onTurnoFin: () => {
+          const texto = textoVozBuffer.trim();
+          textoVozBuffer = '';
+          if(texto){
+            agregarTranscripcionVoz('IA', texto);
+            mostrarVistaChat();
+            agregarMensaje('bot', texto);
+            guardarMensajeEnHistorial('bot', texto);
+          }
+        },
+        onError: (mensaje) => {
+          const txt = document.getElementById('vozEstadoTexto');
+          const dot = document.getElementById('vozDot');
+          if(txt) txt.textContent = mensaje;
+          if(dot){ dot.className = 'modal-voz-dot error'; }
+          actualizarEstadoVoz('error');
+        }
+      }
+    });
+  }
+  vozEnVivo.conectar().catch(() => {});
+}
+
+function abrirModalVoz(){
+  const modal = document.getElementById('modalVoz');
+  if(!modal) return;
+  document.getElementById('vozTranscript').innerHTML = '';
+  document.getElementById('vozEstadoTexto').textContent = t('voz.conectando');
+  document.getElementById('vozDot').className = 'modal-voz-dot conectando';
+  document.getElementById('vozDebug').textContent = 'mic: 0 | ia: 0';
+  modal.style.display = 'flex';
+  // Actualiza el contador de diagnóstico cada 500 ms mientras la ventana esté abierta.
+  clearInterval(vozDebugTimer);
+  vozDebugTimer = setInterval(function(){
+    const modalAbierto = document.getElementById('modalVoz').style.display === 'flex';
+    if(!modalAbierto){ clearInterval(vozDebugTimer); return; }
+    if(vozEnVivo && vozEnVivo.infoDebug){
+      document.getElementById('vozDebug').textContent = vozEnVivo.infoDebug();
+    }
+  }, 500);
+}
+
+function cerrarModalVoz(){
+  const modal = document.getElementById('modalVoz');
+  if(modal) modal.style.display = 'none';
+  if(vozEnVivo) vozEnVivo.desconectar();
+  actualizarEstadoVoz('desconectado');
+}
+
+function agregarTranscripcionVoz(quien, texto){
+  const contenedor = document.getElementById('vozTranscript');
+  if(!contenedor) return;
+  const div = document.createElement('div');
+  div.style.marginBottom = '8px';
+  const etiqueta = document.createElement('strong');
+  etiqueta.textContent = (quien === 'IA' ? 'Fenix' : 'Tú') + ': ';
+  etiqueta.style.color = 'var(--text-main)';
+  const cuerpo = document.createElement('span');
+  cuerpo.textContent = texto;
+  div.appendChild(etiqueta);
+  div.appendChild(cuerpo);
+  contenedor.appendChild(div);
+  contenedor.scrollTop = contenedor.scrollHeight;
+}
+
+function actualizarEstadoVoz(estado){
+  const txt = document.getElementById('vozEstadoTexto');
+  const dot = document.getElementById('vozDot');
+  const clave = { conectando: 'voz.conectando', escuchando: 'voz.escuchando', procesando: 'voz.procesando', iaHablando: 'voz.iaHablando', desconectado: 'voz.desconectado', error: 'voz.error' }[estado];
+  if(txt && clave) txt.textContent = t(clave);
+  if(dot) dot.className = 'modal-voz-dot ' + (estado || 'desconectado');
+
+  const activo = estado === 'conectando' || estado === 'escuchando' || estado === 'procesando' || estado === 'iaHablando';
+  ['vozBtnInicial', 'vozBtnChat'].forEach(function(id){
+    const b = document.getElementById(id);
+    if(b) b.classList.toggle('activo', activo);
+  });
+}
+
+// Limpia la sesión de voz al salir o recargar la página (libera micrófono y sonido).
+window.addEventListener('pagehide', function(){
+  if(vozEnVivo) vozEnVivo.desconectar();
+});
+
+/* ======================
    ENVIAR MENSAJE
 ====================== */
+// Controla la petición en curso para poder cancelarla con el botón "Detener".
+let controladorAbort = null;
+
+function detenerGeneracion(){
+  if(controladorAbort) controladorAbort.abort();
+}
+
+// Muestra el botón de detener y oculta el de enviar mientras se genera (y viceversa).
+function mostrarBotonDetener(visible){
+  const pares = [['sendBtnInicial','stopBtnInicial'], ['sendBtnChat','stopBtnChat']];
+  pares.forEach(function(ids){
+    const enviar = document.getElementById(ids[0]);
+    const detener = document.getElementById(ids[1]);
+    if(enviar) enviar.style.display = visible ? 'none' : 'flex';
+    if(detener) detener.style.display = visible ? 'flex' : 'none';
+  });
+}
+
 function sendMessage(desdeVistaChat){
   const inputActivo = desdeVistaChat ? chatInput2 : chatInput;
   const texto = inputActivo.value.trim();
@@ -1357,29 +1642,112 @@ function sendMessage(desdeVistaChat){
     instruccion: localStorage.getItem('fenixSystemPrompt') || ''
   };
 
+  const controlador = new AbortController();
+  controladorAbort = controlador;
+  mostrarBotonDetener(true);
+
   fetch(BACKEND_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
+    signal: controlador.signal
   })
-    .then(res => res.json().then(data => ({ ok: res.ok, data })))
-    .then(({ ok, data }) => {
-      if(!ok){
+    .then(async res => {
+      if(!res.ok){
+        const data = await res.json().catch(() => ({}));
         if(data.error === 'LIMITE'){
           typingEl.remove();
+          if(controladorAbort === controlador){
+            controladorAbort = null;
+            mostrarBotonDetener(false);
+          }
           agregarMensaje('bot', t('modal.limiteAlcanzado', { n: data.limite }));
           mostrarModalLimite();
           return;
         }
         throw { servidor: true, mensaje: data.error || t('error.servidor') };
       }
+
+      // Stream real: la respuesta llega por partes y se muestra apenas se recibe.
       typingEl.remove();
       const burbujaBot = agregarMensaje('bot', '');
-      escribirTexto(burbujaBot, data.respuesta);
-      guardarMensajeEnHistorial('bot', data.respuesta);
+      const contenedor = document.getElementById('messages');
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor-escribiendo';
+      burbujaBot.appendChild(cursor);
+
+      const reader = res.body.getReader();
+      const dec = new TextDecoder();
+      let buffer = '';
+      let textoAcumulado = '';
+      let errorStream = null;
+
+      function procesarLinea(linea){
+        const l = linea.trim();
+        if(!l.startsWith('data:')) return;
+        const data = l.slice(5).trim();
+        if(!data || data === '[DONE]') return;
+        try {
+          const obj = JSON.parse(data);
+          if(obj.error){
+            errorStream = obj.error;
+            return;
+          }
+          if(typeof obj.texto === 'string' && obj.texto){
+            textoAcumulado += obj.texto;
+            burbujaBot.textContent = textoAcumulado;
+            burbujaBot.appendChild(cursor);
+            if(estaCercaDelFinalDelChat(contenedor)) contenedor.scrollTop = contenedor.scrollHeight;
+          }
+        } catch(e){ /* línea inválida, ignorar */ }
+      }
+
+      function finalizarBurbuja(){
+        cursor.remove();
+        if(controladorAbort === controlador){
+          controladorAbort = null;
+          mostrarBotonDetener(false);
+        }
+        if(errorStream){
+          burbujaBot.textContent = '⚠️ ' + errorStream;
+        } else if(textoAcumulado){
+          guardarMensajeEnHistorial('bot', textoAcumulado);
+        } else {
+          burbujaBot.textContent = '⚠️ ' + t('error.servidor');
+        }
+      }
+
+      try {
+        while(true){
+          const { done, value } = await reader.read();
+          if(done) break;
+          buffer += dec.decode(value, { stream: true });
+          let idx;
+          while((idx = buffer.indexOf('\n')) !== -1){
+            procesarLinea(buffer.slice(0, idx));
+            buffer = buffer.slice(idx + 1);
+          }
+        }
+        if(buffer.trim()) procesarLinea(buffer);
+        finalizarBurbuja();
+      } catch(err){
+        if(err && (err.name === 'AbortError' || (controlador && controlador.signal.aborted))){
+          // El usuario detuvo la generación: se conserva lo que llevaba.
+          finalizarBurbuja();
+        } else {
+          throw err;
+        }
+      }
     })
     .catch(err => {
       typingEl.remove();
+      if(controladorAbort === controlador){
+        controladorAbort = null;
+        mostrarBotonDetener(false);
+      }
+      if(err && (err.name === 'AbortError' || (controlador && controlador.signal.aborted))){
+        return; // detenido antes de recibir respuesta: no mostrar error
+      }
       let mensajeError;
       if(err && err.servidor){
         mensajeError = '⚠️ ' + (err.mensaje || t('error.servidor'));
@@ -1408,31 +1776,6 @@ function agregarMensaje(tipo, texto, esTyping){
    para no interrumpirlo si subió a leer algo anterior */
 function estaCercaDelFinalDelChat(contenedor){
   return contenedor.scrollHeight - contenedor.scrollTop - contenedor.clientHeight < 80;
-}
-
-/* Escribe el texto de la respuesta letra por letra dentro de una burbuja
-   ya existente (creada con agregarMensaje), con scroll que acompaña
-   sin saltar de golpe al final */
-function escribirTexto(burbuja, textoCompleto, callback){
-  const contenedor = document.getElementById('messages');
-  const cursor = document.createElement('span');
-  cursor.className = 'cursor-escribiendo';
-
-  let i = 0;
-  function paso(){
-    const debeSeguir = estaCercaDelFinalDelChat(contenedor);
-    if(i <= textoCompleto.length){
-      burbuja.textContent = textoCompleto.slice(0, i);
-      burbuja.appendChild(cursor);
-      i++;
-      if(debeSeguir) contenedor.scrollTop = contenedor.scrollHeight;
-      setTimeout(paso, 15);
-    } else {
-      cursor.remove();
-      if(callback) callback();
-    }
-  }
-  paso();
 }
 
 /* ======================
@@ -1489,6 +1832,8 @@ function actualizarSaludo(){
    NUEVO CHAT
 ====================== */
 function nuevoChat(){
+  if(controladorAbort) controladorAbort.abort();
+  mostrarBotonDetener(false);
   chatActualId = null;
   proyectoActualId = null;
   chatInput.value = '';
@@ -2000,6 +2345,12 @@ function revisarSesionActual(){
         // Saludo personalizado con el nombre real del usuario
         nombreUsuarioLogueado = u.nombre || t('usuario.invitado');
         actualizarSaludo();
+
+        // Cargar el historial de ESTA cuenta desde el servidor
+        usuarioGoogleId = u.id;
+        cargarDatosDeServidor();
+      } else {
+        usuarioGoogleId = null;
       }
     })
     .catch(() => {});
@@ -2102,6 +2453,8 @@ function eliminarChatDeHistorial(id, event){
 
 function nuevoChatEnProyecto(){
   // Al mandar el próximo mensaje, el chat se crea ya asociado a este proyecto
+  if(controladorAbort) controladorAbort.abort();
+  mostrarBotonDetener(false);
   chatActualId = null;
   chatInput.value = '';
   chatInput2.value = '';
@@ -2242,8 +2595,13 @@ function borrarTodoElHistorial(){
   archivosBiblioteca = [];
   renderizarRecientes();
   nuevoChat();
-  localStorage.removeItem(CLAVE_HISTORIAL);
-  localStorage.removeItem(CLAVE_PROYECTOS);
+  localStorage.removeItem(claveHistorial());
+  localStorage.removeItem(claveProyectos());
+  if(usuarioGoogleId){
+    // Borra también el historial del servidor, sin importar el toggle
+    hayCambiosPendientes = true;
+    enviarDatosAlServidor();
+  }
   alert(t('error.historialEliminado'));
 }
 

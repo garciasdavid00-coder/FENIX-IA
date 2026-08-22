@@ -348,6 +348,10 @@ body{
   color:var(--mic-color);
   padding:6px;
 }
+.mic-btn.activo{
+  color:var(--accent);
+  filter:drop-shadow(0 0 4px var(--accent));
+}
 .send-btn{
   background:var(--send-btn-bg);
   border:none;
@@ -361,6 +365,20 @@ body{
   color:var(--send-btn-color);
 }
 .send-btn:hover{ background:var(--send-btn-bg-hover); }
+
+.stop-btn{
+  background:var(--accent);
+  border:none;
+  border-radius:50%;
+  width:34px;
+  height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  color:#fff;
+}
+.stop-btn:hover{ filter:brightness(1.1); }
 
 .pills{
   display:flex;
@@ -1250,6 +1268,79 @@ body{
   border:none;
 }
 .modal-btn-primary:hover{ opacity:.85; background:var(--accent); }
+
+/* ========================================
+   MODAL DE VOZ EN VIVO
+   ======================================== */
+.modal-voz{ max-width:480px; }
+.modal-voz-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.modal-voz-close{
+  background:none;
+  border:none;
+  font-size:26px;
+  line-height:1;
+  cursor:pointer;
+  color:var(--text-muted);
+  padding:4px 8px;
+}
+.modal-voz-close:hover{ color:var(--text-main); }
+.modal-voz-estado{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:14px 0 12px;
+  font-size:15px;
+  font-weight:600;
+  color:var(--text-main);
+}
+.modal-voz-dot{
+  width:12px; height:12px;
+  border-radius:50%;
+  background:var(--text-muted);
+  flex-shrink:0;
+}
+.modal-voz-dot.conectando{ background:#f0a500; animation:pulsoVoz 1s infinite; }
+.modal-voz-dot.escuchando{ background:#22c55e; animation:pulsoVoz 1.2s infinite; }
+.modal-voz-dot.procesando{ background:#3b82f6; animation:pulsoVoz 1s infinite; }
+.modal-voz-dot.iaHablando{ background:#a855f7; animation:pulsoVoz .8s infinite; }
+.modal-voz-dot.error{ background:#ef4444; }
+.modal-voz-dot.desconectado{ background:var(--text-muted); }
+@keyframes pulsoVoz{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
+.modal-voz-transcript{
+  background:var(--surface-hover);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px 14px;
+  min-height:110px;
+  max-height:220px;
+  overflow-y:auto;
+  font-size:14px;
+  color:var(--text-muted);
+  margin-bottom:12px;
+  white-space:pre-wrap;
+}
+.modal-voz-sugerencia{
+  font-size:12.5px;
+  color:var(--text-muted);
+  margin-bottom:16px;
+}
+.modal-voz-debug{
+  font-size:11px;
+  font-family:Consolas, Menlo, monospace;
+  color:var(--text-muted);
+  opacity:.7;
+  margin-bottom:10px;
+}
+.modal-btn-peligro{
+  background:#ef4444;
+  color:#fff;
+  border:none;
+}
+.modal-btn-peligro:hover{ background:#dc2626; }
 
 /* ========================================
    MODAL DE PLANES Y PRECIOS
