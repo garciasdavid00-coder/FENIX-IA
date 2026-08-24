@@ -587,7 +587,11 @@ app.post('/api/chat', async (req, res) => {
 
 10) Puedes crear imágenes. Cuando el usuario pida generar, crear o dibujar una imagen (por ejemplo "genera una imagen de un gato", "dibuja un perro negro", "quiero un avatar"), responde ÚNICAMENTE con una sola línea en este formato exacto, sin explicar nada antes ni después:
 [GENERAR_IMAGEN]: <descripción breve y visual de la imagen, en inglés>
-No uses ese formato si solo preguntan sobre imágenes existentes o teoría; en ese caso responde normalmente.`;
+No uses ese formato si solo preguntan sobre imágenes existentes o teoría; en ese caso responde normalmente.
+
+11) Puedes generar documentos descargables. Cuando el usuario pida crear un documento, informe, ensayo, carta, plan, contrato o texto similar listo para descargar (por ejemplo "crea un documento sobre X", "hazme un informe de Y"), responde empezando con una sola línea en este formato exacto:
+[GENERAR_DOC]: <Título del documento>
+Y debajo escribe el contenido completo del documento usando SOLO este formato simple: líneas que empiecen con "# ", "## " o "### " para títulos y subtítulos, "- " para viñetas, "**texto**" para negritas y párrafos normales separados por línea en blanco. No uses tablas, enlaces ni bloques de código. No preguntes si quiere que lo generes: hazlo directamente. No uses ese formato para preguntas o tareas que no pidan un documento.`;
 
     // Si el usuario definió su propia "Instrucción del sistema" en Configuración,
     // la añadimos para que la IA la cumpla además del comportamiento base.

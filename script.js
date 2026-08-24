@@ -85,6 +85,8 @@ const TRADUCCIONES = {
     'imagen.generando': 'Generando imagen…',
     'imagen.error': '⚠️ No se pudo generar la imagen. Inténtalo de nuevo.',
     'chat.imagenLista': 'Aquí tienes tu imagen:',
+    'doc.generando': 'Creando documento…',
+    'doc.descargar': 'Descargar documento',
     'pill.escrituraPrompt': 'Ayúdame a escribir: ',
     'pill.resumenPrompt': 'Hazme un resumen de: ',
     'pill.sitiosPrompt': 'Búscame información sobre: ',
@@ -224,6 +226,8 @@ const TRADUCCIONES = {
     'imagen.generando': 'Generating image…',
     'imagen.error': '⚠️ Could not generate the image. Please try again.',
     'chat.imagenLista': 'Here is your image:',
+    'doc.generando': 'Creating document…',
+    'doc.descargar': 'Download document',
     'pill.escrituraPrompt': 'Help me write: ',
     'pill.resumenPrompt': 'Give me a summary of: ',
     'pill.sitiosPrompt': 'Search for information about: ',
@@ -363,6 +367,8 @@ const TRADUCCIONES = {
     'imagen.generando': 'Gerando imagem…',
     'imagen.error': '⚠️ Não foi possível gerar a imagem. Tente novamente.',
     'chat.imagenLista': 'Aqui está a sua imagem:',
+    'doc.generando': 'Criando documento…',
+    'doc.descargar': 'Baixar documento',
     'pill.escrituraPrompt': 'Ajude-me a escrever: ',
     'pill.resumenPrompt': 'Faça um resumo de: ',
     'pill.sitiosPrompt': 'Pesquise informações sobre: ',
@@ -502,6 +508,8 @@ const TRADUCCIONES = {
     'imagen.generando': 'Génération de l\'image…',
     'imagen.error': '⚠️ Impossible de générer l\'image. Veuillez réessayer.',
     'chat.imagenLista': 'Voici votre image :',
+    'doc.generando': 'Création du document…',
+    'doc.descargar': 'Télécharger le document',
     'pill.escrituraPrompt': "Aide-moi à écrire : ",
     'pill.resumenPrompt': 'Fais-moi un résumé de : ',
     'pill.sitiosPrompt': "Cherche-moi des informations sur : ",
@@ -641,6 +649,8 @@ const TRADUCCIONES = {
     'imagen.generando': 'Bild wird erstellt…',
     'imagen.error': '⚠️ Das Bild konnte nicht erstellt werden. Bitte versuche es erneut.',
     'chat.imagenLista': 'Hier ist dein Bild:',
+    'doc.generando': 'Dokument wird erstellt…',
+    'doc.descargar': 'Dokument herunterladen',
     'pill.escrituraPrompt': 'Hilf mir zu schreiben: ',
     'pill.resumenPrompt': 'Fass mir zusammen: ',
     'pill.sitiosPrompt': 'Suche nach Informationen über: ',
@@ -780,6 +790,8 @@ const TRADUCCIONES = {
     'imagen.generando': '画像を生成中…',
     'imagen.error': '⚠️ 画像を生成できませんでした。もう一度お試しください。',
     'chat.imagenLista': '画像ができあがりました：',
+    'doc.generando': 'ドキュメントを作成中…',
+    'doc.descargar': 'ドキュメントをダウンロード',
     'pill.escrituraPrompt': 'の執筆を手伝ってください: ',
     'pill.resumenPrompt': 'の要約を作ってください: ',
     'pill.sitiosPrompt': 'についての情報を検索してください: ',
@@ -919,6 +931,8 @@ const TRADUCCIONES = {
     'imagen.generando': '正在生成图片…',
     'imagen.error': '⚠️ 无法生成图片，请重试。',
     'chat.imagenLista': '这是你的图片：',
+    'doc.generando': '正在创建文档…',
+    'doc.descargar': '下载文档',
     'pill.escrituraPrompt': '帮我写：',
     'pill.resumenPrompt': '为我总结一下：',
     'pill.sitiosPrompt': '搜索关于以下内容的信息：',
@@ -1058,6 +1072,8 @@ const TRADUCCIONES = {
     'imagen.generando': 'جارٍ إنشاء الصورة…',
     'imagen.error': '⚠️ تعذر إنشاء الصورة. حاول مرة أخرى.',
     'chat.imagenLista': 'إليك صورتك:',
+    'doc.generando': 'جارٍ إنشاء المستند…',
+    'doc.descargar': 'تنزيل المستند',
     'pill.escrituraPrompt': 'ساعدني في كتابة: ',
     'pill.resumenPrompt': 'أعطني ملخصًا عن: ',
     'pill.sitiosPrompt': 'ابحث لي عن معلومات حول: ',
@@ -1725,9 +1741,11 @@ function sendMessage(desdeVistaChat){
           }
           if(typeof obj.texto === 'string' && obj.texto){
             textoAcumulado += obj.texto;
-            // Si el modelo pidió una imagen, no mostramos el marcador crudo.
-            const visible = textoAcumulado.replace(/\[GENERAR_IMAGEN\][\s\S]*$/i, '');
-            burbujaBot.textContent = visible.trim() ? visible : t('imagen.generando');
+            // Si el modelo pidió una imagen o un documento, no mostramos
+            // el marcador crudo mientras llega el resto.
+            const visible = textoAcumulado.replace(/\[GENERAR_(IMAGEN|DOC)\][\s\S]*$/i, '');
+            const espera = /\[GENERAR_DOC\]/i.test(textoAcumulado) ? t('doc.generando') : t('imagen.generando');
+            burbujaBot.textContent = visible.trim() ? visible : espera;
             burbujaBot.appendChild(cursor);
             if(estaCercaDelFinalDelChat(contenedor)) contenedor.scrollTop = contenedor.scrollHeight;
           }
@@ -1743,14 +1761,17 @@ function sendMessage(desdeVistaChat){
         if(errorStream){
           burbujaBot.textContent = '⚠️ ' + errorStream;
         } else if(textoAcumulado){
-          // El modelo puede responder con [GENERAR_IMAGEN]: descripcion
-          // para pedirnos que creemos la imagen.
-          const coincidencia = textoAcumulado.match(/\[GENERAR_IMAGEN\]\s*:?\s*([\s\S]+)/i);
-          if(coincidencia && coincidencia[1].trim()){
-            generarImagenEnBurbuja(burbujaBot, coincidencia[1].trim(), t('chat.imagenLista'));
+          // El modelo puede responder con [GENERAR_IMAGEN]: descripcion o
+          // con [GENERAR_DOC]: titulo + contenido para que los creemos.
+          const coincidenciaDoc = textoAcumulado.match(/\[GENERAR_DOC\]\s*:?\s*([^\n]*)\n?([\s\S]*)/i);
+          const coincidenciaImg = textoAcumulado.match(/\[GENERAR_IMAGEN\]\s*:?\s*([\s\S]+)/i);
+          if(coincidenciaDoc && coincidenciaDoc[1].trim() && coincidenciaDoc[2].trim()){
+            crearDocumentoEnBurbuja(burbujaBot, coincidenciaDoc[1].trim(), coincidenciaDoc[2].trim());
+          } else if(coincidenciaImg && coincidenciaImg[1].trim()){
+            generarImagenEnBurbuja(burbujaBot, coincidenciaImg[1].trim(), t('chat.imagenLista'));
           } else {
             // Marcador a medias (usuario detuvo la generación): limpiamos.
-            const limpio = textoAcumulado.replace(/\[GENERAR_IM[\s\S]*$/i, '').trim();
+            const limpio = textoAcumulado.replace(/\[GENERAR_\w*[\s\S]*$/i, '').trim();
             if(limpio){
               burbujaBot.textContent = limpio;
               guardarMensajeEnHistorial('bot', limpio);
@@ -1883,13 +1904,101 @@ function agregarImagenABurbuja(burbuja, imagenUrl, pieTexto){
 }
 
 /* ======================
+   GENERACIÓN DE DOCUMENTOS
+====================== */
+
+/* Convierte el formato simple que usa el modelo (# títulos, - viñetas,
+   **negritas**) a HTML para la vista previa y el archivo Word. */
+function convertirMarkdownAHtml(contenido){
+  const escapar = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const enLinea = s => escapar(s)
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+  const lineas = contenido.replace(/```[\s\S]*?```/g, m => m).split('\n');
+  let html = '';
+  let listaAbierta = null; // 'ul' | 'ol' | null
+  const cerrarLista = () => { if(listaAbierta){ html += '</' + listaAbierta + '>'; listaAbierta = null; } };
+  for(const linea of lineas){
+    const l = linea.trim();
+    if(!l){ cerrarLista(); continue; }
+    let m;
+    if((m = l.match(/^###\s+(.+)/))){ cerrarLista(); html += '<h3>' + enLinea(m[1]) + '</h3>'; }
+    else if((m = l.match(/^##\s+(.+)/))){ cerrarLista(); html += '<h2>' + enLinea(m[1]) + '</h2>'; }
+    else if((m = l.match(/^#\s+(.+)/))){ cerrarLista(); html += '<h1>' + enLinea(m[1]) + '</h1>'; }
+    else if((m = l.match(/^[-*]\s+(.+)/))){ if(listaAbierta !== 'ul'){ cerrarLista(); html += '<ul>'; listaAbierta = 'ul'; } html += '<li>' + enLinea(m[1]) + '</li>'; }
+    else if((m = l.match(/^\d+[.)]\s+(.+)/))){ if(listaAbierta !== 'ol'){ cerrarLista(); html += '<ol>'; listaAbierta = 'ol'; } html += '<li>' + enLinea(m[1]) + '</li>'; }
+    else { cerrarLista(); html += '<p>' + enLinea(l) + '</p>'; }
+  }
+  cerrarLista();
+  return html;
+}
+
+/* Descarga el documento como .doc (HTML con formato Word: lo abren
+   Word, LibreOffice y Google Docs sin librerías extra). */
+function descargarDocumento(titulo, contenidoMarkdown){
+  const cuerpoHtml = convertirMarkdownAHtml(contenidoMarkdown);
+  const docHtml = '<html xmlns:w="urn:schemas-microsoft-com:office:word">' +
+    '<head><meta charset="utf-8"><title>' + titulo.replace(/[<>]/g,'') + '</title>' +
+    '<style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.4;}' +
+    'h1{font-size:18pt;color:#1a3c6e;}h2{font-size:14pt;color:#2a528f;}h3{font-size:12pt;color:#2a528f;}</style></head>' +
+    '<body>' + cuerpoHtml + '</body></html>';
+  const blob = new Blob(['\ufeff', docHtml], { type: 'application/msword' });
+  const enlace = document.createElement('a');
+  enlace.href = URL.createObjectURL(blob);
+  const nombreSeguro = titulo.replace(/[^\w\s\u00C0-\uFFFF-]/g, '').trim().slice(0, 80) || 'documento';
+  enlace.download = nombreSeguro + '.doc';
+  document.body.appendChild(enlace);
+  enlace.click();
+  enlace.remove();
+  setTimeout(() => URL.revokeObjectURL(enlace.href), 5000);
+}
+
+/* Muestra la tarjeta del documento dentro de una burbuja. */
+function agregarDocumentoABurbuja(burbuja, titulo, contenido){
+  burbuja.textContent = '';
+  const tarjeta = document.createElement('div');
+  tarjeta.className = 'tarjeta-doc';
+
+  const icono = document.createElement('div');
+  icono.className = 'tarjeta-doc-icono';
+  icono.textContent = '📄';
+
+  const info = document.createElement('div');
+  info.className = 'tarjeta-doc-info';
+  const nombre = document.createElement('div');
+  nombre.className = 'tarjeta-doc-nombre';
+  nombre.textContent = titulo;
+  info.appendChild(nombre);
+
+  const boton = document.createElement('button');
+  boton.className = 'tarjeta-doc-btn';
+  boton.type = 'button';
+  boton.textContent = '⬇️ ' + t('doc.descargar');
+  boton.addEventListener('click', () => descargarDocumento(titulo, contenido));
+  info.appendChild(boton);
+
+  tarjeta.appendChild(icono);
+  tarjeta.appendChild(info);
+  burbuja.appendChild(tarjeta);
+}
+
+/* Punto de llegada cuando el modelo responde con [GENERAR_DOC]: */
+function crearDocumentoEnBurbuja(burbuja, titulo, contenido){
+  burbuja.className = 'msg msg-bot';
+  agregarDocumentoABurbuja(burbuja, titulo, contenido);
+  guardarMensajeEnHistorial('bot', '📄 ' + titulo, null, { titulo, contenido });
+}
+
+/* ======================
    MOSTRAR MENSAJE EN PANTALLA
 ====================== */
-function agregarMensaje(tipo, texto, esTyping, imagenUrl){
+function agregarMensaje(tipo, texto, esTyping, imagenUrl, documento){
   const contenedor = document.getElementById('messages');
   const burbuja = document.createElement('div');
   burbuja.className = 'msg ' + (tipo === 'user' ? 'msg-user' : 'msg-bot') + (esTyping ? ' typing' : '');
-  if(imagenUrl){
+  if(documento){
+    agregarDocumentoABurbuja(burbuja, documento.titulo || texto || 'Documento', documento.contenido || '');
+  } else if(imagenUrl){
     agregarImagenABurbuja(burbuja, imagenUrl, texto || '');
   } else {
     burbuja.textContent = texto;
@@ -1980,9 +2089,12 @@ function crearNuevoChatEnHistorial(primerMensaje){
   persistirDatos();
 }
 
-function guardarMensajeEnHistorial(tipo, texto, imagen){
+function guardarMensajeEnHistorial(tipo, texto, imagen, documento){
   const chat = historial.find(c => c.id === chatActualId);
-  if(chat) chat.mensajes.push(imagen ? { tipo, texto, imagen } : { tipo, texto });
+  if(chat){
+    const extra = documento ? { documento } : (imagen ? { imagen } : {});
+    chat.mensajes.push(Object.assign({ tipo, texto }, extra));
+  }
   persistirDatos();
 }
 
@@ -2178,7 +2290,7 @@ function abrirChat(id){
   chatActualId = id;
   mostrarVistaChat();
   document.getElementById('messages').innerHTML = '';
-  chat.mensajes.forEach(m => agregarMensaje(m.tipo, m.texto, false, m.imagen));
+  chat.mensajes.forEach(m => agregarMensaje(m.tipo, m.texto, false, m.imagen, m.documento));
 }
 
 /* ======================
