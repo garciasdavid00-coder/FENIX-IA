@@ -87,6 +87,7 @@ const TRADUCCIONES = {
     'chat.imagenLista': 'Aquí tienes tu imagen:',
     'doc.generando': 'Creando documento…',
     'doc.descargar': 'Descargar documento',
+    'doc.ver': 'Ver documento',
     'pill.escrituraPrompt': 'Ayúdame a escribir: ',
     'pill.resumenPrompt': 'Hazme un resumen de: ',
     'pill.sitiosPrompt': 'Búscame información sobre: ',
@@ -228,6 +229,7 @@ const TRADUCCIONES = {
     'chat.imagenLista': 'Here is your image:',
     'doc.generando': 'Creating document…',
     'doc.descargar': 'Download document',
+    'doc.ver': 'View document',
     'pill.escrituraPrompt': 'Help me write: ',
     'pill.resumenPrompt': 'Give me a summary of: ',
     'pill.sitiosPrompt': 'Search for information about: ',
@@ -369,6 +371,7 @@ const TRADUCCIONES = {
     'chat.imagenLista': 'Aqui está a sua imagem:',
     'doc.generando': 'Criando documento…',
     'doc.descargar': 'Baixar documento',
+    'doc.ver': 'Ver documento',
     'pill.escrituraPrompt': 'Ajude-me a escrever: ',
     'pill.resumenPrompt': 'Faça um resumo de: ',
     'pill.sitiosPrompt': 'Pesquise informações sobre: ',
@@ -510,6 +513,7 @@ const TRADUCCIONES = {
     'chat.imagenLista': 'Voici votre image :',
     'doc.generando': 'Création du document…',
     'doc.descargar': 'Télécharger le document',
+    'doc.ver': 'Voir le document',
     'pill.escrituraPrompt': "Aide-moi à écrire : ",
     'pill.resumenPrompt': 'Fais-moi un résumé de : ',
     'pill.sitiosPrompt': "Cherche-moi des informations sur : ",
@@ -651,6 +655,7 @@ const TRADUCCIONES = {
     'chat.imagenLista': 'Hier ist dein Bild:',
     'doc.generando': 'Dokument wird erstellt…',
     'doc.descargar': 'Dokument herunterladen',
+    'doc.ver': 'Dokument ansehen',
     'pill.escrituraPrompt': 'Hilf mir zu schreiben: ',
     'pill.resumenPrompt': 'Fass mir zusammen: ',
     'pill.sitiosPrompt': 'Suche nach Informationen über: ',
@@ -792,6 +797,7 @@ const TRADUCCIONES = {
     'chat.imagenLista': '画像ができあがりました：',
     'doc.generando': 'ドキュメントを作成中…',
     'doc.descargar': 'ドキュメントをダウンロード',
+    'doc.ver': 'ドキュメントを見る',
     'pill.escrituraPrompt': 'の執筆を手伝ってください: ',
     'pill.resumenPrompt': 'の要約を作ってください: ',
     'pill.sitiosPrompt': 'についての情報を検索してください: ',
@@ -933,6 +939,7 @@ const TRADUCCIONES = {
     'chat.imagenLista': '这是你的图片：',
     'doc.generando': '正在创建文档…',
     'doc.descargar': '下载文档',
+    'doc.ver': '查看文档',
     'pill.escrituraPrompt': '帮我写：',
     'pill.resumenPrompt': '为我总结一下：',
     'pill.sitiosPrompt': '搜索关于以下内容的信息：',
@@ -1074,6 +1081,7 @@ const TRADUCCIONES = {
     'chat.imagenLista': 'إليك صورتك:',
     'doc.generando': 'جارٍ إنشاء المستند…',
     'doc.descargar': 'تنزيل المستند',
+    'doc.ver': 'عرض المستند',
     'pill.escrituraPrompt': 'ساعدني في كتابة: ',
     'pill.resumenPrompt': 'أعطني ملخصًا عن: ',
     'pill.sitiosPrompt': 'ابحث لي عن معلومات حول: ',
@@ -1953,6 +1961,46 @@ function descargarDocumento(titulo, contenidoMarkdown){
   setTimeout(() => URL.revokeObjectURL(enlace.href), 5000);
 }
 
+/* Vista previa del documento en una ventana flotante. */
+let _modalDoc = null;
+function verDocumento(titulo, contenido){
+  const modal = asegurarModalDoc();
+  modal.querySelector('.modal-doc-titulo').textContent = titulo;
+  modal.querySelector('.modal-doc-contenido').innerHTML = convertirMarkdownAHtml(contenido);
+  const btnDescargar = modal.querySelector('.modal-doc-pie button');
+  btnDescargar.textContent = '⬇️ ' + t('doc.descargar');
+  btnDescargar.onclick = () => descargarDocumento(titulo, contenido);
+  modal.style.display = 'flex';
+}
+
+function cerrarModalDoc(){
+  if(_modalDoc) _modalDoc.style.display = 'none';
+}
+
+function asegurarModalDoc(){
+  if(_modalDoc) return _modalDoc;
+  const modal = document.createElement('div');
+  modal.id = 'modalDoc';
+  modal.className = 'modal-doc-fondo';
+  modal.innerHTML =
+    '<div class="modal-doc">' +
+      '<div class="modal-doc-cabecera">' +
+        '<div class="modal-doc-titulo"></div>' +
+        '<button class="modal-doc-cerrar" type="button">✕</button>' +
+      '</div>' +
+      '<div class="modal-doc-contenido"></div>' +
+      '<div class="modal-doc-pie">' +
+        '<button class="tarjeta-doc-btn" type="button"></button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(modal);
+  _modalDoc = modal;
+  modal.addEventListener('click', e => { if(e.target === modal) cerrarModalDoc(); });
+  modal.querySelector('.modal-doc-cerrar').addEventListener('click', cerrarModalDoc);
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') cerrarModalDoc(); });
+  return modal;
+}
+
 /* Muestra la tarjeta del documento dentro de una burbuja. */
 function agregarDocumentoABurbuja(burbuja, titulo, contenido){
   burbuja.textContent = '';
@@ -1970,12 +2018,24 @@ function agregarDocumentoABurbuja(burbuja, titulo, contenido){
   nombre.textContent = titulo;
   info.appendChild(nombre);
 
-  const boton = document.createElement('button');
-  boton.className = 'tarjeta-doc-btn';
-  boton.type = 'button';
-  boton.textContent = '⬇️ ' + t('doc.descargar');
-  boton.addEventListener('click', () => descargarDocumento(titulo, contenido));
-  info.appendChild(boton);
+  const botones = document.createElement('div');
+  botones.className = 'tarjeta-doc-botones';
+
+  const botonVer = document.createElement('button');
+  botonVer.className = 'tarjeta-doc-btn tarjeta-doc-btn-sec';
+  botonVer.type = 'button';
+  botonVer.textContent = '👁️ ' + t('doc.ver');
+  botonVer.addEventListener('click', () => verDocumento(titulo, contenido));
+  botones.appendChild(botonVer);
+
+  const botonDescargar = document.createElement('button');
+  botonDescargar.className = 'tarjeta-doc-btn';
+  botonDescargar.type = 'button';
+  botonDescargar.textContent = '⬇️ ' + t('doc.descargar');
+  botonDescargar.addEventListener('click', () => descargarDocumento(titulo, contenido));
+  botones.appendChild(botonDescargar);
+
+  info.appendChild(botones);
 
   tarjeta.appendChild(icono);
   tarjeta.appendChild(info);
