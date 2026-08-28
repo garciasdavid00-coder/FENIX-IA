@@ -622,6 +622,27 @@ function crearFiltroRazonamiento(){
 // MEMORIAS DEL USUARIO — lo que la IA recuerda de él (ver backend/memoryManager.js)
 // ------------------------------------------------------------
 
+// Diagnóstico público: confirma desde el navegador si la base de datos está
+// conectada en este entorno (útil para depurar Render).
+app.get('/api/diagnostico', async (req, res) => {
+  const estado = {
+    fecha: new Date().toISOString(),
+    tieneDATABASE_URL: !!process.env.DATABASE_URL
+  };
+  if (db.pool) {
+    try {
+      const r = await db.pool.query('SELECT NOW() AS ahora');
+      estado.conexion = 'ok';
+      estado.horaBD = r.rows[0].ahora;
+    } catch (e) {
+      estado.conexion = 'error: ' + e.message;
+    }
+  } else {
+    estado.conexion = 'sin pool (falta DATABASE_URL)';
+  }
+  res.json(estado);
+});
+
 // Devuelve las memorias del usuario conectado.
 app.get('/api/memories', async (req, res) => {
   if (!req.isAuthenticated || !req.isAuthenticated()) {
@@ -632,6 +653,27 @@ app.get('/api/memories', async (req, res) => {
     res.json({ memorias });
   } catch (e) {
     console.error('Error en GET /api/memories:', e.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// Guarda una memoria escrita a mano (o desde el botón "Recuérdalo").
+app.post('/api/memories', async (req, res) => {
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
+    return res.status(401).json({ error: 'No autenticado' });
+  }
+  const texto = typeof req.body.texto === 'string' ? req.body.texto.trim() : '';
+  if (!texto) {
+    return res.status(400).json({ error: 'Falta el campo "texto"' });
+  }
+  try {
+    const memoria = await memory.addMemory(req.user.id, texto, req.body.categoria);
+    if (!memoria) {
+      return res.status(400).json({ error: 'No se pudo guardar la memoria' });
+    }
+    res.status(201).json({ ok: true, memoria });
+  } catch (e) {
+    console.error('Error en POST /api/memories:', e.message);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });

@@ -1,10 +1,11 @@
 /* Fenix IA - Service Worker */
-const CACHE = 'fenix-v14';
+const CACHE = 'fenix-v17';
 const ASSETS = [
   '/',
   '/index.html',
   '/style.css',
   '/script.js',
+  '/imageEditor.js',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png'

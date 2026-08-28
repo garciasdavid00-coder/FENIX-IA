@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
 
@@ -44,6 +44,10 @@
     <div class="nav-item" onclick="mostrarVistaBiblioteca()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
       <span data-i18n="nav.biblioteca">Biblioteca</span>
+    </div>
+    <div class="nav-item" onclick="mostrarVistaMemoria()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4h6a2 2 0 012 2v14l-5-3-5 3V6a2 2 0 012-2z"/></svg>
+      <span data-i18n="nav.memoria">Memoria</span>
     </div>
 
     <div class="nav-item" id="navInstalar" onclick="instalarApp()" style="display:none;">
@@ -222,6 +226,16 @@
       <div class="panel-grid" id="bibliotecaList"></div>
     </div>
 
+    <!-- Vista de Memoria -->
+    <div class="panel-view" id="vistaMemoria" style="display:none;">
+      <div class="panel-header">
+        <h2 data-i18n="memoria.titulo">Memoria</h2>
+        <button class="btn-primario" onclick="abrirModalMemoria()"><span data-i18n="memoria.agregar">+ Agregar memoria</span></button>
+      </div>
+      <div class="memoria-desc" data-i18n="memoria.desc"></div>
+      <div class="memoria-list" id="memoriasList"></div>
+    </div>
+
     <!-- Vista de Configuración -->
     <div class="panel-view" id="vistaConfiguracion" style="display:none;">
       <div class="config-container">
@@ -342,12 +356,12 @@
             <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <div class="lang-card" data-lang="en" onclick="seleccionarIdiomaVista('en')">
-            <span class="lang-flag">🇺🇸</span>
+            <span class="lang-flag">🇬🇧</span>
             <span class="lang-name">English</span>
             <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <div class="lang-card" data-lang="pt" onclick="seleccionarIdiomaVista('pt')">
-            <span class="lang-flag">🇧🇷</span>
+            <span class="lang-flag">🇵🇹</span>
             <span class="lang-name">Português</span>
             <svg class="lang-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
@@ -402,6 +416,27 @@
     <h3 class="modal-title" id="modalGenericoTitulo"></h3>
     <p class="modal-text" id="modalGenericoTexto"></p>
     <div class="modal-actions" id="modalGenericoAcciones"></div>
+  </div>
+</div>
+
+<!-- Modal para agregar/recordar una memoria -->
+<div class="modal-overlay" id="modalMemoria" onclick="if(event.target===this)cerrarModalMemoria()" style="display:none;">
+  <div class="modal modal-memoria">
+    <h3 class="modal-title" data-i18n="memoria.titulo">Memoria</h3>
+    <label class="memoria-label" for="memoriaModalTexto" data-i18n="memoria.queRecordar">¿Qué quieres que recuerde?</label>
+    <textarea id="memoriaModalTexto" rows="4" class="memoria-textarea" data-i18n-placeholder="memoria.placeholder"></textarea>
+    <label class="memoria-label" for="memoriaModalCat" data-i18n="memoria.categoria">Categoría</label>
+    <select id="memoriaModalCat" class="config-select memoria-select">
+      <option value="personal" data-i18n="memoria.catPersonal">Personal</option>
+      <option value="preferencia" data-i18n="memoria.catPreferencia">Preferencias</option>
+      <option value="proyecto" data-i18n="memoria.catProyecto">Proyectos</option>
+      <option value="tecnico" data-i18n="memoria.catTecnico">Técnico</option>
+      <option value="temas" data-i18n="memoria.catTemas">Temas importantes</option>
+    </select>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="cerrarModalMemoria()" data-i18n="memoria.cancelar">Cancelar</button>
+      <button class="modal-btn modal-btn-primary" id="memoriaModalGuardar" onclick="guardarMemoriaDesdeModal()" data-i18n="memoria.guardar">Guardar</button>
+    </div>
   </div>
 </div>
 
@@ -471,8 +506,9 @@
   </div>
 </div>
 
-<script src="voiceClient.js?v=7"></script>
-<script src="script.js?v=7"></script>
+<script src="voiceClient.js?v=10"></script>
+<script src="imageEditor.js?v=10"></script>
+<script src="script.js?v=10"></script>
 <script>
   if('serviceWorker' in navigator){
     window.addEventListener('load', function(){

@@ -13,7 +13,8 @@ const MEMORY_EXTRACTION_INTERVAL = 6;
 const MAX_MEMORIAS = 30;
 
 // Categorías aceptadas; si llega otra, se guarda como 'personal'.
-const CATEGORIAS = ['personal', 'preferencia', 'proyecto', 'tecnico'];
+// 'temas' son temas importantes que interesan al usuario.
+const CATEGORIAS = ['personal', 'preferencia', 'proyecto', 'tecnico', 'temas'];
 
 // Contador de mensajes por usuario para saber cuándo toca extraer.
 const contadorMensajes = new Map();
@@ -153,13 +154,31 @@ async function addMemory(userId, memoryText, category) {
 }
 
 // Arma el bloque que se inyecta al inicio del system prompt.
-// Devuelve un string vacío si el usuario no tiene memorias.
+// Separa los datos personales de los temas importantes. Devuelve un string
+// vacío si el usuario no tiene memorias.
 async function buildMemoryContext(userId) {
   const memorias = await getUserMemories(userId);
   if (!memorias.length) return '';
 
-  const lineas = memorias.map(m => `- ${m.memory_text}`);
-  return 'Datos que recuerdas de este usuario:\n' + lineas.join('\n');
+  const bloqueDatos = [];
+  const bloqueTemas = [];
+  for (const m of memorias) {
+    const linea = `- ${m.memory_text}`;
+    if (m.category === 'temas') {
+      bloqueTemas.push(linea);
+    } else {
+      bloqueDatos.push(linea);
+    }
+  }
+
+  const secciones = [];
+  if (bloqueDatos.length) {
+    secciones.push('Datos que recuerdas de este usuario:\n' + bloqueDatos.join('\n'));
+  }
+  if (bloqueTemas.length) {
+    secciones.push('Temas importantes que le interesan:\n' + bloqueTemas.join('\n'));
+  }
+  return secciones.join('\n\n');
 }
 
 // Borra una memoria (solo si pertenece a ese usuario).
@@ -209,14 +228,14 @@ async function extractMemoriesFromConversation(userId, mensajesConversacion) {
     messages: [
       {
         role: 'system',
-        content: `Eres un extractor de datos personales. A partir de una conversación, saca los hechos y preferencias DURADEROS sobre el usuario: nombres, edades, profesión, idiomas, gustos, preferencias, proyectos en curso, herramientas o información técnica relevante.
+        content: `Eres un extractor de datos personales. A partir de una conversación, saca los hechos y preferencias DURADEROS sobre el usuario: nombres, edades, profesión, idiomas, gustos, preferencias, proyectos en curso, herramientas o información técnica relevante, y los TEMAS IMPORTANTES que le interesan (aquellos temas que repite, sobre los que pide consejo o quiere aprender).
 
 Reglas:
 - NO extraigas saludos, frases sueltas, estados momentáneos ni información trivial.
 - Si la conversación no aporta datos nuevos y relevantes, devuelve [].
 - Solo responde con un array JSON válido, sin texto adicional, del formato:
 [{"text": "hecho sobre el usuario", "category": "personal"}, ...]
-- category debe ser uno de: personal, preferencia, proyecto, tecnico.`
+- category debe ser uno de: personal, preferencia, proyecto, tecnico, temas.`
       },
       {
         role: 'user',

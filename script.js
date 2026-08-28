@@ -107,6 +107,26 @@ const TRADUCCIONES = {
     'biblioteca.titulo': 'Biblioteca',
     'biblioteca.subir': '+ Subir archivo',
     'biblioteca.vacio': 'Aún no has subido archivos. Usa el botón "+ Subir archivo".',
+    'nav.memoria': 'Memoria',
+    'memoria.titulo': 'Memoria',
+    'memoria.agregar': '+ Agregar memoria',
+    'memoria.desc': 'Fenix recuerda información sobre ti y los temas que te importan para personalizar tus respuestas. Puedes revisarla, borrarla o agregarla a mano.',
+    'memoria.vacia': 'Todavía no hay memorias guardadas. Chatea un rato y Fenix irá recordando tus datos y temas importantes.',
+    'memoria.queRecordar': '¿Qué quieres que recuerde?',
+    'memoria.placeholder': 'Ej.: "Me llamo Sara y trabajo de arquitecta"',
+    'memoria.categoria': 'Categoría',
+    'memoria.catPersonal': 'Personal',
+    'memoria.catPreferencia': 'Preferencias',
+    'memoria.catProyecto': 'Proyectos',
+    'memoria.catTecnico': 'Técnico',
+    'memoria.catTemas': 'Temas importantes',
+    'memoria.guardar': 'Guardar',
+    'memoria.cancelar': 'Cancelar',
+    'memoria.eliminar': 'Eliminar',
+    'memoria.eliminarConfirm': '¿Eliminar esta memoria?',
+    'memoria.guardada': 'Memoria guardada',
+    'memoria.requiereSesion': 'Inicia sesión para guardar y ver tus memorias.',
+    'chat.recordar': 'Recuérdalo',
     'chat.escribiendo': 'Escribiendo...',
     'chat.sinTitulo': 'Sin título',
     'chat.eliminarConfirm': '¿Eliminar este chat?',
@@ -250,6 +270,26 @@ const TRADUCCIONES = {
     'biblioteca.titulo': 'Library',
     'biblioteca.subir': '+ Upload file',
     'biblioteca.vacio': "You haven't uploaded any files yet. Use the \"+ Upload file\" button.",
+    'nav.memoria': 'Memory',
+    'memoria.titulo': 'Memory',
+    'memoria.agregar': '+ Add memory',
+    'memoria.desc': 'Fenix remembers information about you and the topics that matter to you to personalize your answers. You can review, delete or add memories by hand.',
+    'memoria.vacia': 'No memories saved yet. Chat for a while and Fenix will start remembering your data and important topics.',
+    'memoria.queRecordar': 'What should I remember?',
+    'memoria.placeholder': 'E.g.: "My name is Sara and I work as an architect"',
+    'memoria.categoria': 'Category',
+    'memoria.catPersonal': 'Personal',
+    'memoria.catPreferencia': 'Preferences',
+    'memoria.catProyecto': 'Projects',
+    'memoria.catTecnico': 'Technical',
+    'memoria.catTemas': 'Important topics',
+    'memoria.guardar': 'Save',
+    'memoria.cancelar': 'Cancel',
+    'memoria.eliminar': 'Delete',
+    'memoria.eliminarConfirm': 'Delete this memory?',
+    'memoria.guardada': 'Memory saved',
+    'memoria.requiereSesion': 'Sign in to save and view your memories.',
+    'chat.recordar': 'Remember this',
     'chat.escribiendo': 'Typing...',
     'chat.sinTitulo': 'Untitled',
     'chat.eliminarConfirm': 'Delete this chat?',
@@ -393,6 +433,26 @@ const TRADUCCIONES = {
     'biblioteca.titulo': 'Biblioteca',
     'biblioteca.subir': '+ Enviar arquivo',
     'biblioteca.vacio': 'Você ainda não enviou arquivos. Use o botão "+ Enviar arquivo".',
+    'nav.memoria': 'Memória',
+    'memoria.titulo': 'Memória',
+    'memoria.agregar': '+ Adicionar memória',
+    'memoria.desc': 'A Fenix lembra informações sobre você e os temas que lhe importam para personalizar as respostas. Você pode revisar, apagar ou adicionar memórias manualmente.',
+    'memoria.vacia': 'Ainda não há memórias salvas. Converse um pouco e a Fenix começará a lembrar seus dados e temas importantes.',
+    'memoria.queRecordar': 'O que devo lembrar?',
+    'memoria.placeholder': 'Ex.: "Meu nome é Sara e trabalho como arquiteta"',
+    'memoria.categoria': 'Categoria',
+    'memoria.catPersonal': 'Pessoal',
+    'memoria.catPreferencia': 'Preferências',
+    'memoria.catProyecto': 'Projetos',
+    'memoria.catTecnico': 'Técnico',
+    'memoria.catTemas': 'Temas importantes',
+    'memoria.guardar': 'Salvar',
+    'memoria.cancelar': 'Cancelar',
+    'memoria.eliminar': 'Excluir',
+    'memoria.eliminarConfirm': 'Excluir esta memória?',
+    'memoria.guardada': 'Memória salva',
+    'memoria.requiereSesion': 'Entre na sua conta para salvar e ver suas memórias.',
+    'chat.recordar': 'Lembrar disso',
     'chat.escribiendo': 'Escrevendo...',
     'chat.sinTitulo': 'Sem título',
     'chat.eliminarConfirm': 'Excluir este chat?',
@@ -536,6 +596,26 @@ const TRADUCCIONES = {
     'biblioteca.titulo': 'Bibliothèque',
     'biblioteca.subir': '+ Envoyer un fichier',
     'biblioteca.vacio': "Vous n'avez pas encore envoyé de fichiers. Utilisez le bouton \"+ Envoyer un fichier\".",
+    'nav.memoria': 'Mémoire',
+    'memoria.titulo': 'Mémoire',
+    'memoria.agregar': '+ Ajouter un souvenir',
+    'memoria.desc': 'Fenix se souvient d\'informations sur vous et des sujets qui vous tiennent à cœur pour personnaliser ses réponses. Vous pouvez les consulter, les supprimer ou les ajouter à la main.',
+    'memoria.vacia': 'Aucun souvenir enregistré pour l\'instant. Discutez un moment et Fenix commencera à se souvenir de vos données et sujets importants.',
+    'memoria.queRecordar': 'Que dois-je retenir ?',
+    'memoria.placeholder': 'Ex. : "Je m\'appelle Sara et je suis architecte"',
+    'memoria.categoria': 'Catégorie',
+    'memoria.catPersonal': 'Personnel',
+    'memoria.catPreferencia': 'Préférences',
+    'memoria.catProyecto': 'Projets',
+    'memoria.catTecnico': 'Technique',
+    'memoria.catTemas': 'Sujets importants',
+    'memoria.guardar': 'Enregistrer',
+    'memoria.cancelar': 'Annuler',
+    'memoria.eliminar': 'Supprimer',
+    'memoria.eliminarConfirm': 'Supprimer ce souvenir ?',
+    'memoria.guardada': 'Souvenir enregistré',
+    'memoria.requiereSesion': 'Connectez-vous pour enregistrer et voir vos souvenirs.',
+    'chat.recordar': 'Retenir ceci',
     'chat.escribiendo': 'Écrit...',
     'chat.sinTitulo': 'Sans titre',
     'chat.eliminarConfirm': 'Supprimer ce chat ?',
@@ -679,6 +759,26 @@ const TRADUCCIONES = {
     'biblioteca.titulo': 'Bibliothek',
     'biblioteca.subir': '+ Datei hochladen',
     'biblioteca.vacio': 'Du hast noch keine Dateien hochgeladen. Verwende die Schaltfläche "+ Datei hochladen".',
+    'nav.memoria': 'Erinnerung',
+    'memoria.titulo': 'Erinnerung',
+    'memoria.agregar': '+ Erinnerung hinzufügen',
+    'memoria.desc': 'Fenix merkt sich Informationen über dich und die Themen, die dir wichtig sind, um Antworten zu personalisieren. Du kannst sie ansehen, löschen oder von Hand hinzufügen.',
+    'memoria.vacia': 'Noch keine Erinnerungen gespeichert. Unterhalte dich eine Weile und Fenix merkt sich deine Daten und wichtigen Themen.',
+    'memoria.queRecordar': 'Woran soll ich mich erinnern?',
+    'memoria.placeholder': 'Z. B.: "Ich heiße Sara und arbeite als Architektin"',
+    'memoria.categoria': 'Kategorie',
+    'memoria.catPersonal': 'Persönlich',
+    'memoria.catPreferencia': 'Vorlieben',
+    'memoria.catProyecto': 'Projekte',
+    'memoria.catTecnico': 'Technisch',
+    'memoria.catTemas': 'Wichtige Themen',
+    'memoria.guardar': 'Speichern',
+    'memoria.cancelar': 'Abbrechen',
+    'memoria.eliminar': 'Löschen',
+    'memoria.eliminarConfirm': 'Diese Erinnerung löschen?',
+    'memoria.guardada': 'Erinnerung gespeichert',
+    'memoria.requiereSesion': 'Melde dich an, um Erinnerungen zu speichern und anzusehen.',
+    'chat.recordar': 'Merken',
     'chat.escribiendo': 'Schreibt...',
     'chat.sinTitulo': 'Ohne Titel',
     'chat.eliminarConfirm': 'Diesen Chat löschen?',
@@ -822,6 +922,26 @@ const TRADUCCIONES = {
     'biblioteca.titulo': 'ライブラリ',
     'biblioteca.subir': '+ ファイルをアップロード',
     'biblioteca.vacio': 'まだファイルをアップロードしていません。「+ ファイルをアップロード」ボタンを使用してください。',
+    'nav.memoria': 'メモリー',
+    'memoria.titulo': 'メモリー',
+    'memoria.agregar': '+ メモリー追加',
+    'memoria.desc': 'Fenix は、回答をパーソナライズするためにあなたに関する情報や関心のある重要なトピックを覚えています。確認、削除、手動追加ができます。',
+    'memoria.vacia': '保存されたメモリーはまだありません。少しチャットすると、Fenix があなたのデータや重要なトピックを覚えていきます。',
+    'memoria.queRecordar': '何を覚えておきましょうか？',
+    'memoria.placeholder': '例：「サラと申します。建築家として働いています」',
+    'memoria.categoria': 'カテゴリ',
+    'memoria.catPersonal': '個人',
+    'memoria.catPreferencia': '好み',
+    'memoria.catProyecto': 'プロジェクト',
+    'memoria.catTecnico': '技術',
+    'memoria.catTemas': '重要なトピック',
+    'memoria.guardar': '保存',
+    'memoria.cancelar': 'キャンセル',
+    'memoria.eliminar': '削除',
+    'memoria.eliminarConfirm': 'このメモリーを削除しますか？',
+    'memoria.guardada': 'メモリーを保存しました',
+    'memoria.requiereSesion': 'メモリーを保存・表示するにはログインしてください。',
+    'chat.recordar': 'これを覚える',
     'chat.escribiendo': '入力中...',
     'chat.sinTitulo': '無題',
     'chat.eliminarConfirm': 'このチャットを削除しますか？',
@@ -965,6 +1085,26 @@ const TRADUCCIONES = {
     'biblioteca.titulo': '资料库',
     'biblioteca.subir': '+ 上传文件',
     'biblioteca.vacio': '您还没有上传文件。使用“+ 上传文件”按钮。',
+    'nav.memoria': '记忆',
+    'memoria.titulo': '记忆',
+    'memoria.agregar': '+ 添加记忆',
+    'memoria.desc': 'Fenix 会记住关于你的信息和你在意的主题，以便个性化回答。你可以查看、删除或手动添加。',
+    'memoria.vacia': '还没有保存的记忆。聊一会儿，Fenix 就会开始记住你的数据和重要主题。',
+    'memoria.queRecordar': '你想让我记住什么？',
+    'memoria.placeholder': '例如："我叫萨拉，是名建筑师"',
+    'memoria.categoria': '分类',
+    'memoria.catPersonal': '个人',
+    'memoria.catPreferencia': '偏好',
+    'memoria.catProyecto': '项目',
+    'memoria.catTecnico': '技术',
+    'memoria.catTemas': '重要主题',
+    'memoria.guardar': '保存',
+    'memoria.cancelar': '取消',
+    'memoria.eliminar': '删除',
+    'memoria.eliminarConfirm': '删除这条记忆？',
+    'memoria.guardada': '记忆已保存',
+    'memoria.requiereSesion': '请登录以保存和查看记忆。',
+    'chat.recordar': '记住这个',
     'chat.escribiendo': '正在输入...',
     'chat.sinTitulo': '无标题',
     'chat.eliminarConfirm': '删除此对话？',
@@ -1108,6 +1248,26 @@ const TRADUCCIONES = {
     'biblioteca.titulo': 'المكتبة',
     'biblioteca.subir': '+ رفع ملف',
     'biblioteca.vacio': 'لم ترفع أي ملفات بعد. استخدم زر "+ رفع ملف".',
+    'nav.memoria': 'الذاكرة',
+    'memoria.titulo': 'الذاكرة',
+    'memoria.agregar': '+ إضافة ذاكرة',
+    'memoria.desc': 'تتذكر فينكس معلومات عنك وعن المواضيع المهمة لك لتخصيص إجاباتها. يمكنك مراجعتها أو حذفها أو إضافتها يدويًا.',
+    'memoria.vacia': 'لا توجد ذكريات محفوظة بعد. تحدث قليلاً وستبدأ فينكس بتذكر بياناتك ومواضيعك المهمة.',
+    'memoria.queRecordar': 'ماذا تريدني أن أتذكر؟',
+    'memoria.placeholder': 'مثال: "اسمي سارة وأعمل مهندسة معمارية"',
+    'memoria.categoria': 'الفئة',
+    'memoria.catPersonal': 'شخصي',
+    'memoria.catPreferencia': 'التفضيلات',
+    'memoria.catProyecto': 'المشاريع',
+    'memoria.catTecnico': 'تقني',
+    'memoria.catTemas': 'مواضيع مهمة',
+    'memoria.guardar': 'حفظ',
+    'memoria.cancelar': 'إلغاء',
+    'memoria.eliminar': 'حذف',
+    'memoria.eliminarConfirm': 'حذف هذه الذاكرة؟',
+    'memoria.guardada': 'تم حفظ الذاكرة',
+    'memoria.requiereSesion': 'سجّل الدخول لحفظ ذكرياتك وعرضها.',
+    'chat.recordar': 'تذكر هذا',
     'chat.escribiendo': 'يكتب...',
     'chat.sinTitulo': 'بدون عنوان',
     'chat.eliminarConfirm': 'حذف هذه المحادثة؟',
@@ -1799,6 +1959,8 @@ function sendMessage(desdeVistaChat){
             if(limpio){
               burbujaBot.textContent = limpio;
               guardarMensajeEnHistorial('bot', limpio);
+              agregarBotonRecordar(burbujaBot, limpio);
+              agregarMenuMensaje(burbujaBot, limpio, null);
             } else {
               burbujaBot.remove();
             }
@@ -1906,8 +2068,9 @@ async function generarImagenEnBurbuja(burbuja, descripcion, pieTexto){
   }
 }
 
-/* Mete la imagen (y su pie de foto) dentro de una burbuja vacía. */
-function agregarImagenABurbuja(burbuja, imagenUrl, pieTexto){
+/* Mete la imagen (y su pie de foto) dentro de una burbuja vacía.
+   Si `edicion` trae configuración guardada, se vuelve a aplicar. */
+function agregarImagenABurbuja(burbuja, imagenUrl, pieTexto, edicion){
   burbuja.textContent = '';
   const img = document.createElement('img');
   img.src = imagenUrl;
@@ -1924,6 +2087,11 @@ function agregarImagenABurbuja(burbuja, imagenUrl, pieTexto){
     pie.className = 'msg-pie';
     pie.textContent = pieTexto;
     burbuja.appendChild(pie);
+  }
+  if(window.FenixImgEditor && window.FenixImgEditor.adjuntar){
+    window.FenixImgEditor.adjuntar(img, imagenUrl, edicion || null, function(config){
+      actualizarEdicionEnHistorial(imagenUrl, config);
+    });
   }
 }
 
@@ -2162,19 +2330,25 @@ async function crearDocumentoEnBurbuja(burbuja, titulo, contenido){
 /* ======================
    MOSTRAR MENSAJE EN PANTALLA
 ====================== */
-function agregarMensaje(tipo, texto, esTyping, imagenUrl, documento){
+function agregarMensaje(tipo, texto, esTyping, imagenUrl, documento, edicion){
   const contenedor = document.getElementById('messages');
   const burbuja = document.createElement('div');
   burbuja.className = 'msg ' + (tipo === 'user' ? 'msg-user' : 'msg-bot') + (esTyping ? ' typing' : '');
+  let imgEl = null;
   if(documento){
     agregarDocumentoABurbuja(burbuja, documento.titulo || texto || 'Documento', documento.contenido || '');
   } else if(imagenUrl){
-    agregarImagenABurbuja(burbuja, imagenUrl, texto || '');
+    agregarImagenABurbuja(burbuja, imagenUrl, texto || '', edicion);
+    imgEl = burbuja.querySelector('img');
   } else {
     burbuja.textContent = texto;
   }
   contenedor.appendChild(burbuja);
   contenedor.scrollTop = contenedor.scrollHeight;
+  if(!esTyping) agregarMenuMensaje(burbuja, texto || '', imgEl);
+  if(tipo === 'bot' && !documento && !imagenUrl && texto){
+    agregarBotonRecordar(burbuja, texto);
+  }
   return burbuja;
 }
 
@@ -2193,6 +2367,7 @@ function ocultarTodasLasVistas(){
   document.getElementById('vistaProyectos').style.display = 'none';
   document.getElementById('vistaProyectoDetalle').style.display = 'none';
   document.getElementById('vistaBiblioteca').style.display = 'none';
+  document.getElementById('vistaMemoria').style.display = 'none';
   document.getElementById('vistaConfiguracion').style.display = 'none';
   document.getElementById('vistaIdioma').style.display = 'none';
 }
@@ -2259,12 +2434,28 @@ function crearNuevoChatEnHistorial(primerMensaje){
   persistirDatos();
 }
 
-function guardarMensajeEnHistorial(tipo, texto, imagen, documento){
+function guardarMensajeEnHistorial(tipo, texto, imagen, documento, edicion){
   const chat = historial.find(c => c.id === chatActualId);
   if(chat){
-    const extra = documento ? { documento } : (imagen ? { imagen } : {});
+    let extra = {};
+    if(documento){
+      extra = { documento };
+    } else if(imagen){
+      extra = { imagen };
+      if(edicion) extra.edicion = edicion;
+    }
     chat.mensajes.push(Object.assign({ tipo, texto }, extra));
   }
+  persistirDatos();
+}
+
+// Cuando el usuario edita una imagen ya mostrada, guardamos la nueva
+// configuración (filtro/tamaño) en el chat correspondiente del historial.
+function actualizarEdicionEnHistorial(imagenUrl, edicion){
+  const chat = historial.find(c => c.id === chatActualId);
+  if(!chat) return;
+  const msj = chat.mensajes.find(m => m.imagen === imagenUrl);
+  if(msj) msj.edicion = edicion;
   persistirDatos();
 }
 
@@ -2460,7 +2651,7 @@ function abrirChat(id){
   chatActualId = id;
   mostrarVistaChat();
   document.getElementById('messages').innerHTML = '';
-  chat.mensajes.forEach(m => agregarMensaje(m.tipo, m.texto, false, m.imagen, m.documento));
+  chat.mensajes.forEach(m => agregarMensaje(m.tipo, m.texto, false, m.imagen, m.documento, m.edicion));
 }
 
 /* ======================
@@ -2930,6 +3121,262 @@ function renderizarBiblioteca(){
     card.onclick = () => window.open(archivo.url, '_blank');
     cont.appendChild(card);
   });
+}
+
+/* ======================
+   MEMORIA
+====================== */
+function mostrarVistaMemoria(){
+  ocultarTodasLasVistas();
+  document.getElementById('vistaMemoria').style.display = 'block';
+  cargarMemorias();
+}
+
+async function cargarMemorias(){
+  const cont = document.getElementById('memoriasList');
+  if(!cont) return;
+  cont.innerHTML = '';
+  try{
+    const respuesta = await fetch('/api/memories', { credentials: 'include' });
+    if(respuesta.status === 401){
+      cont.innerHTML = '<div class="empty-state">' + t('memoria.requiereSesion') + '</div>';
+      return;
+    }
+    if(!respuesta.ok) throw new Error('error');
+    const datos = await respuesta.json();
+    renderizarMemorias(datos.memorias || []);
+  }catch(e){
+    cont.innerHTML = '<div class="empty-state">❌</div>';
+  }
+}
+
+function renderizarMemorias(memorias){
+  const cont = document.getElementById('memoriasList');
+  if(!cont) return;
+  cont.innerHTML = '';
+
+  if(!memorias.length){
+    cont.innerHTML = '<div class="empty-state">' + t('memoria.vacia') + '</div>';
+    return;
+  }
+
+  memorias.forEach(m => {
+    const item = document.createElement('div');
+    item.className = 'memoria-item';
+    item.innerHTML = `
+      <div class="memoria-texto">${escaparHTML(m.memory_text)}</div>
+      <div class="memoria-pie">
+        <span class="memoria-cat">${etiquetaCategoria(m.category)}</span>
+        <button class="memoria-del" onclick="eliminarMemoria(${m.id})" title="${t('memoria.eliminar')}">✕</button>
+      </div>
+    `;
+    cont.appendChild(item);
+  });
+}
+
+function etiquetaCategoria(cat){
+  const mapa = {
+    personal: 'memoria.catPersonal',
+    preferencia: 'memoria.catPreferencia',
+    proyecto: 'memoria.catProyecto',
+    tecnico: 'memoria.catTecnico',
+    temas: 'memoria.catTemas'
+  };
+  return t(mapa[cat] || 'memoria.catPersonal');
+}
+
+async function eliminarMemoria(id){
+  if(!confirm(t('memoria.eliminarConfirm'))) return;
+  try{
+    const respuesta = await fetch('/api/memories/' + id, { method: 'DELETE', credentials: 'include' });
+    if(!respuesta.ok) throw new Error('error');
+    cargarMemorias();
+  }catch(e){
+    mostrarToastMemoria('❌');
+  }
+}
+
+function abrirModalMemoria(prefill){
+  const texto = document.getElementById('memoriaModalTexto');
+  texto.value = prefill || '';
+  document.getElementById('memoriaModalCat').value = reglaCategoriaPreferida(prefill);
+  document.getElementById('memoriaModal').style.display = 'flex';
+  texto.focus();
+}
+
+function cerrarModalMemoria(){
+  document.getElementById('memoriaModal').style.display = 'none';
+}
+
+// Cuando el botón "Recuérdalo" prellenó texto largo (una respuesta), conviene
+// la categoría "temas"; si no, dejamos la que el usuario eligió antes.
+function reglaCategoriaPreferida(prefill){
+  if(prefill && prefill.length > 80) return 'temas';
+  return document.getElementById('memoriaModalCat').value || 'personal';
+}
+
+async function guardarMemoriaDesdeModal(){
+  const inputTexto = document.getElementById('memoriaModalTexto');
+  const texto = inputTexto.value.trim();
+  if(!texto){
+    inputTexto.focus();
+    return;
+  }
+  const categoria = document.getElementById('memoriaModalCat').value || 'personal';
+  const btn = document.getElementById('memoriaModalGuardar');
+  btn.disabled = true;
+  try{
+    const respuesta = await fetch('/api/memories', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texto, categoria })
+    });
+    if(respuesta.status === 401){
+      cerrarModalMemoria();
+      mostrarToastMemoria(t('memoria.requiereSesion'));
+      return;
+    }
+    if(!respuesta.ok) throw new Error('error');
+    cerrarModalMemoria();
+    mostrarToastMemoria('✓ ' + t('memoria.guardada'));
+    const viendoMemoria = document.getElementById('vistaMemoria').style.display === 'block';
+    if(viendoMemoria) cargarMemorias();
+  }catch(e){
+    mostrarToastMemoria('❌');
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+function mostrarToastMemoria(texto){
+  const previo = document.querySelector('.memoria-toast');
+  if(previo) previo.remove();
+  const toast = document.createElement('div');
+  toast.className = 'memoria-toast';
+  toast.textContent = texto;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2600);
+}
+
+// Botón elegante "Recuérdalo" en las respuestas del asistente.
+function agregarBotonRecordar(burbuja, texto){
+  if(!burbuja || !texto || burbuja.querySelector('.msg-recordar')) return;
+  const limpiar = String(texto)
+    .replace(/\[GENERAR_(IMAGEN|DOC)\][\s\S]*$/i, '')
+    .replace(/^\[IMAGEN\]\s*:?.*$/gim, '')
+    .trim();
+  if(!limpiar) return;
+  const boton = document.createElement('button');
+  boton.type = 'button';
+  boton.className = 'msg-recordar';
+  boton.title = t('chat.recordar');
+  boton.setAttribute('aria-label', t('chat.recordar'));
+  boton.innerHTML =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+    '<path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/>' +
+    '<line x1="9" y1="9" x2="15" y2="9"/></svg>' +
+    '<span></span>';
+  boton.querySelector('span').textContent = t('chat.recordar');
+  boton.onclick = () => abrirModalMemoria(limpiar.slice(0, 300));
+  burbuja.appendChild(boton);
+}
+
+/* Menú de acciones (⋮) en cada mensaje: Editar (imágenes), Recordar y Copiar. */
+let menuGlobalEscuchando = false;
+
+function limpiarTextoParaAcciones(texto){
+  return String(texto || '')
+    .replace(/\[GENERAR_(IMAGEN|DOC)\][\s\S]*$/i, '')
+    .replace(/^\[IMAGEN\]\s*:?.*$/gim, '')
+    .trim();
+}
+
+function cerrarMenusMensaje(){
+  document.querySelectorAll('.msg-menu-abierto').forEach(m => m.classList.remove('msg-menu-abierto'));
+}
+
+function copiarAlPortapapeles(texto){
+  const limpio = limpiarTextoParaAcciones(texto);
+  if(!limpio) return;
+  const aviso = () => mostrarToastMemoria('✓ ' + (window.FenixImgEditor ? window.FenixImgEditor.t('copiado') : 'Copiado'));
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(limpio).then(aviso, () => copiarConFallback(limpio, aviso));
+  } else {
+    copiarConFallback(limpio, aviso);
+  }
+}
+
+function copiarConFallback(texto, onListo){
+  const ta = document.createElement('textarea');
+  ta.value = texto;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); if(onListo) onListo(); } catch(e){}
+  ta.remove();
+}
+
+function agregarMenuMensaje(burbuja, texto, imgEl){
+  if(!burbuja || burbuja.querySelector('.msg-menu-btn')) return;
+  const limpio = limpiarTextoParaAcciones(texto);
+  if(!limpio && !imgEl) return;
+
+  const caja = document.createElement('div');
+  caja.className = 'msg-menu-caja';
+  if(imgEl) caja.dataset.conImagen = '1';
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'msg-menu-btn';
+  btn.setAttribute('aria-label', '⋮');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>';
+  caja.appendChild(btn);
+
+  const menu = document.createElement('div');
+  menu.className = 'msg-menu';
+  const labEditar = window.FenixImgEditor ? window.FenixImgEditor.t('editar') : 'Editar';
+  const labCopiar = window.FenixImgEditor ? window.FenixImgEditor.t('copiar') : 'Copiar';
+  const labRecordar = t('chat.recordar');
+
+  if(imgEl){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg><span>' + labEditar + '</span>';
+    b.onclick = () => { cerrarMenusMensaje(); if(window.FenixImgEditor) window.FenixImgEditor.editar(imgEl); };
+    menu.appendChild(b);
+  }
+  if(limpio){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/><line x1="9" y1="9" x2="15" y2="9"/></svg><span>' + labRecordar + '</span>';
+    b.onclick = () => { cerrarMenusMensaje(); abrirModalMemoria(limpio.slice(0, 300)); };
+    menu.appendChild(b);
+  }
+  if(limpio){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>' + labCopiar + '</span>';
+    b.onclick = () => { cerrarMenusMensaje(); copiarAlPortapapeles(limpio); };
+    menu.appendChild(b);
+  }
+  if(!menu.children.length) return;
+  caja.appendChild(menu);
+  burbuja.appendChild(caja);
+
+  btn.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    cerrarMenusMensaje();
+    menu.classList.add('msg-menu-abierto');
+  });
+
+  if(!menuGlobalEscuchando){
+    menuGlobalEscuchando = true;
+    document.addEventListener('click', (ev) => {
+      if(!ev.target.closest('.msg-menu-btn')) cerrarMenusMensaje();
+    });
+  }
 }
 
 /* ======================
