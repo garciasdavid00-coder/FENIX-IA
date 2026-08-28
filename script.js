@@ -47,6 +47,9 @@ let proyectoActualId = null; // para saber en qué proyecto estamos parados
 let archivosBiblioteca = []; // [{id, nombre, tipo, tamanoKB, url}]
 let idiomaSeleccionado = localStorage.getItem('fenixIdioma') || 'es';
 let idiomaPendiente = null;
+// Última petición del usuario: se usa como "tema" cuando pedimos un
+// documento real (para que la IA busque info de verdad sobre eso).
+let ultimoMensajeUsuario = '';
 
 /* ======================
    INTERNACIONALIZACIÓN (i18n)
@@ -88,6 +91,7 @@ const TRADUCCIONES = {
     'doc.generando': 'Creando documento…',
     'doc.descargar': 'Descargar documento',
     'doc.ver': 'Ver documento',
+    'doc.imagenes': 'Generando imagen {n} de {total}…',
     'pill.escrituraPrompt': 'Ayúdame a escribir: ',
     'pill.resumenPrompt': 'Hazme un resumen de: ',
     'pill.sitiosPrompt': 'Búscame información sobre: ',
@@ -230,6 +234,7 @@ const TRADUCCIONES = {
     'doc.generando': 'Creating document…',
     'doc.descargar': 'Download document',
     'doc.ver': 'View document',
+    'doc.imagenes': 'Generating image {n} of {total}…',
     'pill.escrituraPrompt': 'Help me write: ',
     'pill.resumenPrompt': 'Give me a summary of: ',
     'pill.sitiosPrompt': 'Search for information about: ',
@@ -372,6 +377,7 @@ const TRADUCCIONES = {
     'doc.generando': 'Criando documento…',
     'doc.descargar': 'Baixar documento',
     'doc.ver': 'Ver documento',
+    'doc.imagenes': 'Gerando imagem {n} de {total}…',
     'pill.escrituraPrompt': 'Ajude-me a escrever: ',
     'pill.resumenPrompt': 'Faça um resumo de: ',
     'pill.sitiosPrompt': 'Pesquise informações sobre: ',
@@ -514,6 +520,7 @@ const TRADUCCIONES = {
     'doc.generando': 'Création du document…',
     'doc.descargar': 'Télécharger le document',
     'doc.ver': 'Voir le document',
+    'doc.imagenes': 'Génération de l\'image {n} sur {total}…',
     'pill.escrituraPrompt': "Aide-moi à écrire : ",
     'pill.resumenPrompt': 'Fais-moi un résumé de : ',
     'pill.sitiosPrompt': "Cherche-moi des informations sur : ",
@@ -656,6 +663,7 @@ const TRADUCCIONES = {
     'doc.generando': 'Dokument wird erstellt…',
     'doc.descargar': 'Dokument herunterladen',
     'doc.ver': 'Dokument ansehen',
+    'doc.imagenes': 'Bild {n} von {total} wird erstellt…',
     'pill.escrituraPrompt': 'Hilf mir zu schreiben: ',
     'pill.resumenPrompt': 'Fass mir zusammen: ',
     'pill.sitiosPrompt': 'Suche nach Informationen über: ',
@@ -798,6 +806,7 @@ const TRADUCCIONES = {
     'doc.generando': 'ドキュメントを作成中…',
     'doc.descargar': 'ドキュメントをダウンロード',
     'doc.ver': 'ドキュメントを見る',
+    'doc.imagenes': '画像 {n} / {total} を生成中…',
     'pill.escrituraPrompt': 'の執筆を手伝ってください: ',
     'pill.resumenPrompt': 'の要約を作ってください: ',
     'pill.sitiosPrompt': 'についての情報を検索してください: ',
@@ -940,6 +949,7 @@ const TRADUCCIONES = {
     'doc.generando': '正在创建文档…',
     'doc.descargar': '下载文档',
     'doc.ver': '查看文档',
+    'doc.imagenes': '正在生成第 {n} 张图片，共 {total} 张…',
     'pill.escrituraPrompt': '帮我写：',
     'pill.resumenPrompt': '为我总结一下：',
     'pill.sitiosPrompt': '搜索关于以下内容的信息：',
@@ -1082,6 +1092,7 @@ const TRADUCCIONES = {
     'doc.generando': 'جارٍ إنشاء المستند…',
     'doc.descargar': 'تنزيل المستند',
     'doc.ver': 'عرض المستند',
+    'doc.imagenes': 'جارٍ إنشاء الصورة {n} من {total}…',
     'pill.escrituraPrompt': 'ساعدني في كتابة: ',
     'pill.resumenPrompt': 'أعطني ملخصًا عن: ',
     'pill.sitiosPrompt': 'ابحث لي عن معلومات حول: ',
@@ -1659,6 +1670,7 @@ function sendMessage(desdeVistaChat){
   agregarMensaje('user', texto);
   guardarMensajeEnHistorial('user', texto);
 
+  ultimoMensajeUsuario = texto;
   inputActivo.value = '';
   autoGrow(inputActivo);
 
@@ -1750,8 +1762,10 @@ function sendMessage(desdeVistaChat){
           if(typeof obj.texto === 'string' && obj.texto){
             textoAcumulado += obj.texto;
             // Si el modelo pidió una imagen o un documento, no mostramos
-            // el marcador crudo mientras llega el resto.
-            const visible = textoAcumulado.replace(/\[GENERAR_(IMAGEN|DOC)\][\s\S]*$/i, '');
+            // los marcadores crudos mientras llega el resto.
+            const visible = textoAcumulado
+              .replace(/\[GENERAR_(IMAGEN|DOC)\][\s\S]*$/i, '')
+              .replace(/^\[IMAGEN\]\s*:?.*$/gim, '');
             const espera = /\[GENERAR_DOC\]/i.test(textoAcumulado) ? t('doc.generando') : t('imagen.generando');
             burbujaBot.textContent = visible.trim() ? visible : espera;
             burbujaBot.appendChild(cursor);
@@ -1770,11 +1784,13 @@ function sendMessage(desdeVistaChat){
           burbujaBot.textContent = '⚠️ ' + errorStream;
         } else if(textoAcumulado){
           // El modelo puede responder con [GENERAR_IMAGEN]: descripcion o
-          // con [GENERAR_DOC]: titulo + contenido para que los creemos.
+          // con [GENERAR_DOC]: Título. En el caso del documento, el modelo
+          // solo aporta el título: el cuerpo lo redacta el servidor con
+          // hechos reales y fotos reales (ver /api/documento-real).
           const coincidenciaDoc = textoAcumulado.match(/\[GENERAR_DOC\]\s*:?\s*([^\n]*)\n?([\s\S]*)/i);
           const coincidenciaImg = textoAcumulado.match(/\[GENERAR_IMAGEN\]\s*:?\s*([\s\S]+)/i);
-          if(coincidenciaDoc && coincidenciaDoc[1].trim() && coincidenciaDoc[2].trim()){
-            crearDocumentoEnBurbuja(burbujaBot, coincidenciaDoc[1].trim(), coincidenciaDoc[2].trim());
+          if(coincidenciaDoc && coincidenciaDoc[1].trim()){
+            crearDocumentoEnBurbuja(burbujaBot, coincidenciaDoc[1].trim(), (coincidenciaDoc[2] || '').trim());
           } else if(coincidenciaImg && coincidenciaImg[1].trim()){
             generarImagenEnBurbuja(burbujaBot, coincidenciaImg[1].trim(), t('chat.imagenLista'));
           } else {
@@ -1930,7 +1946,8 @@ function convertirMarkdownAHtml(contenido){
     const l = linea.trim();
     if(!l){ cerrarLista(); continue; }
     let m;
-    if((m = l.match(/^###\s+(.+)/))){ cerrarLista(); html += '<h3>' + enLinea(m[1]) + '</h3>'; }
+    if((m = l.match(/^\[FENIX_IMG:([^\]]+)\]$/))){ cerrarLista(); html += '<img class="doc-imagen" src="' + escapar(m[1]) + '" alt="">'; }
+    else if((m = l.match(/^###\s+(.+)/))){ cerrarLista(); html += '<h3>' + enLinea(m[1]) + '</h3>'; }
     else if((m = l.match(/^##\s+(.+)/))){ cerrarLista(); html += '<h2>' + enLinea(m[1]) + '</h2>'; }
     else if((m = l.match(/^#\s+(.+)/))){ cerrarLista(); html += '<h1>' + enLinea(m[1]) + '</h1>'; }
     else if((m = l.match(/^[-*]\s+(.+)/))){ if(listaAbierta !== 'ul'){ cerrarLista(); html += '<ul>'; listaAbierta = 'ul'; } html += '<li>' + enLinea(m[1]) + '</li>'; }
@@ -1943,14 +1960,76 @@ function convertirMarkdownAHtml(contenido){
 
 /* Descarga el documento como .doc (HTML con formato Word: lo abren
    Word, LibreOffice y Google Docs sin librerías extra). */
-function descargarDocumento(titulo, contenidoMarkdown){
+/* ---- helpers de codificación para el archivo Word con fotos ---- */
+function utf8ABase64(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  for(let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+function blobABase64(blob){
+  return new Promise((resolver, rechazar) => {
+    const lector = new FileReader();
+    lector.onload = () => resolver(String(lector.result).split(',')[1] || '');
+    lector.onerror = rechazar;
+    lector.readAsDataURL(blob);
+  });
+}
+function envolver76(s){ return s.replace(/(.{76})/g, '$1\n'); }
+
+/* Descarga el documento como .doc. Si el contenido trae fotos
+   ([FENIX_IMG:url]), se incrustan en formato MHTML, que Word abre
+   con las imágenes incluidas. */
+async function descargarDocumento(titulo, contenidoMarkdown){
   const cuerpoHtml = convertirMarkdownAHtml(contenidoMarkdown);
-  const docHtml = '<html xmlns:w="urn:schemas-microsoft-com:office:word">' +
+  let docHtml = '<html xmlns:w="urn:schemas-microsoft-com:office:word">' +
     '<head><meta charset="utf-8"><title>' + titulo.replace(/[<>]/g,'') + '</title>' +
     '<style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.4;}' +
-    'h1{font-size:18pt;color:#1a3c6e;}h2{font-size:14pt;color:#2a528f;}h3{font-size:12pt;color:#2a528f;}</style></head>' +
+    'h1{font-size:18pt;color:#1a3c6e;}h2{font-size:14pt;color:#2a528f;}h3{font-size:12pt;color:#2a528f;}' +
+    '.doc-imagen{max-width:480px;border-radius:8px;margin:10px 0;}</style></head>' +
     '<body>' + cuerpoHtml + '</body></html>';
-  const blob = new Blob(['\ufeff', docHtml], { type: 'application/msword' });
+
+  // Intentamos bajar cada foto del documento para incrustarla.
+  const partesImagen = [];
+  const tokens = contenidoMarkdown.match(/\[FENIX_IMG:[^\]]+\]/g) || [];
+  for(const token of tokens){
+    const url = token.slice(11, -1);
+    try {
+      const r = await fetch(url);
+      if(!r.ok) throw new Error('http ' + r.status);
+      const blob = await r.blob();
+      const tipo = (blob.type || 'image/jpeg').split(';')[0];
+      if(!tipo.startsWith('image/')) throw new Error('no imagen');
+      const nombre = 'foto' + (partesImagen.length + 1) + (tipo === 'image/png' ? '.png' : '.jpg');
+      docHtml = docHtml.replace(token, '<img class="doc-imagen" src="' + nombre + '" alt="">');
+      partesImagen.push({ nombre, tipo, b64: await blobABase64(blob) });
+    } catch(e) {
+      docHtml = docHtml.replace(token, '');
+    }
+  }
+
+  let contenido;
+  if(partesImagen.length){
+    // MHTML: un solo archivo con el HTML y las fotos dentro.
+    const LIM = '==FENIX==';
+    let mht = 'MIME-Version: 1.0\r\n' +
+      'Content-Type: multipart/related; type="text/html"; boundary="' + LIM + '"\r\n\r\n' +
+      '--' + LIM + '\r\nContent-Location: file:///C:/FenixIA/doc.html\r\n' +
+      'Content-Transfer-Encoding: base64\r\nContent-Type: text/html; charset="utf-8"\r\n\r\n' +
+      envolver76(utf8ABase64(docHtml)) + '\r\n';
+    for(const p of partesImagen){
+      mht += '--' + LIM + '\r\nContent-Location: file:///C:/FenixIA/' + p.nombre + '\r\n' +
+        'Content-Transfer-Encoding: base64\r\nContent-Type: ' + p.tipo + '\r\n\r\n' +
+        envolver76(p.b64) + '\r\n';
+    }
+    mht += '--' + LIM + '--\r\n';
+    contenido = mht;
+  } else {
+    // Sin fotos (o fallaron todas): HTML simple como siempre.
+    contenido = '\ufeff' + docHtml;
+  }
+
+  const blob = new Blob([contenido], { type: 'application/msword' });
   const enlace = document.createElement('a');
   enlace.href = URL.createObjectURL(blob);
   const nombreSeguro = titulo.replace(/[^\w\s\u00C0-\uFFFF-]/g, '').trim().slice(0, 80) || 'documento';
@@ -2042,11 +2121,42 @@ function agregarDocumentoABurbuja(burbuja, titulo, contenido){
   burbuja.appendChild(tarjeta);
 }
 
-/* Punto de llegada cuando el modelo responde con [GENERAR_DOC]: */
-function crearDocumentoEnBurbuja(burbuja, titulo, contenido){
-  burbuja.className = 'msg msg-bot';
-  agregarDocumentoABurbuja(burbuja, titulo, contenido);
-  guardarMensajeEnHistorial('bot', '📄 ' + titulo, null, { titulo, contenido });
+/* Punto de llegada cuando el modelo responde con [GENERAR_DOC]:.
+   El cuerpo NO lo redacta el modelo del chat (alucinaba datos): se pide al
+   servidor /api/documento-real, que usa el grounding de Gemini para buscar
+   hechos reales en internet y fotos REALES de Wikimedia Commons.
+   El contenido devuelto usa el formato simple que ya renderiza la app
+   (con [FENIX_IMG:url] para las fotos), así que la vista previa, el .doc
+   y la descarga siguen funcionando igual (clases .doc-imagen). */
+async function crearDocumentoEnBurbuja(burbuja, titulo, contenido){
+  burbuja.className = 'msg msg-bot typing';
+  burbuja.textContent = t('doc.generando');
+
+  // El "tema" se manda tal cual lo pidió el usuario (mejor que el título,
+  // porque trae el contexto completo de la petición).
+  let tema = String(ultimoMensajeUsuario || '').trim();
+  if(!tema) tema = String(titulo || '').trim();
+  if(!tema) tema = String(contenido || '').trim();
+
+  try {
+    const res = await fetch('/api/documento-real', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tema })
+    });
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok || !data.contenido) throw new Error(data.error || t('error.servidor'));
+
+    const contenidoLimpio = String(data.contenido).replace(/\n{3,}/g, '\n\n').trim();
+    const tituloFinal = String(titulo || '').trim() || 'Documento';
+    burbuja.className = 'msg msg-bot';
+    agregarDocumentoABurbuja(burbuja, tituloFinal, contenidoLimpio);
+    guardarMensajeEnHistorial('bot', '📄 ' + tituloFinal, null, { titulo: tituloFinal, contenido: contenidoLimpio });
+  } catch(e) {
+    console.error('Error generando documento real:', e);
+    burbuja.className = 'msg msg-bot';
+    burbuja.textContent = '⚠️ ' + String((e && e.message) || t('error.servidor'));
+  }
 }
 
 /* ======================

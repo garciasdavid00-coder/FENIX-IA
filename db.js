@@ -54,6 +54,22 @@ async function inicializar() {
         UNIQUE (google_id, cliente_id)
       )
     `);
+    // Memoria persistente: hechos y preferencias del usuario, reinyectados
+    // en el system prompt (ver backend/memoryManager.js).
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS user_memories (
+        id          SERIAL PRIMARY KEY,
+        user_id     VARCHAR(100) NOT NULL REFERENCES usuarios(google_id) ON DELETE CASCADE,
+        memory_text TEXT         NOT NULL,
+        category    VARCHAR(50)  NOT NULL DEFAULT 'personal',
+        created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+        updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+      )
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_user_memories_user_id
+        ON user_memories(user_id)
+    `);
     console.log('Base de datos conectada y lista.');
   } catch (e) {
     console.error('ERROR al conectar la base de datos:', e.message);

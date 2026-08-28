@@ -7,6 +7,9 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const path = require('path');
 const db = require('./db');
 const { selectModel } = require('./modelRouter');
+const { generarDocumentoConHechosReales } = require('./services/promptDocumentos');
+const { router: imagenesRealesRouter, buscarImagenReal } = require('./routes/imagenesReales');
+const memory = require('./backend/memoryManager');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -144,6 +147,10 @@ app.post('/api/logout', (req, res) => {
   });
 });
 
+// Endpoint GET /api/imagen-real (fotos reales de Wikimedia Commons).
+// Ver routes/imagenesReales.js.
+app.use(imagenesRealesRouter);
+
 // Historial en la nube: devuelve los chats y proyectos de la cuenta logueada.
 app.get('/api/sincronizar', async (req, res) => {
   if (!req.isAuthenticated || !req.isAuthenticated()) {
@@ -179,7 +186,8 @@ app.post('/api/sincronizar', async (req, res) => {
 // Voz en tiempo real: token efímero para Gemini Live API.
 // (Va directo aquí para no depender de carpetas extra en el repo.)
 app.post('/api/voice-token', async (req, res) => {
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
   if (!GEMINI_API_KEY) {
     return res.status(500).json({ error: 'Gemini no está configurado en el servidor.' });
   }
@@ -223,6 +231,8 @@ app.post('/api/voice-token', async (req, res) => {
 // Generación de imágenes con Pollinations.ai (gratis y sin API key).
 // Devolvemos la URL con semilla fija: la misma URL vuelve a dar la misma
 // imagen, así el historial guarda solo la dirección (no llena localStorage).
+// AVISO: este generador por IA se usa SOLO para ilustraciones sueltas del
+// chat. Los DOCUMENTOS usan fotos reales vía /api/documento-real.
 app.post('/api/imagen', async (req, res) => {
   try {
     const prompt = ((req.body && req.body.prompt) || '').trim().slice(0, 500);
@@ -231,9 +241,10 @@ app.post('/api/imagen', async (req, res) => {
     }
 
     const seed = Math.floor(Math.random() * 1e9);
-    // Devolvemos una ruta de NUESTRO servidor: el navegador nunca depende
-    // de terceros (adblockers ni redes que bloqueen pollinations).
-    const url = '/api/imagen-archivo?q=' + encodeURIComponent(prompt) + '&s=' + seed;
+    // El proxy /api/imagen-archivo quedó deprecado, así que devolvemos la
+    // URL directa de Pollinations (mismo resultado gracias a la semilla).
+    const url = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) +
+      '?width=1024&height=1024&nologo=true&seed=' + seed;
 
     // Verificamos que la imagen se genera bien antes de responder al cliente.
     const controlador = new AbortController();
@@ -255,7 +266,7 @@ app.post('/api/imagen', async (req, res) => {
       return res.status(502).json({ error: 'No se pudo generar la imagen. Intenta de nuevo.' });
     }
     // Consumimos el cuerpo para liberar la conexión (Pollinations la cachea
-    // y /api/imagen-archivo la volverá a pedir con la misma semilla).
+    // y así la siguiente petición con la misma semilla responde más rápido).
     await respuesta.arrayBuffer().catch(() => {});
 
     res.json({ url });
@@ -265,9 +276,22 @@ app.post('/api/imagen', async (req, res) => {
   }
 });
 
-// Sirve la imagen generada haciendo de intermediario (proxy).
-// Con la misma pregunta y semilla, Pollinations devuelve siempre la misma
-// imagen, así que podemos cachearla en el navegador sin miedo.
+/* ============================================================
+   ENDPOINT VIEJO /api/imagen-archivo — DEPRECADO (no borrado)
+   ------------------------------------------------------------
+   Antes servía de intermediario (proxy) hacia Pollinations para
+   las imágenes generadas con IA: con la misma pregunta y semilla
+   Pollinations devolvía siempre la misma imagen, así podíamos
+   cachearla en el navegador.
+
+   Quedó fuera de uso porque los DOCUMENTOS ahora usan fotos
+   REALES de Wikimedia Commons (ver /api/documento-real y
+   routes/imagenesReales.js), y no queremos generar imágenes
+   falsas para ilustrar datos reales.
+
+   El código se conserva abajo por si lo necesitas otra vez:
+   basta con descomentarlo.
+
 app.get('/api/imagen-archivo', async (req, res) => {
   try {
     const prompt = ((req.query.q) || '').trim().slice(0, 500);
@@ -299,6 +323,73 @@ app.get('/api/imagen-archivo', async (req, res) => {
   } catch (e) {
     console.error('Error en /api/imagen-archivo:', e.message);
     res.status(502).end();
+  }
+});
+============================================================ */
+
+// POST /api/documento-real
+// Genera un documento con HECHOS REALES: el modelo usa el grounding de
+// Google Search (no inventa fechas/nombres/cifras) y las ilustraciones
+// son FOTOS REALES de Wikimedia Commons, nunca imágenes generadas por IA.
+app.post('/api/documento-real', async (req, res) => {
+  try {
+    const tema = ((req.body && req.body.tema) || '').toString().trim().slice(0, 1000);
+    if (!tema) {
+      return res.status(400).json({ error: 'Falta el campo "tema".' });
+    }
+    if (!GEMINI_API_KEY) {
+      return res.status(400).json({ error: 'GEMINI_API_KEY no está configurado en el servidor.' });
+    }
+
+    // 1) El modelo redacta basándose en búsquedas reales (grounding) y, en
+    //    vez de imágenes, emite marcadores [IMG_QUERY: consulta corta].
+    const { contenido, fuentes } = await generarDocumentoConHechosReales({
+      tema,
+      apiKey: GEMINI_API_KEY,
+      modelo: GEMINI_MODEL
+    });
+
+    // 2) Resolvemos cada [IMG_QUERY: ...] contra una foto real de Commons
+    //    (llamada interna, sin pasar por HTTP). Si no hay foto, el marcador
+    //    desaparece en vez de dejar una imagen rota.
+    const MAX_IMAGENES = 4;
+    let imagenesColocadas = 0;
+    const marcadores = Array.from(contenido.matchAll(/\[IMG_QUERY:\s*([^\]]+)\]/gi));
+    let documentoFinal = contenido;
+
+    for (const m of marcadores) {
+      const consultaImg = m[1].trim().slice(0, 120);
+      let reemplazo = '';
+      if (imagenesColocadas < MAX_IMAGENES) {
+        try {
+          const fotos = await buscarImagenReal(consultaImg);
+          const urlFoto = fotos[0] && fotos[0].url;
+          if (urlFoto) {
+            reemplazo = '[FENIX_IMG:' + urlFoto + ']';
+            imagenesColocadas++;
+          } else {
+            console.warn('[documento-real] Sin foto real para:', consultaImg, '— marcador eliminado.');
+          }
+        } catch (e) {
+          console.error('[documento-real] Error buscando foto real para "' + consultaImg + '":', e.message);
+        }
+      }
+      // reemplaza la primera aparición exacta de este marcador
+      documentoFinal = documentoFinal.replace(m[0], reemplazo);
+    }
+
+    // 3) Al final, sección "Fuentes" con las URLs REALES que usó Gemini.
+    if (fuentes.length) {
+      const enlaces = fuentes.map(f => '- ' + f.url).join('\n');
+      documentoFinal = documentoFinal.trim() + '\n\n## Fuentes\n\n' + enlaces;
+    }
+
+    // Formato compatible con el renderizador del front (clases .doc-imagen).
+    const contenidoLimpio = documentoFinal.replace(/\n{3,}/g, '\n\n').trim();
+    res.json({ contenido: contenidoLimpio, fuentes });
+  } catch (e) {
+    console.error('Error en /api/documento-real:', e);
+    res.status(502).json({ error: 'No se pudo generar el documento con hechos reales. Intenta de nuevo.' });
   }
 });
 
@@ -527,6 +618,45 @@ function crearFiltroRazonamiento(){
   };
 }
 
+// ------------------------------------------------------------
+// MEMORIAS DEL USUARIO — lo que la IA recuerda de él (ver backend/memoryManager.js)
+// ------------------------------------------------------------
+
+// Devuelve las memorias del usuario conectado.
+app.get('/api/memories', async (req, res) => {
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
+    return res.status(401).json({ error: 'No autenticado' });
+  }
+  try {
+    const memorias = await memory.getUserMemories(req.user.id);
+    res.json({ memorias });
+  } catch (e) {
+    console.error('Error en GET /api/memories:', e.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// Borra una memoria (solo si pertenece al usuario autenticado).
+app.delete('/api/memories/:id', async (req, res) => {
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
+    return res.status(401).json({ error: 'No autenticado' });
+  }
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ error: 'ID inválido' });
+  }
+  try {
+    const borrada = await memory.deleteMemory(id, req.user.id);
+    if (!borrada) {
+      return res.status(404).json({ error: 'Memoria no encontrada' });
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('Error en DELETE /api/memories:', e.message);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
 app.post('/api/chat', async (req, res) => {
   try {
     const { mensaje, historial, modelo, idioma, instruccion } = req.body;
@@ -537,6 +667,7 @@ app.post('/api/chat', async (req, res) => {
 
     // Límite de mensajes sin iniciar sesión (3 gratis por sesión)
     const autenticado = !!(req.isAuthenticated && req.isAuthenticated());
+    const userId = req.user ? req.user.id : null;
     const LIMITE_SIN_LOGIN = 3;
     if(!autenticado){
       const usados = req.session.mensajesSinLogin || 0;
@@ -565,7 +696,24 @@ app.post('/api/chat', async (req, res) => {
       : '';
 
     // Construimos el historial de mensajes para dar contexto a la IA
-    const sistemaBase = `Eres Fenix IA, un asistente útil y amigable. Responde siempre en ${lang}. Tu creador es Joshua Blandon Gonzales.
+    // ----------------------------------------------------------
+    // MEMORIA PERSISTENTE: si el usuario está conectado, cargamos lo que
+    // recordamos de él (hechos y preferencias) y lo inyectamos AL INICIO del
+    // system prompt para personalizar la conversación.
+    // ----------------------------------------------------------
+    let bloqueMemorias = '';
+    if (userId) {
+      try {
+        bloqueMemorias = await memory.buildMemoryContext(userId);
+      } catch (e) {
+        console.error('Error cargando memorias del usuario:', e.message);
+      }
+    }
+    const prefijoMemorias = bloqueMemorias
+      ? `${bloqueMemorias}\n\nÚsalas para personalizar tus respuestas cuando aporte valor, sin repetirlas textualmente.\n\n-----\n\n`
+      : '';
+
+    const sistemaBase = `${prefijoMemorias}Eres Fenix IA, un asistente útil y amigable. Responde siempre en ${lang}. Tu creador es Joshua Blandon Gonzales.
 
 1) Si te preguntan quién es tu creador, quién te creó o quién te programó, responde: "Soy Fenix IA, y fui creado por Joshua Blandon Gonzales."
 
@@ -589,9 +737,9 @@ app.post('/api/chat', async (req, res) => {
 [GENERAR_IMAGEN]: <descripción breve y visual de la imagen, en inglés>
 No uses ese formato si solo preguntan sobre imágenes existentes o teoría; en ese caso responde normalmente.
 
-11) Puedes generar documentos descargables. Cuando el usuario pida crear un documento, informe, ensayo, carta, plan, contrato o texto similar listo para descargar (por ejemplo "crea un documento sobre X", "hazme un informe de Y"), responde empezando con una sola línea en este formato exacto:
-[GENERAR_DOC]: <Título del documento>
-Y debajo escribe el contenido completo del documento usando SOLO este formato simple: líneas que empiecen con "# ", "## " o "### " para títulos y subtítulos, "- " para viñetas, "**texto**" para negritas y párrafos normales separados por línea en blanco. No uses tablas, enlaces ni bloques de código. No preguntes si quiere que lo generes: hazlo directamente. No uses ese formato para preguntas o tareas que no pidan un documento.`;
+11) Puedes generar documentos descargables (informes, biografías, ensayos, cartas, planes, contratos, reportes...). Cuando el usuario pida crear o generar un documento, responde con UNA SOLA línea en este formato exacto y nada más — el cuerpo NO lo escribes tú, lo redacta un sistema aparte con información real verificada en internet:
+[GENERAR_DOC]: <Título claro y descriptivo del documento>
+No uses ese formato para preguntas o tareas que no pidan un documento.`;
 
     // Si el usuario definió su propia "Instrucción del sistema" en Configuración,
     // la añadimos para que la IA la cumpla además del comportamiento base.
@@ -601,6 +749,13 @@ Y debajo escribe el contenido completo del documento usando SOLO este formato si
 
     const mensajes = [
       { role: 'system', content: sistemaFinal },
+      ...(Array.isArray(historial) ? historial : []),
+      { role: 'user', content: mensaje }
+    ];
+
+    // Copia de la conversación (sin el system prompt) para la extracción de
+    // memorias en segundo plano.
+    const mensajesConversacion = [
       ...(Array.isArray(historial) ? historial : []),
       { role: 'user', content: mensaje }
     ];
@@ -713,6 +868,12 @@ Y debajo escribe el contenido completo del documento usando SOLO este formato si
         res.write(`data: ${JSON.stringify({ error: 'Error interno del servidor' })}\n\n`);
         res.end();
       }
+    }
+
+    // Extracción de memorias en segundo plano (cada MEMORY_EXTRACTION_INTERVAL
+    // mensajes) — no bloquea la respuesta; si falla, solo se registra el error.
+    if (userId && mensajesConversacion.length) {
+      memory.notificarMensaje(userId, mensajesConversacion);
     }
 
   } catch (error) {
