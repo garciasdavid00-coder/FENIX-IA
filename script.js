@@ -2092,6 +2092,7 @@ function agregarImagenABurbuja(burbuja, imagenUrl, pieTexto, edicion){
       actualizarEdicionEnHistorial(imagenUrl, config);
     });
   }
+  agregarMenuMensaje(burbuja, pieTexto || '', img);
 }
 
 /* ======================
@@ -2286,6 +2287,7 @@ function agregarDocumentoABurbuja(burbuja, titulo, contenido){
   tarjeta.appendChild(icono);
   tarjeta.appendChild(info);
   burbuja.appendChild(tarjeta);
+  agregarMenuMensaje(burbuja, titulo || '', null);
 }
 
 /* Punto de llegada cuando el modelo responde con [GENERAR_DOC]:.
