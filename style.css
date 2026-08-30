@@ -1809,10 +1809,13 @@ body{
   overflow:auto;
 }
 .fe-lienzo canvas{
-  max-width:100%;
-  max-height:100%;
+  /* Sin max-width/max-height: el canvas NO debe escalarse con CSS porque
+     Fabric calcula las coordenadas del cursor a partir del tamaño real
+     (atributo) del elemento; el contenedor con overflow:auto se encarga
+     del desplazamiento si la imagen excede el área visible. */
   border:1px solid var(--border);
   box-shadow:0 6px 24px rgba(0,0,0,.18);
+  touch-action:none;
 }
 .fe-lienzo-error{ color:var(--text-muted); font-size:14px; text-align:center; }
 .fe-pie{

@@ -256,15 +256,23 @@ function encenderLienzo(im, snapshot) {
   zona.innerHTML = '<canvas></canvas>';
   const el = zona.querySelector('canvas');
 
+  // El lienzo se ajusta al área visible del modal (móvil incluido).
+  const maxW = Math.max(240, (zona.clientWidth || 860) - 28);
+  const maxH = Math.max(200, (zona.clientHeight || 480) - 28);
   const dims = snapshot && snapshot.ancho
     ? { w: snapshot.ancho, h: snapshot.alto }
-    : dimensionesLienzo(im, 860, 480, 1400);
+    : dimensionesLienzo(im, maxW, maxH, 1400);
   el.width = dims.w;
   el.height = dims.h;
 
   canvas = new fabricInst.Canvas(el, { backgroundColor: '#ffffff' });
   baseImagen = im;
-  im.set({ selectable: false, evented: false });
+  // La imagen base se ajusta al lienzo (manteniendo la proporción y desde
+  // la esquina superior izquierda) para que entre completa.
+  const fw = dims.w / (im.width || 1);
+  const fh = dims.h / (im.height || 1);
+  const escalaBase = Math.min(fw, fh);
+  im.set({ left: 0, top: 0, scaleX: escalaBase, scaleY: escalaBase, selectable: false, evented: false });
   canvas.add(im);
   canvas.sendToBack(im);
 
