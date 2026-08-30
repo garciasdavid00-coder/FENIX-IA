@@ -478,7 +478,7 @@
     refs.ancho.value = '';
     refs.alto.value = '';
     if (estado.src) {
-      refs._internas.actualizarChips();
+      modal._internas.actualizarChips();
       pintarPreview();
       construirRecomendaciones();
     }
@@ -564,9 +564,13 @@
         if (meta.onAplicar) meta.onAplicar(cfg);
       };
       estado.blobActual = null;
-      pintarPreview();
-      construirRecomendaciones();
-      abrir();
+      try {
+        pintarPreview();
+        construirRecomendaciones();
+        abrir();
+      } catch (err) {
+        console.error('[FenixImgEditor] No se pudo abrir el editor:', err);
+      }
     }).catch(function () {
       console.warn('[FenixImgEditor] Imagen sin acceso de lectura (posible bloqueo CORS):', meta.url);
     });
