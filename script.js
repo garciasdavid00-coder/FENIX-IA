@@ -127,6 +127,10 @@ const TRADUCCIONES = {
     'memoria.guardada': 'Memoria guardada',
     'memoria.requiereSesion': 'Inicia sesión para guardar y ver tus memorias.',
     'chat.recordar': 'Recuérdalo',
+    'chat.escuchar': 'Escuchar',
+    'chat.detener': 'Detener',
+    'chat.copiar': 'Copiar',
+    'chat.editar': 'Editar',
     'chat.escribiendo': 'Escribiendo...',
     'chat.sinTitulo': 'Sin título',
     'chat.eliminarConfirm': '¿Eliminar este chat?',
@@ -290,6 +294,10 @@ const TRADUCCIONES = {
     'memoria.guardada': 'Memory saved',
     'memoria.requiereSesion': 'Sign in to save and view your memories.',
     'chat.recordar': 'Remember this',
+    'chat.escuchar': 'Listen',
+    'chat.detener': 'Stop',
+    'chat.copiar': 'Copy',
+    'chat.editar': 'Edit',
     'chat.escribiendo': 'Typing...',
     'chat.sinTitulo': 'Untitled',
     'chat.eliminarConfirm': 'Delete this chat?',
@@ -453,6 +461,10 @@ const TRADUCCIONES = {
     'memoria.guardada': 'Memória salva',
     'memoria.requiereSesion': 'Entre na sua conta para salvar e ver suas memórias.',
     'chat.recordar': 'Lembrar disso',
+    'chat.escuchar': 'Ouvir',
+    'chat.detener': 'Parar',
+    'chat.copiar': 'Copiar',
+    'chat.editar': 'Editar',
     'chat.escribiendo': 'Escrevendo...',
     'chat.sinTitulo': 'Sem título',
     'chat.eliminarConfirm': 'Excluir este chat?',
@@ -616,6 +628,10 @@ const TRADUCCIONES = {
     'memoria.guardada': 'Souvenir enregistré',
     'memoria.requiereSesion': 'Connectez-vous pour enregistrer et voir vos souvenirs.',
     'chat.recordar': 'Retenir ceci',
+    'chat.escuchar': 'Écouter',
+    'chat.detener': 'Arrêter',
+    'chat.copiar': 'Copier',
+    'chat.editar': 'Modifier',
     'chat.escribiendo': 'Écrit...',
     'chat.sinTitulo': 'Sans titre',
     'chat.eliminarConfirm': 'Supprimer ce chat ?',
@@ -779,6 +795,10 @@ const TRADUCCIONES = {
     'memoria.guardada': 'Erinnerung gespeichert',
     'memoria.requiereSesion': 'Melde dich an, um Erinnerungen zu speichern und anzusehen.',
     'chat.recordar': 'Merken',
+    'chat.escuchar': 'Anhören',
+    'chat.detener': 'Stopp',
+    'chat.copiar': 'Kopieren',
+    'chat.editar': 'Bearbeiten',
     'chat.escribiendo': 'Schreibt...',
     'chat.sinTitulo': 'Ohne Titel',
     'chat.eliminarConfirm': 'Diesen Chat löschen?',
@@ -942,6 +962,10 @@ const TRADUCCIONES = {
     'memoria.guardada': 'メモリーを保存しました',
     'memoria.requiereSesion': 'メモリーを保存・表示するにはログインしてください。',
     'chat.recordar': 'これを覚える',
+    'chat.escuchar': '読み上げ',
+    'chat.detener': '停止',
+    'chat.copiar': 'コピー',
+    'chat.editar': '編集',
     'chat.escribiendo': '入力中...',
     'chat.sinTitulo': '無題',
     'chat.eliminarConfirm': 'このチャットを削除しますか？',
@@ -1105,6 +1129,10 @@ const TRADUCCIONES = {
     'memoria.guardada': '记忆已保存',
     'memoria.requiereSesion': '请登录以保存和查看记忆。',
     'chat.recordar': '记住这个',
+    'chat.escuchar': '朗读',
+    'chat.detener': '停止',
+    'chat.copiar': '复制',
+    'chat.editar': '编辑',
     'chat.escribiendo': '正在输入...',
     'chat.sinTitulo': '无标题',
     'chat.eliminarConfirm': '删除此对话？',
@@ -1268,6 +1296,10 @@ const TRADUCCIONES = {
     'memoria.guardada': 'تم حفظ الذاكرة',
     'memoria.requiereSesion': 'سجّل الدخول لحفظ ذكرياتك وعرضها.',
     'chat.recordar': 'تذكر هذا',
+    'chat.escuchar': 'استمع',
+    'chat.detener': 'إيقاف',
+    'chat.copiar': 'نسخ',
+    'chat.editar': 'تحرير',
     'chat.escribiendo': 'يكتب...',
     'chat.sinTitulo': 'بدون عنوان',
     'chat.eliminarConfirm': 'حذف هذه المحادثة؟',
@@ -2068,7 +2100,8 @@ async function generarImagenEnBurbuja(burbuja, descripcion, pieTexto){
 }
 
 /* Mete la imagen (y su pie de foto) dentro de una burbuja vacía.
-   Si `edicion` trae configuración guardada, se vuelve a aplicar. */
+   Si `edicion` trae un snapshot de edición (Fabric JSON) guardado,
+   se re-renderiza la versión editada sobre la imagen original. */
 function agregarImagenABurbuja(burbuja, imagenUrl, pieTexto, edicion){
   burbuja.textContent = '';
   const img = document.createElement('img');
@@ -2076,6 +2109,7 @@ function agregarImagenABurbuja(burbuja, imagenUrl, pieTexto, edicion){
   img.alt = pieTexto || 'Imagen generada';
   img.className = 'msg-imagen';
   img.loading = 'lazy';
+  img.__fenixEditor = { url: imagenUrl, snapshot: edicion || null };
   img.addEventListener('load', () => {
     const c = document.getElementById('messages');
     if(estaCercaDelFinalDelChat(c)) c.scrollTop = c.scrollHeight;
@@ -2087,9 +2121,9 @@ function agregarImagenABurbuja(burbuja, imagenUrl, pieTexto, edicion){
     pie.textContent = pieTexto;
     burbuja.appendChild(pie);
   }
-  if(window.FenixImgEditor && window.FenixImgEditor.adjuntar){
-    window.FenixImgEditor.adjuntar(img, imagenUrl, edicion || null, function(config){
-      actualizarEdicionEnHistorial(imagenUrl, config);
+  if(edicion && window.FenixImgEditor && window.FenixImgEditor.renderVista){
+    window.FenixImgEditor.renderVista(imagenUrl, edicion).then(dataURL => {
+      if(dataURL && dataURL !== imagenUrl) img.src = dataURL;
     });
   }
   agregarMenuMensaje(burbuja, pieTexto || '', img);
@@ -2447,8 +2481,8 @@ function guardarMensajeEnHistorial(tipo, texto, imagen, documento, edicion){
   persistirDatos();
 }
 
-// Cuando el usuario edita una imagen ya mostrada, guardamos la nueva
-// configuración (filtro/tamaño) en el chat correspondiente del historial.
+// Cuando el usuario edita una imagen ya mostrada, guardamos el snapshot
+// de edición (Fabric JSON) en el chat correspondiente del historial.
 function actualizarEdicionEnHistorial(imagenUrl, edicion){
   const chat = historial.find(c => c.id === chatActualId);
   if(!chat) return;
@@ -3257,18 +3291,14 @@ function mostrarToastMemoria(texto){
   setTimeout(() => toast.remove(), 2600);
 }
 
-/* Menú de acciones (⋮) en cada mensaje: Editar (imágenes), Recordar y Copiar. */
-let menuGlobalEscuchando = false;
+/* Barra de acciones por mensaje: Escuchar / Editar / Recordar / Copiar. */
+let mensajeVoz = null;
 
 function limpiarTextoParaAcciones(texto){
   return String(texto || '')
     .replace(/\[GENERAR_(IMAGEN|DOC)\][\s\S]*$/i, '')
     .replace(/^\[IMAGEN\]\s*:?.*$/gim, '')
     .trim();
-}
-
-function cerrarMenusMensaje(){
-  document.querySelectorAll('.msg-menu-abierto').forEach(m => m.classList.remove('msg-menu-abierto'));
 }
 
 function copiarAlPortapapeles(texto){
@@ -3293,65 +3323,108 @@ function copiarConFallback(texto, onListo){
   ta.remove();
 }
 
+function detenerVozMensaje(){
+  if(!mensajeVoz) return;
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  if(mensajeVoz.boton){
+    const b = mensajeVoz.boton;
+    b.classList.remove('activado');
+    b.title = t('chat.escuchar');
+    b.setAttribute('aria-label', t('chat.escuchar'));
+  }
+  mensajeVoz = null;
+}
+
+function escucharMensaje(boton, texto){
+  const limpio = limpiarTextoParaAcciones(texto);
+  if(!limpio) return;
+  if(!('speechSynthesis' in window)){
+    const noVoz = {
+      es: 'La voz no está disponible en este navegador',
+      en: 'Voice is not available in this browser',
+      pt: 'A voz não está disponível neste navegador',
+      fr: 'La voix n\'est pas disponible dans ce navigateur',
+      de: 'Die Stimme ist in diesem Browser nicht verfügbar',
+      ja: 'このブラウザでは音声が利用できません',
+      zh: '此浏览器不支持语音功能',
+      ar: 'الصوت غير متوفر في هذا المتصفح'
+    };
+    mostrarToastMemoria(noVoz[idiomaSeleccionado] || noVoz.es);
+    return;
+  }
+  if(mensajeVoz && mensajeVoz.boton === boton){
+    detenerVozMensaje();
+    return;
+  }
+  detenerVozMensaje();
+  const locales = {
+    es: 'es-ES', en: 'en-US', pt: 'pt-BR', fr: 'fr-FR',
+    de: 'de-DE', ja: 'ja-JP', zh: 'zh-CN', ar: 'ar-SA'
+  };
+  const loc = locales[idiomaSeleccionado] || 'es-ES';
+  const utt = new SpeechSynthesisUtterance(limpio);
+  utt.lang = loc;
+  utt.rate = 1;
+  const prefijo = loc.split('-')[0].toLowerCase();
+  const voces = window.speechSynthesis.getVoices();
+  const voz = voces.find(v => (v.lang || '').toLowerCase().replace('_', '-').startsWith(prefijo));
+  if(voz) utt.voice = voz;
+  const fin = () => {
+    mensajeVoz = null;
+    boton.classList.remove('activado');
+    boton.title = t('chat.escuchar');
+    boton.setAttribute('aria-label', t('chat.escuchar'));
+  };
+  utt.onend = fin;
+  utt.onerror = fin;
+  window.speechSynthesis.speak(utt);
+  mensajeVoz = { boton };
+  boton.classList.add('activado');
+  boton.title = t('chat.detener');
+  boton.setAttribute('aria-label', t('chat.detener'));
+}
+
 function agregarMenuMensaje(burbuja, texto, imgEl){
-  if(!burbuja || burbuja.querySelector('.msg-menu-btn')) return;
+  if(!burbuja || burbuja.querySelector('.msg-bar')) return;
   const limpio = limpiarTextoParaAcciones(texto);
   if(!limpio && !imgEl) return;
 
-  const caja = document.createElement('div');
-  caja.className = 'msg-menu-caja';
-  if(imgEl) caja.dataset.conImagen = '1';
+  const barra = document.createElement('div');
+  barra.className = 'msg-bar';
+  if(imgEl) barra.dataset.conImagen = '1';
+  barra.setAttribute('role', 'toolbar');
 
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'msg-menu-btn';
-  btn.setAttribute('aria-label', '⋮');
-  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>';
-  caja.appendChild(btn);
+  const nuevoBoton = (titulo) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'msg-accion';
+    b.title = titulo;
+    b.setAttribute('aria-label', titulo);
+    barra.appendChild(b);
+    return b;
+  };
 
-  const menu = document.createElement('div');
-  menu.className = 'msg-menu';
-  const labEditar = window.FenixImgEditor ? window.FenixImgEditor.t('editar') : 'Editar';
-  const labCopiar = window.FenixImgEditor ? window.FenixImgEditor.t('copiar') : 'Copiar';
-  const labRecordar = t('chat.recordar');
+  if(limpio){
+    const escuchar = nuevoBoton(t('chat.escuchar'));
+    escuchar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M12 18h.01"/></svg>';
+    escuchar.onclick = (ev) => { ev.stopPropagation(); escucharMensaje(escuchar, limpio); };
+
+    const recordar = nuevoBoton(t('chat.recordar'));
+    recordar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/><line x1="9" y1="9" x2="15" y2="9"/></svg>';
+    recordar.onclick = (ev) => { ev.stopPropagation(); abrirModalMemoria(limpio.slice(0, 300)); };
+
+    const copiar = nuevoBoton(t('chat.copiar'));
+    copiar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+    copiar.onclick = (ev) => { ev.stopPropagation(); copiarAlPortapapeles(limpio); };
+  }
 
   if(imgEl){
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg><span>' + labEditar + '</span>';
-    b.onclick = () => { cerrarMenusMensaje(); if(window.FenixImgEditor) window.FenixImgEditor.editar(imgEl); };
-    menu.appendChild(b);
+    const editar = nuevoBoton(t('chat.editar'));
+    editar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>';
+    editar.onclick = (ev) => { ev.stopPropagation(); if(window.FenixImgEditor) window.FenixImgEditor.editar(imgEl); };
   }
-  if(limpio){
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/><line x1="9" y1="9" x2="15" y2="9"/></svg><span>' + labRecordar + '</span>';
-    b.onclick = () => { cerrarMenusMensaje(); abrirModalMemoria(limpio.slice(0, 300)); };
-    menu.appendChild(b);
-  }
-  if(limpio){
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>' + labCopiar + '</span>';
-    b.onclick = () => { cerrarMenusMensaje(); copiarAlPortapapeles(limpio); };
-    menu.appendChild(b);
-  }
-  if(!menu.children.length) return;
-  caja.appendChild(menu);
-  burbuja.appendChild(caja);
 
-  btn.addEventListener('click', (ev) => {
-    ev.stopPropagation();
-    cerrarMenusMensaje();
-    menu.classList.add('msg-menu-abierto');
-  });
-
-  if(!menuGlobalEscuchando){
-    menuGlobalEscuchando = true;
-    document.addEventListener('click', (ev) => {
-      if(!ev.target.closest('.msg-menu-btn')) cerrarMenusMensaje();
-    });
-  }
+  burbuja.appendChild(barra);
 }
 
 /* ======================
@@ -3438,6 +3511,14 @@ function borrarTodoElHistorial(){
 
 // Guardar prompt del sistema cuando cambia el textarea
 document.addEventListener('DOMContentLoaded', function(){
+  // Persistencia del editor de imágenes: cuando el usuario guarda una
+  // edición desde el chat, se guarda el snapshot en el historial local.
+  if(window.FenixImgEditor && window.FenixImgEditor.configurarAlGuardar){
+    window.FenixImgEditor.configurarAlGuardar(function(imgEl, snapshot){
+      const url = imgEl && imgEl.__fenixEditor ? imgEl.__fenixEditor.url : '';
+      if(url && snapshot) actualizarEdicionEnHistorial(url, snapshot);
+    });
+  }
   const ta = document.getElementById('configSystemPrompt');
   if(ta){
     ta.addEventListener('input', function(){
