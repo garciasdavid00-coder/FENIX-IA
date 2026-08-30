@@ -1959,7 +1959,6 @@ function sendMessage(desdeVistaChat){
             if(limpio){
               burbujaBot.textContent = limpio;
               guardarMensajeEnHistorial('bot', limpio);
-              agregarBotonRecordar(burbujaBot, limpio);
               agregarMenuMensaje(burbujaBot, limpio, null);
             } else {
               burbujaBot.remove();
@@ -2346,9 +2345,6 @@ function agregarMensaje(tipo, texto, esTyping, imagenUrl, documento, edicion){
   contenedor.appendChild(burbuja);
   contenedor.scrollTop = contenedor.scrollHeight;
   if(!esTyping) agregarMenuMensaje(burbuja, texto || '', imgEl);
-  if(tipo === 'bot' && !documento && !imagenUrl && texto){
-    agregarBotonRecordar(burbuja, texto);
-  }
   return burbuja;
 }
 
@@ -3257,29 +3253,6 @@ function mostrarToastMemoria(texto){
   toast.textContent = texto;
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 2600);
-}
-
-// Botón elegante "Recuérdalo" en las respuestas del asistente.
-function agregarBotonRecordar(burbuja, texto){
-  if(!burbuja || !texto || burbuja.querySelector('.msg-recordar')) return;
-  const limpiar = String(texto)
-    .replace(/\[GENERAR_(IMAGEN|DOC)\][\s\S]*$/i, '')
-    .replace(/^\[IMAGEN\]\s*:?.*$/gim, '')
-    .trim();
-  if(!limpiar) return;
-  const boton = document.createElement('button');
-  boton.type = 'button';
-  boton.className = 'msg-recordar';
-  boton.title = t('chat.recordar');
-  boton.setAttribute('aria-label', t('chat.recordar'));
-  boton.innerHTML =
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-    '<path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/>' +
-    '<line x1="9" y1="9" x2="15" y2="9"/></svg>' +
-    '<span></span>';
-  boton.querySelector('span').textContent = t('chat.recordar');
-  boton.onclick = () => abrirModalMemoria(limpiar.slice(0, 300));
-  burbuja.appendChild(boton);
 }
 
 /* Menú de acciones (⋮) en cada mensaje: Editar (imágenes), Recordar y Copiar. */

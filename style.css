@@ -496,34 +496,6 @@ body{
   color:var(--text-muted);
   font-style:italic;
 }
-.msg-recordar{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  width:max-content;
-  margin:10px 0 2px auto;
-  background:transparent;
-  border:1px solid transparent;
-  color:var(--text-muted);
-  cursor:pointer;
-  font-family:inherit;
-  font-size:12.5px;
-  font-weight:600;
-  line-height:1;
-  padding:7px 13px;
-  border-radius:999px;
-  transition:color .15s, background .15s, border-color .15s;
-}
-.msg-recordar svg{
-  width:14px;
-  height:14px;
-  flex-shrink:0;
-}
-.msg-recordar:hover{
-  color:var(--accent);
-  border-color:var(--accent);
-  background:rgba(0,0,0,.04);
-}
 
 .chat-box-bottom{
   margin-bottom:20px;
