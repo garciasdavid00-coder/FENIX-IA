@@ -452,6 +452,7 @@ body{
 }
 
 .msg{
+  position:relative;
   max-width:75%;
   padding:12px 16px;
   border-radius:16px;
@@ -495,6 +496,50 @@ body{
 .msg-bot.typing{
   color:var(--text-muted);
   font-style:italic;
+}
+
+/* Barra de acciones por mensaje: Escuchar / Editar / Recordar / Copiar */
+.msg-bar{
+  position:absolute;
+  top:8px;
+  right:8px;
+  display:flex;
+  gap:2px;
+  padding:3px;
+  border-radius:10px;
+  background:var(--surface-alt);
+  opacity:1;
+  box-shadow:0 1px 4px rgba(0,0,0,.12);
+  transition:background .15s;
+  z-index:3;
+}
+.msg-bar:hover{ background:var(--surface-alt); }
+.msg-accion{
+  width:29px;
+  height:29px;
+  padding:0;
+  border:none;
+  border-radius:8px;
+  background:transparent;
+  color:var(--text-main);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:background .15s, color .15s;
+}
+.msg-accion:hover,
+.msg-accion:focus-visible{ background:var(--surface-alt); color:var(--accent); }
+.msg-accion.activado{ color:var(--accent); background:var(--surface-alt); }
+.msg-accion.activado svg{ animation:msgVozPulso 1.2s ease-in-out infinite; }
+.msg-accion svg{
+  width:17px;
+  height:17px;
+  flex:none;
+}
+@keyframes msgVozPulso{
+  0%,100%{ transform:scale(1); }
+  50%{ transform:scale(1.18); }
 }
 
 .chat-box-bottom{
