@@ -520,9 +520,11 @@ body{
   margin-top:10px;
   width:max-content;
 }
-/* Alineación según el autor del mensaje */
-.msg-bot .msg-bar{ align-self:flex-start; margin-left:2px; }
-.msg-user .msg-bar{ align-self:flex-end; margin-right:2px; }
+/* Alineación según el autor del mensaje: la barra ya arranca al borde del
+   texto (misma línea del flex); el -6px compensa el padding interno del
+   botón para que el PRIMER glifo quede a la misma altura x que el texto. */
+.msg-bot .msg-bar{ align-self:flex-start; margin-left:-6px; }
+.msg-user .msg-bar{ align-self:flex-end; margin-right:-6px; }
 .msg-accion{
   padding:6px;
   border:none;
