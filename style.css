@@ -500,52 +500,60 @@ body{
   font-style:italic;
 }
 
-/* Barra de acciones por mensaje: Escuchar / Editar / Recordar / Copiar
-   Estilo tipo Claude.ai: sin contenedor visible, íconos planos y discretos
-   que solo muestran un fondo sutil al pasar el mouse sobre cada uno.
-   La barra va debajo del mensaje, SIEMPRE alineada a la izquierda (tanto en
-   mensajes del asistente como del usuario) y pegada al margen del texto:
-   el -6px del margin compensa el padding interno del botón para que el
-   primer glifo coincida exactamente con el borde izquierdo del texto. */
+/* ======================
+   BARRA DE ACCIONES POR MENSAJE (estilo Claude.ai) — REGLAS ÚNICAS.
+   Reglas exclusivas para .msg-bar / .msg-accion (no hay otras en el proyecto
+   que les apliquen: un solo archivo style.css, sin !important, sin duplicados).
+   Íconos pequeños y discretos, con espacio entre ellos y hover individual con
+   fondo redondeado sutil. Barra debajo del mensaje, SIEMPRE a la izquierda y
+   pegada al margen del texto (el -6px del margin compensa el padding interno
+   del botón para que el primer glifo coincida con el borde del texto).
+====================== */
 .msg-bar{
   display:flex;
-  gap:4px;
+  align-items:center;
+  gap:8px;              /* separación entre botones */
   margin-top:8px;
   width:max-content;
   align-self:flex-start;
   margin-left:-6px;
 }
 .msg-accion{
-  padding:6px;
+  padding:6px;          /* área táctil cómoda sin agrandar el ícono */
   border:none;
-  background:none;
+  background:transparent;
   box-shadow:none;
   color:inherit;
-  opacity:.55;
+  opacity:.45;          /* discretos por defecto */
   cursor:pointer;
-  display:flex;
+  display:inline-flex;
   align-items:center;
   justify-content:center;
-  border-radius:6px;
-  transition:background-color 150ms ease, opacity 150ms ease;
+  border-radius:8px;    /* fondo redondeado sutil SOLO en hover */
+  transition:background-color 160ms ease, opacity 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 .msg-accion:hover,
 .msg-accion:focus-visible{
-  background-color:rgba(0,0,0,.06);
+  background-color:rgba(0,0,0,.06); /* hover individual */
   opacity:1;
+  box-shadow:0 1px 2px rgba(0,0,0,.06);
 }
 /* En modo oscuro el hover se ilumina en vez de oscurecerse */
 [data-theme="dark"] .msg-accion:hover,
 [data-theme="dark"] .msg-accion:focus-visible{
   background-color:rgba(255,255,255,.10);
-  opacity:1;
+  box-shadow:0 1px 3px rgba(0,0,0,.45);
+}
+@media (hover:none){
+  /* En táctil no existe :hover: se mantienen visibles sin fondo */
+  .msg-accion{ opacity:.7; }
 }
 .msg-accion.activado{ color:var(--accent); opacity:1; }
 .msg-accion.activado svg{ animation:msgVozPulso 1.2s ease-in-out infinite; }
-/* Íconos finos y pequeños (16px), stroke delgado */
+/* Íconos finos y pequeños (15px), stroke delgado */
 .msg-accion svg{
-  width:16px;
-  height:16px;
+  width:15px;
+  height:15px;
   flex:none;
   stroke-width:1.5;
 }
