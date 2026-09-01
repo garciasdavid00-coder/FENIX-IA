@@ -502,14 +502,22 @@ body{
 
 /* Barra de acciones por mensaje: Escuchar / Editar / Recordar / Copiar
    ESTILO FINAL: sin cápsula, sin bordes ni fondos. Íconos planos y discretos.
-   Solo aparece un círculo sutil al hacer hover sobre cada ícono.
    La barra va debajo del mensaje en flujo normal (nunca se superpone),
    alineada a la izquierda en respuestas del asistente (.msg-bot) y a la
-   derecha en mensajes del usuario (.msg-user). */
+   derecha en mensajes del usuario (.msg-user).
+   El color de reposo usa opacidad sobre el color de texto de la burbuja
+   (se ve bien tanto sobre el fondo blanco del asistente como sobre el
+   beige/crema del usuario) y el hover usa una variable --icon-hover-bg
+   que se ajusta según el contexto: burbuja blanca rgba(0,0,0,.06),
+   burbuja beige rgba(0,0,0,.08), y sus equivalentes de luz en modo oscuro. */
+.msg{ --icon-hover-bg: rgba(0,0,0,.06); }            /* .msg-bot → blanco */
+.msg-user{ --icon-hover-bg: rgba(0,0,0,.08); }       /* .msg-user → beige */
+[data-theme="dark"] .msg{ --icon-hover-bg: rgba(255,255,255,.10); }
+[data-theme="dark"] .msg-user{ --icon-hover-bg: rgba(255,255,255,.14); }
 .msg-bar{
   display:flex;
-  gap:8px;
-  margin-top:6px;
+  gap:14px;
+  margin-top:10px;
   width:max-content;
 }
 /* Alineación según el autor del mensaje */
@@ -520,27 +528,21 @@ body{
   border:none;
   background:none;
   box-shadow:none;
-  color:var(--text-muted);
+  color:inherit;
+  opacity:.6;
   cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
-  border-radius:0;
-  transition:background-color .15s ease, color .15s ease;
+  border-radius:6px;
+  transition:background-color 150ms ease, opacity 150ms ease;
 }
 .msg-accion:hover,
 .msg-accion:focus-visible{
-  background-color:rgba(0,0,0,.06);
-  color:var(--text-main);
-  border-radius:50%;
+  background-color:var(--icon-hover-bg);
+  opacity:1;
 }
-/* En modo oscuro el hover se ilumina en vez de oscurecerse */
-[data-theme="dark"] .msg-accion:hover,
-[data-theme="dark"] .msg-accion:focus-visible{
-  background-color:rgba(255,255,255,.10);
-  color:var(--text-invert);
-}
-.msg-accion.activado{ color:var(--accent); }
+.msg-accion.activado{ color:var(--accent); opacity:1; }
 .msg-accion.activado svg{ animation:msgVozPulso 1.2s ease-in-out infinite; }
 /* Íconos finos y ligeramente más pequeños */
 .msg-accion svg{
