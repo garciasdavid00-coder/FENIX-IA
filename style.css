@@ -501,24 +501,23 @@ body{
 }
 
 /* Barra de acciones por mensaje: Escuchar / Editar / Recordar / Copiar
-   Se muestra DEBAJO del mensaje, en flujo normal (no superpuesta).
-   Alineada a la izquierda si es del asistente (.msg-bot) o a la derecha si
-   es del usuario (.msg-user). Aparece con una transición suave al pasar el
-   mouse por encima del mensaje, y siempre visible en pantallas táctiles. */
+   Estilo minimalista tipo Notion/Linear: sin caja pesada, íconos finos y
+   discretos, y controles que solo se revelan al hacer hover.
+   Aparece debajo del mensaje en flujo normal (no superpuesta), alineada a la
+   izquierda en respuestas del asistente (.msg-bot) o a la derecha en mensajes
+   del usuario (.msg-user). */
 .msg-bar{
   display:flex;
-  gap:4px;
+  gap:16px;
   width:max-content;
   margin-top:8px;
   margin-bottom:2px;
-  padding:5px;
+  padding:2px 4px;
   border-radius:8px;
-  background:var(--surface-alt);
-  border:1px solid var(--border);
-  box-shadow:0 1px 3px rgba(0,0,0,.08);
+  background:rgba(0,0,0,.03);
   opacity:0;
   transform:translateY(-2px);
-  transition:opacity .2s ease, transform .2s ease;
+  transition:opacity .2s ease, transform .2s ease, background .2s ease;
 }
 .msg:hover .msg-bar,
 .msg-bar:focus-within,
@@ -528,34 +527,46 @@ body{
 .msg-user .msg-bar{ align-self:flex-end; margin-right:2px; }
 /* En móviles y pantallas táctiles la barra siempre está visible */
 @media (hover:none), (pointer:coarse){
-  .msg-bar{ opacity:1; transform:none; }
+  .msg-bar{ opacity:1; transform:none; background:transparent; }
 }
 .msg-accion{
-  width:30px;
-  height:30px;
+  width:24px;
+  height:24px;
   padding:0;
   border:none;
-  border-radius:6px;
+  border-radius:50%;
   background:transparent;
   color:var(--text-muted);
   cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
-  transition:background .15s, color .15s;
+  transition:background-color .18s ease, color .18s ease;
 }
 .msg-accion:hover,
-.msg-accion:focus-visible{ background:var(--surface-hover); color:var(--text-main); }
-.msg-accion.activado{ color:var(--accent); background:var(--surface-hover); }
-.msg-accion.activado svg{ animation:msgVozPulso 1.2s ease-in-out infinite; }
-.msg-accion svg{
-  width:18px;
-  height:18px;
-  flex:none;
+.msg-accion:focus-visible{
+  background-color:rgba(0,0,0,.06);
+  color:var(--text-main);
 }
+/* En modo oscuro el hover se ilumina en vez de oscurecerse */
+[data-theme="dark"] .msg-accion:hover,
+[data-theme="dark"] .msg-accion:focus-visible{
+  background-color:rgba(255,255,255,.10);
+  color:var(--text-invert);
+}
+.msg-accion.activado{ color:var(--accent); }
+.msg-accion.activado svg{ animation:msgVozPulso 1.2s ease-in-out infinite; }
+/* Íconos finos y ligeramente más pequeños */
+.msg-accion svg{
+  width:17px;
+  height:17px;
+  flex:none;
+  stroke-width:1.5;
+}
+[data-theme="dark"] .msg-bar{ background:rgba(255,255,255,.04); }
 @keyframes msgVozPulso{
   0%,100%{ transform:scale(1); }
-  50%{ transform:scale(1.18); }
+  50%{ transform:scale(1.15); }
 }
 
 .chat-box-bottom{

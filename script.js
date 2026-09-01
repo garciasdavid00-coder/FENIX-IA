@@ -3406,21 +3406,21 @@ function agregarMenuMensaje(burbuja, texto, imgEl){
 
   if(limpio){
     const escuchar = nuevoBoton(t('chat.escuchar'));
-    escuchar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M12 18h.01"/></svg>';
+    escuchar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M12 18h.01"/></svg>';
     escuchar.onclick = (ev) => { ev.stopPropagation(); escucharMensaje(escuchar, limpio); };
 
     const recordar = nuevoBoton(t('chat.recordar'));
-    recordar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/><line x1="9" y1="9" x2="15" y2="9"/></svg>';
+    recordar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/><line x1="9" y1="9" x2="15" y2="9"/></svg>';
     recordar.onclick = (ev) => { ev.stopPropagation(); abrirModalMemoria(limpio.slice(0, 300)); };
 
     const copiar = nuevoBoton(t('chat.copiar'));
-    copiar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+    copiar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
     copiar.onclick = (ev) => { ev.stopPropagation(); copiarAlPortapapeles(limpio); };
   }
 
   if(imgEl){
     const editar = nuevoBoton(t('chat.editar'));
-    editar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>';
+    editar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>';
     editar.onclick = (ev) => { ev.stopPropagation(); if(window.FenixImgEditor) window.FenixImgEditor.editar(imgEl); };
   }
 
