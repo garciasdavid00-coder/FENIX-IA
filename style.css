@@ -501,37 +501,27 @@ body{
 }
 
 /* Barra de acciones por mensaje: Escuchar / Editar / Recordar / Copiar
-   ESTILO FINAL: sin cápsula, sin bordes ni fondos. Íconos planos y discretos.
-   La barra va debajo del mensaje en flujo normal (nunca se superpone),
-   alineada a la izquierda en respuestas del asistente (.msg-bot) y a la
-   derecha en mensajes del usuario (.msg-user).
-   El color de reposo usa opacidad sobre el color de texto de la burbuja
-   (se ve bien tanto sobre el fondo blanco del asistente como sobre el
-   beige/crema del usuario) y el hover usa una variable --icon-hover-bg
-   que se ajusta según el contexto: burbuja blanca rgba(0,0,0,.06),
-   burbuja beige rgba(0,0,0,.08), y sus equivalentes de luz en modo oscuro. */
-.msg{ --icon-hover-bg: rgba(0,0,0,.06); }            /* .msg-bot → blanco */
-.msg-user{ --icon-hover-bg: rgba(0,0,0,.08); }       /* .msg-user → beige */
-[data-theme="dark"] .msg{ --icon-hover-bg: rgba(255,255,255,.10); }
-[data-theme="dark"] .msg-user{ --icon-hover-bg: rgba(255,255,255,.14); }
+   Estilo tipo Claude.ai: sin contenedor visible, íconos planos y discretos
+   que solo muestran un fondo sutil al pasar el mouse sobre cada uno.
+   La barra va debajo del mensaje, SIEMPRE alineada a la izquierda (tanto en
+   mensajes del asistente como del usuario) y pegada al margen del texto:
+   el -6px del margin compensa el padding interno del botón para que el
+   primer glifo coincida exactamente con el borde izquierdo del texto. */
 .msg-bar{
   display:flex;
-  gap:14px;
-  margin-top:10px;
+  gap:4px;
+  margin-top:8px;
   width:max-content;
+  align-self:flex-start;
+  margin-left:-6px;
 }
-/* Alineación según el autor del mensaje: la barra ya arranca al borde del
-   texto (misma línea del flex); el -6px compensa el padding interno del
-   botón para que el PRIMER glifo quede a la misma altura x que el texto. */
-.msg-bot .msg-bar{ align-self:flex-start; margin-left:-6px; }
-.msg-user .msg-bar{ align-self:flex-end; margin-right:-6px; }
 .msg-accion{
   padding:6px;
   border:none;
   background:none;
   box-shadow:none;
   color:inherit;
-  opacity:.6;
+  opacity:.55;
   cursor:pointer;
   display:flex;
   align-items:center;
@@ -541,15 +531,21 @@ body{
 }
 .msg-accion:hover,
 .msg-accion:focus-visible{
-  background-color:var(--icon-hover-bg);
+  background-color:rgba(0,0,0,.06);
+  opacity:1;
+}
+/* En modo oscuro el hover se ilumina en vez de oscurecerse */
+[data-theme="dark"] .msg-accion:hover,
+[data-theme="dark"] .msg-accion:focus-visible{
+  background-color:rgba(255,255,255,.10);
   opacity:1;
 }
 .msg-accion.activado{ color:var(--accent); opacity:1; }
 .msg-accion.activado svg{ animation:msgVozPulso 1.2s ease-in-out infinite; }
-/* Íconos finos y ligeramente más pequeños */
+/* Íconos finos y pequeños (16px), stroke delgado */
 .msg-accion svg{
-  width:17px;
-  height:17px;
+  width:16px;
+  height:16px;
   flex:none;
   stroke-width:1.5;
 }
