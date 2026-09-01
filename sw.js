@@ -1,5 +1,5 @@
 /* Fenix IA - Service Worker */
-const CACHE = 'fenix-v23';
+const CACHE = 'fenix-v24';
 const ASSETS = [
   '/',
   '/index.html',

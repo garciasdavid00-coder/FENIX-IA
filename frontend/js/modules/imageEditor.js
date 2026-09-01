@@ -12,7 +12,11 @@
    La edición se persiste como snapshot { ancho, alto, objetos } de
    Fabric (compacto y re-editable); el raster final viaja en dataURL.
 ============================================================ */
-const fabricInst = (typeof fabric !== 'undefined') ? fabric : null;
+function getFabric() {
+  if (typeof fabric !== 'undefined') return fabric;
+  if (typeof window !== 'undefined' && window.fabric) return window.fabric;
+  return null;
+}
 
 const COLOR_NEGRO = '#111111';
 const COLOR_BLANCO = '#ffffff';
@@ -133,7 +137,7 @@ function construirModal() {
 
   porDato['grosor'].forEach(i => i.addEventListener('input', e => {
     controlGrosor = parseInt(e.target.value, 10) || 3;
-    if (canvas) canvas.freeDrawingBrush.width = controlGrosor;
+    if (canvas && canvas.freeDrawingBrush) canvas.freeDrawingBrush.width = controlGrosor;
   }));
   porDato['tamTexto'].forEach(i => i.addEventListener('input', e => {
     controlTamTexto = parseInt(e.target.value, 10) || 28;
@@ -161,7 +165,8 @@ function construirModal() {
    Apertura pública: openImageEditor(url, onSave, opciones)
    ============================================================ */
 export function openImageEditor(url, onSave, opciones) {
-  if (!fabricInst) { alert('Fabric.js no está cargado.'); return; }
+  const f = getFabric();
+  if (!f) { alert('Fabric.js no está cargado.'); return; }
   opciones = opciones || {};
   if (modal && !modal.hidden) {
     if (!confirm(t('confirmarSustituir'))) return;
@@ -177,7 +182,8 @@ export function openImageEditor(url, onSave, opciones) {
   abrirModalUI();
   cargarImagenFabric(url).then(im => {
     encenderLienzo(im, estadoActivo.snapshot);
-  }).catch(() => {
+  }).catch((err) => {
+    console.error('[FenixImgEditor] Error cargando imagen:', err);
     mensajeEnLienzo('⚠️ ' + t('errorCarga'));
   });
 }
@@ -186,11 +192,42 @@ export function openImageEditor(url, onSave, opciones) {
 export function configurarAlGuardar(fn) { hookAlGuardar = fn; }
 
 /* ============================================================
-   Utilidades Fabric: carga de imagen con CORS y tamaño del lienzo
+   Utilidades Fabric: carga universal de imagen con CORS y tamaño
    ============================================================ */
+function crearImagenDesdeURL(url, opciones = {}) {
+  const f = getFabric();
+  if (!f) return Promise.reject(new Error('Fabric.js no disponible'));
+  return new Promise((resolver, rechazar) => {
+    try {
+      const opts = Object.assign({ crossOrigin: /^https?:/i.test(url) ? 'anonymous' : undefined }, opciones);
+      const ret = f.Image.fromURL(url, (img) => {
+        if (img) resolver(img);
+      }, opts);
+      if (ret && typeof ret.then === 'function') {
+        ret.then(resolver).catch(rechazar);
+      }
+    } catch (e) {
+      rechazar(e);
+    }
+  });
+}
+
 function cargarImagenFabric(url) {
-  return new Promise((ok, mal) => {
-    fabricInst.Image.fromURL(url, img => ok(img), { crossOrigin: 'anonymous' }, err => mal(err));
+  return crearImagenDesdeURL(url);
+}
+
+function cargarJSONEnCanvas(c, objetos) {
+  return new Promise((resolver, rechazar) => {
+    try {
+      const ret = c.loadFromJSON(objetos, () => {
+        resolver();
+      });
+      if (ret && typeof ret.then === 'function') {
+        ret.then(resolver).catch(rechazar);
+      }
+    } catch (e) {
+      rechazar(e);
+    }
   });
 }
 
@@ -252,6 +289,7 @@ function cerrarModal() {
    objetos (texto, trazos, recortes) sobre la imagen original.
    ============================================================ */
 function encenderLienzo(im, snapshot) {
+  const f = getFabric();
   const zona = modal.querySelector('.fe-lienzo');
   zona.innerHTML = '<canvas></canvas>';
   const el = zona.querySelector('canvas');
@@ -265,7 +303,7 @@ function encenderLienzo(im, snapshot) {
   el.width = dims.w;
   el.height = dims.h;
 
-  canvas = new fabricInst.Canvas(el, { backgroundColor: '#ffffff' });
+  canvas = new f.Canvas(el, { backgroundColor: '#ffffff' });
   baseImagen = im;
   // La imagen base se ajusta al lienzo (manteniendo la proporción y desde
   // la esquina superior izquierda) para que entre completa.
@@ -290,9 +328,6 @@ function encenderLienzo(im, snapshot) {
 
 /* ============================================================
    Historial undo/redo con snapshots de Fabric (toJSON).
-   - Cada acción registrada guarda el estado anterior en pilaDeshacer
-     y limpia pilaRehacer.
-   - deshacer() restaura el estado más reciente y lo mueve a rehacer.
    ============================================================ */
 function generarEstado() {
   return { ancho: canvas.getWidth(), alto: canvas.getHeight(), objetos: canvas.toJSON() };
@@ -338,20 +373,17 @@ function restaurarSnapshot(snapshot) {
   bloqueoHistorial = true;
   canvas.clear();
   canvas.setDimensions({ width: snapshot.ancho, height: snapshot.alto });
-  // Se ejecuta cuando el estado ya quedó completamente restaurado.
   const finalizar = () => {
     try { estadoPrevisto = JSON.stringify(generarEstado()); } catch (e) {}
     bloqueoHistorial = false;
   };
-  canvas.loadFromJSON(snapshot.objetos, null, () => {
+  cargarJSONEnCanvas(canvas, snapshot.objetos).then(() => {
     const im = canvas.getObjects().find(o => o.type === 'image');
     if (im) {
       im.set({ selectable: false, evented: false });
       im.sendToBack();
       baseImagen = im;
-      // La imagen base se recarga SIEMPRE (con CORS si es una URL) para que
-      // el lienzo no quede "tainted" o sin decodificar y se pueda exportar.
-      fabricInst.Image.fromURL(im.getSrc(), nueva => {
+      crearImagenDesdeURL(im.getSrc()).then(nueva => {
         nueva.set({
           left: im.left, top: im.top, scaleX: im.scaleX, scaleY: im.scaleY,
           angle: im.angle, flipX: im.flipX, flipY: im.flipY,
@@ -363,13 +395,12 @@ function restaurarSnapshot(snapshot) {
         baseImagen = nueva;
         canvas.renderAll();
         finalizar();
-      }, { crossOrigin: /^https?:/i.test(im.getSrc()) ? 'anonymous' : undefined }, finalizar);
+      }).catch(finalizar);
     } else {
       canvas.renderAll();
       finalizar();
     }
-  }, () => {
-    // Si falla el render del snapshot, liberamos el historial igualmente.
+  }).catch(() => {
     bloqueoHistorial = false;
   });
 }
@@ -387,15 +418,19 @@ function actualizarBotonesHistorial() {
 function alternarDibujo() {
   if (!canvas) return;
   salirRecorte();
+  const f = getFabric();
   if (canvas.isDrawingMode) {
     desactivarDibujo();
     marcarHerramienta(null);
   } else {
     canvas.isDrawingMode = true;
     canvas.selection = false;
-    canvas.freeDrawingBrush = new fabricInst.PencilBrush(canvas);
-    canvas.freeDrawingBrush.color = controlColor;
-    canvas.freeDrawingBrush.width = controlGrosor;
+    const BrushClass = (f && f.PencilBrush) || (f && f.fabric && f.fabric.PencilBrush);
+    if (BrushClass) {
+      canvas.freeDrawingBrush = new BrushClass(canvas);
+      canvas.freeDrawingBrush.color = controlColor;
+      canvas.freeDrawingBrush.width = controlGrosor;
+    }
     marcarHerramienta('dibujar');
   }
 }
@@ -410,7 +445,10 @@ function agregarTexto() {
   if (!canvas) return;
   salirRecorte();
   desactivarDibujo();
-  const nuevo = new fabricInst.IText('Texto', {
+  const f = getFabric();
+  const ITextClass = (f && f.IText) || (f && f.fabric && f.fabric.IText);
+  if (!ITextClass) return;
+  const nuevo = new ITextClass('Texto', {
     left: canvas.getWidth() / 2 - 40,
     top: canvas.getHeight() / 2 - 16,
     fontFamily: 'Playfair Display, Georgia, serif',
@@ -429,7 +467,7 @@ function setColor(color) {
   controlColor = color;
   const sws = modal.querySelectorAll('.fe-swatch');
   sws.forEach(sw => {
-    const esNegro = sw.getAttribute('aria-label') === t('negro');
+    const esNegro = sw.getAttribute('data-fe') === 'colorN';
     sw.classList.toggle('activo', (color === COLOR_NEGRO) === esNegro);
   });
   if (canvas && canvas.freeDrawingBrush) canvas.freeDrawingBrush.color = color;
@@ -464,17 +502,19 @@ function voltear(horizontal) {
 }
 
 /* ============================================================
-   Recorte: modo con rectángulo arrastrable y "aplicar" filtra la
-   región recortada como nueva imagen base (resultado predecible).
+   Recorte: modo con rectángulo arrastrable
    ============================================================ */
 function alternarRecorte() {
   if (!canvas || !baseImagen) return;
   if (rectRecorte) { aplicarRecorte(); return; }
   salirRecorte();
   desactivarDibujo();
+  const f = getFabric();
+  const RectClass = (f && f.Rect) || (f && f.fabric && f.fabric.Rect);
+  if (!RectClass) return;
   const w = Math.round(baseImagen.getScaledWidth() * 0.55);
   const h = Math.round(baseImagen.getScaledHeight() * 0.55);
-  rectRecorte = new fabricInst.Rect({
+  rectRecorte = new RectClass({
     left: (canvas.getWidth() - w) / 2,
     top: (canvas.getHeight() - h) / 2,
     width: w, height: h,
@@ -516,26 +556,24 @@ function aplicarRecorte() {
   tmp.height = alto;
   const ctx = tmp.getContext('2d');
   ctx.translate(-left, -top);
-  ctx.drawImage(canvas.lowerCanvasEl, 0, 0);
+  const lower = canvas.lowerCanvasEl || canvas.getElement();
+  ctx.drawImage(lower, 0, 0);
   const datos = tmp.toDataURL('image/png');
 
   canvas.clear();
   canvas.setDimensions({ width: ancho, height: alto });
-  fabricInst.Image.fromURL(datos, im => {
+  crearImagenDesdeURL(datos).then(im => {
     im.set({ selectable: false, evented: false });
     baseImagen = im;
     canvas.add(im);
     canvas.renderAll();
     marcarHerramienta(null);
     onCambio();
-  }, { crossOrigin: 'anonymous' });
+  });
 }
 
 /* ============================================================
    Descargar y Guardar: exportan el lienzo a imagen final.
-   El botón principal (Guardar en Fenix IA) invoca onSave(snapshot,
-   dataURL) y, si se abrió desde un mensaje, actualiza su <img> y
-   notifica a script.js vía hookAlGuardar para persistir.
    ============================================================ */
 function descargar() {
   if (!canvas) return;
@@ -574,45 +612,21 @@ function guardarYcerrar() {
    una dataURL con la imagen editada aplicada (sin abrir el modal).
    ============================================================ */
 export function renderVista(url, snapshot) {
-  return new Promise((resolver, rechazar) => {
-    if (!fabricInst || !snapshot) { resolver(url); return; }
+  return new Promise((resolver) => {
+    const f = getFabric();
+    if (!f || !snapshot) { resolver(url); return; }
     cargarImagenFabric(url).then(im => {
       const ancho = snapshot.ancho || im.width;
       const alto = snapshot.alto || im.height;
       const off = document.createElement('canvas');
       off.width = ancho;
       off.height = alto;
-      const lienzoOff = new fabricInst.Canvas(off, { backgroundColor: '#ffffff' });
-      try {
-        lienzoOff.loadFromJSON(snapshot.objetos, null, () => {
-          const imagenes = lienzoOff.getObjects().filter(o => o.type === 'image');
-          let pendientes = 0;
-          const restan = () => {
-            if (--pendientes <= 0) {
-              try {
-                resolver(lienzoOff.toDataURL({ format: 'jpeg', quality: 0.92 }));
-              } catch (e) {
-                resolver(url);
-              }
-              lienzoOff.dispose();
-            }
-          };
-          imagenes.forEach(o => {
-            pendientes++;
-            fabricInst.Image.fromURL(o.getSrc(), nueva => {
-              nueva.set({
-                left: o.left, top: o.top, scaleX: o.scaleX, scaleY: o.scaleY,
-                angle: o.angle, flipX: o.flipX, flipY: o.flipY,
-                selectable: false, evented: false
-              });
-              lienzoOff.remove(o);
-              lienzoOff.add(nueva);
-              lienzoOff.sendToBack(nueva);
-              lienzoOff.renderAll();
-              restan();
-            }, { crossOrigin: /^https?:/i.test(o.getSrc()) ? 'anonymous' : undefined }, () => restan());
-          });
-          if (!imagenes.length) {
+      const lienzoOff = new f.Canvas(off, { backgroundColor: '#ffffff' });
+      cargarJSONEnCanvas(lienzoOff, snapshot.objetos).then(() => {
+        const imagenes = lienzoOff.getObjects().filter(o => o.type === 'image');
+        let pendientes = 0;
+        const restan = () => {
+          if (--pendientes <= 0) {
             try {
               resolver(lienzoOff.toDataURL({ format: 'jpeg', quality: 0.92 }));
             } catch (e) {
@@ -620,25 +634,45 @@ export function renderVista(url, snapshot) {
             }
             lienzoOff.dispose();
           }
+        };
+        imagenes.forEach(o => {
+          pendientes++;
+          crearImagenDesdeURL(o.getSrc()).then(nueva => {
+            nueva.set({
+              left: o.left, top: o.top, scaleX: o.scaleX, scaleY: o.scaleY,
+              angle: o.angle, flipX: o.flipX, flipY: o.flipY,
+              selectable: false, evented: false
+            });
+            lienzoOff.remove(o);
+            lienzoOff.add(nueva);
+            lienzoOff.sendToBack(nueva);
+            lienzoOff.renderAll();
+            restan();
+          }).catch(() => restan());
         });
-      } catch (e) {
-        resolver(url);
-      }
+        if (!imagenes.length) {
+          try {
+            resolver(lienzoOff.toDataURL({ format: 'jpeg', quality: 0.92 }));
+          } catch (e) {
+            resolver(url);
+          }
+          lienzoOff.dispose();
+        }
+      }).catch(() => resolver(url));
     }).catch(() => resolver(url));
   });
 }
 
 /* ============================================================
    Puente global para script.js (script clásico).
-   - editar(imgEl): abre el editor para el <img> de un mensaje,
-     leyendo { url, snapshot } guardados en img.__fenixEditor.
    ============================================================ */
 window.FenixImgEditor = {
+  openImageEditor: openImageEditor,
   editar(imgEl) {
     if (!imgEl || !window.FenixImgEditor) return;
     const meta = imgEl.__fenixEditor || {};
     openImageEditor(meta.url || imgEl.src, (snapshot, dataURL) => {
-      // script.js decide qué hacer con el resultado vía hookAlGuardar
+      // Notificado a través de hookAlGuardar
     }, {
       snapshot: meta.snapshot || null,
       imgEl: imgEl
@@ -649,3 +683,7 @@ window.FenixImgEditor = {
   t: clave => t(clave),
   cargado: true
 };
+
+try {
+  window.dispatchEvent(new CustomEvent('fenixImgEditorReady'));
+} catch(e) {}

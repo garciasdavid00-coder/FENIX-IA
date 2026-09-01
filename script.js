@@ -3509,16 +3509,20 @@ function borrarTodoElHistorial(){
   alert(t('error.historialEliminado'));
 }
 
-// Guardar prompt del sistema cuando cambia el textarea
-document.addEventListener('DOMContentLoaded', function(){
-  // Persistencia del editor de imágenes: cuando el usuario guarda una
-  // edición desde el chat, se guarda el snapshot en el historial local.
+function conectarEditorImagenes(){
   if(window.FenixImgEditor && window.FenixImgEditor.configurarAlGuardar){
     window.FenixImgEditor.configurarAlGuardar(function(imgEl, snapshot){
       const url = imgEl && imgEl.__fenixEditor ? imgEl.__fenixEditor.url : '';
       if(url && snapshot) actualizarEdicionEnHistorial(url, snapshot);
     });
   }
+}
+window.addEventListener('fenixImgEditorReady', conectarEditorImagenes);
+conectarEditorImagenes();
+
+// Guardar prompt del sistema cuando cambia el textarea
+document.addEventListener('DOMContentLoaded', function(){
+  conectarEditorImagenes();
   const ta = document.getElementById('configSystemPrompt');
   if(ta){
     ta.addEventListener('input', function(){
