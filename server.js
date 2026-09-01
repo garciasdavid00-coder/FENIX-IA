@@ -10,6 +10,8 @@ const { selectModel } = require('./modelRouter');
 const { generarDocumentoConHechosReales } = require('./services/promptDocumentos');
 const { router: imagenesRealesRouter, buscarImagenReal } = require('./routes/imagenesReales');
 const memory = require('./backend/memoryManager');
+const chatEngine = require('./backend/chatEngine');
+const whatsappRouter = require('./routes/whatsapp');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -46,7 +48,9 @@ if (!googleHabilitado) {
 app.set('trust proxy', 1);
 
 app.use(cors({ credentials: true }));
-app.use(express.json({ limit: '5mb' }));
+// El `verify` guarda el cuerpo crudo (req.rawBody) para poder verificar la
+// firma X-Hub-Signature-256 de los webhooks de WhatsApp.
+app.use(express.json({ limit: '5mb', verify: (req, res, buf) => { req.rawBody = buf; } }));
 
 app.use(session({
   secret: SESSION_SECRET,
@@ -434,37 +438,8 @@ app.post('/api/cambiar-plan', async (req, res) => {
 // Guarda el historial de conversación en memoria por sesión simple (no persistente)
 // Para producción real, esto debería ir en una base de datos.
 
-// Traduce los errores de las APIs a mensajes claros en español para el usuario.
-function mensajeErrorIA(proveedor, status, cuerpo){
-  let detalle = '';
-  try {
-    const j = JSON.parse(cuerpo);
-    detalle = (j.error && (j.error.message || j.error)) || JSON.stringify(j);
-  } catch(e){
-    detalle = String(cuerpo || '');
-  }
-  const txt = detalle.toLowerCase();
-
-  if(status === 401){
-    return `La clave de API de ${proveedor} no es válida. Revisa la configuración del servidor.`;
-  }
-  if(/insufficient balance|billing|payment/i.test(txt)){
-    return `No hay saldo disponible en la cuenta de ${proveedor}. Recarga la cuenta o usa otro modelo.`;
-  }
-  if(status === 429 || /rate.?limit|quota|exhausted|too many requests/i.test(txt)){
-    return `Límite de peticiones alcanzado en ${proveedor}. Espera un momento e intenta de nuevo.`;
-  }
-  if(/model.*(not found|not available)|no longer/i.test(txt)){
-    return `El modelo de ${proveedor} no está disponible en este momento.`;
-  }
-  if(/invalid.*key|unauthorized|forbidden|permission/i.test(txt)){
-    return `Acceso denegado por ${proveedor}. Revisa la clave de API.`;
-  }
-  if(status >= 500){
-    return `El servicio ${proveedor} está teniendo problemas. Intenta de nuevo en unos segundos.`;
-  }
-  return `El servicio ${proveedor} devolvió un error. Intenta de nuevo.`;
-}
+// Los errores de las APIs del proveedor se traducen en backend/chatEngine.js
+// (mensajeErrorIA), compartido con el bot de WhatsApp.
 
 // Lee el stream SSE del proveedor (Groq/Gemini/DeepSeek) y llama onTexto
 // por cada fragmento de contenido nuevo que llega. Si opciones.esActivo()
@@ -726,16 +701,10 @@ app.post('/api/chat', async (req, res) => {
       ? modelo
       : selectModel(mensaje, historial);
 
-    const nombresIdiomas = {
-      es: 'español', en: 'inglés', pt: 'portugués', fr: 'francés',
-      de: 'alemán', ja: 'japonés', zh: 'chino', ar: 'árabe'
-    };
-    const lang = nombresIdiomas[idioma] || 'español';
+    const lang = chatEngine.lenguajeDe(idioma);
 
     // Instrucción del sistema personalizada que el usuario escribe en Configuración
-    const instruccionUsuario = (typeof instruccion === 'string' && instruccion.trim())
-      ? instruccion.trim()
-      : '';
+    const instruccionUsuario = chatEngine.instruccionUsuarioDe(instruccion);
 
     // Construimos el historial de mensajes para dar contexto a la IA
     // ----------------------------------------------------------
@@ -751,94 +720,34 @@ app.post('/api/chat', async (req, res) => {
         console.error('Error cargando memorias del usuario:', e.message);
       }
     }
-    const prefijoMemorias = bloqueMemorias
-      ? `${bloqueMemorias}\n\nÚsalas para personalizar tus respuestas cuando aporte valor, sin repetirlas textualmente.\n\n-----\n\n`
-      : '';
 
-    const sistemaBase = `${prefijoMemorias}Eres Fenix IA, un asistente útil y amigable. Responde siempre en ${lang}. Tu creador es Joshua Blandon Gonzales.
-
-1) Si te preguntan quién es tu creador, quién te creó o quién te programó, responde: "Soy Fenix IA, y fui creado por Joshua Blandon Gonzales."
-
-2) Si te preguntan quién es Joshua Blandon o simplemente quién es Joshua, responde con tacto y de forma breve que "Joshua" es un nombre con origen bíblico (en la Biblia, Josué fue el sucesor de Moisés y el líder que llevó al pueblo de Israel a la Tierra Prometida), y que también es el nombre de varias personas famosas, como actores, músicos y deportistas. No des información sobre personas reales que conozcas; en su lugar, pregunta amablemente al usuario a qué Joshua se refiere o qué le gustaría saber, por ejemplo: "¿A qué Joshua te refieres? Hay varios personajes famosos con ese nombre. Dime más y con gusto te ayudo."
-
-3) Sé honesto/a y directo/a. Prioriza la verdad y la precisión sobre complacer al usuario. Nunca inventes información, datos, fuentes, resultados, capacidades o hechos. Si no sabes algo, díselo claramente. Si no tienes suficiente información, pide la aclaración o explica la limitación.
-
-4) No seas aduladora. No le des la razón al usuario automáticamente. No uses elogios innecesarios como "Tienes toda la razón", "Excelente pregunta", "Qué buena idea", "Exactamente", etc., a menos que realmente lo merezca.
-
-5) Si el usuario está equivocado, se amable pero claro. Explica brevemente cuál es el error y proporciona la información correcta.
-
-6) Practica el pensamiento crítico. Analiza las afirmaciones y propuestas del usuario. Si detectas una contradicción, error, mala suposición o una alternativa considerablemente mejor, Señálalo. No aceptes una premisa falsa simplemente porque el usuario la presenta como cierta.
-
-7) Cuando no tengas suficiente certeza, reconoce la incertidumbre. Diferencia entre hechos, estimaciones, inferencias y opiniones. Nunca presentes una suposición como un hecho.
-
-8) Responde de forma directa y natural. Responde primero a lo que el usuario preguntó. Evita relleno, frases genéricas y explicaciones innecesarias. Ser directa no significa ser grosera; puedes contradecir al usuario sin insultarlo, burlarte o tratarlo mal.
-
-9) Tu objetivo principal no es conseguir la aprobación del usuario. Tu objetivo es proporcionar la respuesta más útil, precisa y honesta posible.
-
-10) Puedes crear imágenes. Cuando el usuario pida generar, crear o dibujar una imagen (por ejemplo "genera una imagen de un gato", "dibuja un perro negro", "quiero un avatar"), responde ÚNICAMENTE con una sola línea en este formato exacto, sin explicar nada antes ni después:
-[GENERAR_IMAGEN]: <descripción breve y visual de la imagen, en inglés>
-No uses ese formato si solo preguntan sobre imágenes existentes o teoría; en ese caso responde normalmente.
-
-11) Puedes generar documentos descargables (informes, biografías, ensayos, cartas, planes, contratos, reportes...). Cuando el usuario pida crear o generar un documento, responde con UNA SOLA línea en este formato exacto y nada más — el cuerpo NO lo escribes tú, lo redacta un sistema aparte con información real verificada en internet:
-[GENERAR_DOC]: <Título claro y descriptivo del documento>
-No uses ese formato para preguntas o tareas que no pidan un documento.`;
-
-    // Si el usuario definió su propia "Instrucción del sistema" en Configuración,
-    // la añadimos para que la IA la cumpla además del comportamiento base.
-    const sistemaFinal = instruccionUsuario
-      ? `${sistemaBase}\n\nInstrucciones adicionales del usuario: ${instruccionUsuario}`
-      : sistemaBase;
-
-    const mensajes = [
-      { role: 'system', content: sistemaFinal },
-      ...(Array.isArray(historial) ? historial : []),
-      { role: 'user', content: mensaje }
-    ];
-
-    // Copia de la conversación (sin el system prompt) para la extracción de
-    // memorias en segundo plano.
-    const mensajesConversacion = [
-      ...(Array.isArray(historial) ? historial : []),
-      { role: 'user', content: mensaje }
-    ];
+    // Prompt de sistema, historial de mensajes y copia para extraer memorias
+    // (compartidos con el bot de WhatsApp en backend/chatEngine.js).
+    const { sistemaFinal } = chatEngine.armarSistema({
+      lang,
+      instruccion: instruccionUsuario,
+      memoriaContexto: bloqueMemorias
+    });
+    const { mensajes, mensajesConversacion } = chatEngine.construirMensajes({
+      mensaje,
+      historial,
+      sistemaFinal
+    });
 
     let url, apiKey, modeloIA;
-
-    if (proveedor === 'deepseek') {
-      if (!DEEPSEEK_API_KEY) {
-        return res.status(400).json({ error: 'DeepSeek no está configurado en el servidor todavía.' });
+    try {
+      const config = chatEngine.configurarProveedor(proveedor);
+      url = config.url;
+      apiKey = config.apiKey;
+      modeloIA = config.modeloIA;
+    } catch (e) {
+      if (e.claveError && e.status === 400) {
+        return res.status(400).json({ error: e.message });
       }
-      url = 'https://api.deepseek.com/chat/completions';
-      apiKey = DEEPSEEK_API_KEY;
-      modeloIA = 'deepseek-v4-flash'; // el nombre viejo "deepseek-chat" se retiró el 24 de julio de 2026
-    } else if (proveedor === 'gemini') {
-      if (!GEMINI_API_KEY) {
-        return res.status(400).json({ error: 'Gemini no está configurado en el servidor todavía.' });
-      }
-      // Google ofrece un endpoint compatible con el formato de OpenAI, así que
-      // funciona con la misma estructura de petición que Groq y DeepSeek.
-      url = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions';
-      apiKey = GEMINI_API_KEY;
-      modeloIA = 'gemini-3.6-flash';
-    } else {
-      url = 'https://api.groq.com/openai/v1/chat/completions';
-      apiKey = GROQ_API_KEY;
-      modeloIA = 'qwen/qwen3.6-27b';
+      throw e;
     }
 
-    const bodyIA = {
-      model: modeloIA,
-      messages: mensajes,
-      temperature: 0.7,
-      max_tokens: 1024,
-      stream: true
-    };
-
-    // Groq y DeepSeek soportan desactivar el razonamiento para responder más rápido;
-    // Gemini no acepta este parámetro, así que solo lo mandamos a los que lo soportan.
-    if (proveedor !== 'gemini') {
-      bodyIA.reasoning_effort = 'none';
-    }
+    const bodyIA = chatEngine.crearCuerpoIA({ modeloIA, mensajes, stream: true, proveedor });
 
     const respuestaIA = await fetch(url, {
       method: 'POST',
@@ -852,7 +761,7 @@ No uses ese formato para preguntas o tareas que no pidan un documento.`;
     if (!respuestaIA.ok) {
       const errorData = await respuestaIA.text();
       console.error(`Error de ${proveedor}:`, errorData);
-      return res.status(respuestaIA.status).json({ error: mensajeErrorIA(proveedor, respuestaIA.status, errorData) });
+      return res.status(respuestaIA.status).json({ error: chatEngine.mensajeErrorIA(proveedor, respuestaIA.status, errorData) });
     }
 
     // Stream real (SSE): cada fragmento que llega del modelo se reenvía al navegador
@@ -923,6 +832,9 @@ No uses ese formato para preguntas o tareas que no pidan un documento.`;
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
+
+// Bot de WhatsApp (webhook de Meta). Debe montarse ANTES del fallback SPA.
+app.use(whatsappRouter);
 
 // Sirve el front-end (HTML, CSS, JS) — deben estar en la misma carpeta que este archivo
 // El service worker y el manifest no se cachean en el navegador para que las

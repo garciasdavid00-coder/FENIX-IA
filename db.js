@@ -70,6 +70,40 @@ async function inicializar() {
       CREATE INDEX IF NOT EXISTS idx_user_memories_user_id
         ON user_memories(user_id)
     `);
+    // ------------------------------------------------------------
+    // Soporte WhatsApp: los usuarios se identifican por teléfono (no por
+    // Google), así que google_id pasa a ser opcional y se añade el campo
+    // phone_number. La memoria (user_memories) se indexa por un string
+    // genérico ("wa:<teléfono>" o el id de Google), ya sin FK obligatoria.
+    // ------------------------------------------------------------
+    await pool.query(`ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS phone_number VARCHAR(20)`);
+    await pool.query(`ALTER TABLE usuarios ALTER COLUMN google_id DROP NOT NULL`);
+    await pool.query(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_usuarios_phone_number
+        ON usuarios(phone_number) WHERE phone_number IS NOT NULL
+    `);
+    await pool.query(`
+      ALTER TABLE user_memories DROP CONSTRAINT IF EXISTS user_memories_user_id_fkey
+    `);
+    // Historial de conversación por número de WhatsApp (el servidor guarda
+    // este historial porque el usuario no tiene "cliente_id" de navegador).
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS whatsapp_conversaciones (
+        phone_number   VARCHAR(20) PRIMARY KEY,
+        mensajes       JSONB       NOT NULL DEFAULT '[]',
+        creado_en      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        actualizado_en TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
+    // Límite de uso por número: un contador por ventana de una hora.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS whatsapp_rate_limit (
+        phone_number   VARCHAR(20) PRIMARY KEY,
+        contador_hora  INTEGER     NOT NULL DEFAULT 0,
+        ventana_hora   TIMESTAMPTZ NOT NULL,
+        actualizado_en TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
     console.log('Base de datos conectada y lista.');
   } catch (e) {
     console.error('ERROR al conectar la base de datos:', e.message);
@@ -183,6 +217,81 @@ async function obtenerDatos(googleId) {
   };
 }
 
+// ------------------------------------------------------------
+// Soporte WhatsApp (identificación por número de teléfono)
+// ------------------------------------------------------------
+
+// Crea el usuario si su número de WhatsApp no existe todavía, o devuelve el
+// registro existente. El teléfono llega en formato E.164 (p. ej.
+// "5215512345678") en el campo "from" del webhook de Meta.
+async function obtenerOCrearUsuarioPorTelefono(phone, { nombre } = {}) {
+  if (!pool || !phone) return null;
+  if (!nombre) {
+    await pool.query(
+      `INSERT INTO usuarios (phone_number) VALUES ($1) ON CONFLICT (phone_number) DO NOTHING`,
+      [phone]
+    );
+  } else {
+    await pool.query(
+      `INSERT INTO usuarios (phone_number, nombre) VALUES ($1, $2)
+       ON CONFLICT (phone_number) DO UPDATE SET
+         nombre = EXCLUDED.nombre,
+         actualizado_en = NOW()`,
+      [phone, String(nombre).slice(0, 200)]
+    );
+  }
+  const { rows } = await pool.query('SELECT * FROM usuarios WHERE phone_number = $1', [phone]);
+  return rows[0] || null;
+}
+
+// Devuelve el historial de conversación guardado para ese número.
+async function obtenerConversacionWhatsapp(phone) {
+  if (!pool || !phone) return [];
+  const { rows } = await pool.query(
+    'SELECT mensajes FROM whatsapp_conversaciones WHERE phone_number = $1',
+    [phone]
+  );
+  return (rows[0] && rows[0].mensajes) || [];
+}
+
+// Guarda (o reemplaza) el historial de conversación del número, recortándolo
+// a las últimas 60 líneas para no crecer sin límite en Neon.
+async function guardarConversacionWhatsapp(phone, mensajes) {
+  if (!pool || !phone) return null;
+  const recortados = Array.isArray(mensajes) ? mensajes.slice(-60) : [];
+  const { rows } = await pool.query(
+    `INSERT INTO whatsapp_conversaciones (phone_number, mensajes, actualizado_en)
+     VALUES ($1, $2::jsonb, NOW())
+     ON CONFLICT (phone_number) DO UPDATE SET
+       mensajes = EXCLUDED.mensajes,
+       actualizado_en = NOW()
+     RETURNING mensajes`,
+    [phone, JSON.stringify(recortados)]
+  );
+  return (rows[0] && rows[0].mensajes) || [];
+}
+
+// Cuenta el uso del número dentro de la hora actual (rate limiting por hora).
+// Devuelve el contador ya incrementado: > LIMITE_HORA significa bloqueado.
+async function contarUsoWhatsapp(phone) {
+  if (!pool || !phone) return 1; // si no hay BD, el router usa un contador en memoria
+  const { rows } = await pool.query(
+    `INSERT INTO whatsapp_rate_limit (phone_number, contador_hora, ventana_hora)
+     VALUES ($1, 1, date_trunc('hour', now()))
+     ON CONFLICT (phone_number) DO UPDATE SET
+       contador_hora = CASE
+         WHEN whatsapp_rate_limit.ventana_hora = date_trunc('hour', now())
+         THEN whatsapp_rate_limit.contador_hora + 1
+         ELSE 1
+       END,
+       ventana_hora = date_trunc('hour', now()),
+       actualizado_en = NOW()
+     RETURNING contador_hora`,
+    [phone]
+  );
+  return (rows[0] && rows[0].contador_hora) || 1;
+}
+
 module.exports = {
   pool,
   inicializar,
@@ -190,5 +299,9 @@ module.exports = {
   obtenerUsuarioPorGoogleId,
   actualizarPlan,
   sincronizarDatos,
-  obtenerDatos
+  obtenerDatos,
+  obtenerOCrearUsuarioPorTelefono,
+  obtenerConversacionWhatsapp,
+  guardarConversacionWhatsapp,
+  contarUsoWhatsapp
 };
