@@ -22,6 +22,7 @@ export default function HomePage() {
     chats,
     guardarMensajesEnHistorial,
     modeloSeleccionado,
+    busquedaWeb,
   } = useChat();
 
   const {
@@ -56,7 +57,10 @@ export default function HomePage() {
   }, [mensajes, generando, chatActualId, setChatActualId, guardarMensajesEnHistorial]);
 
   const manejarEnvio = (texto) => {
-    enviarAlStream(texto, { modelo: modeloSeleccionado });
+    enviarAlStream(texto, {
+      modelo: modeloSeleccionado,
+      webSearch: busquedaWeb === 'auto' ? undefined : busquedaWeb === 'on',
+    });
   };
 
   const mostrarChat = mensajes.length > 0;

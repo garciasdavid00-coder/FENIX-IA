@@ -30,6 +30,30 @@ export default function MessageBubble({ mensaje }) {
 
   return (
     <div className={`msg ${esUsuario ? 'msg-user' : 'msg-bot'}`}>
+      {/* Badge de búsqueda web en vivo */}
+      {!esUsuario && mensaje.searchInfo && mensaje.searchInfo.estado && (
+        <div
+          className={`busqueda-web-badge ${
+            mensaje.searchInfo.estado === 'buscando' ? 'anim-pulse' : 'completado'
+          }`}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z" />
+          </svg>
+          <span>
+            {mensaje.searchInfo.estado === 'buscando' ? (
+              <>
+                Buscando en la web: <i>{mensaje.searchInfo.query}</i>
+              </>
+            ) : (
+              'Búsqueda web completada'
+            )}
+          </span>
+        </div>
+      )}
+
       {/* Contenido del mensaje */}
       <div>
         {mensaje.imagen ? (
@@ -79,6 +103,50 @@ export default function MessageBubble({ mensaje }) {
           </>
         )}
       </div>
+
+      {/* Fuentes consultadas */}
+      {!esUsuario && mensaje.searchInfo?.fuentes?.length > 0 && (
+        <div className="fuentes-container">
+          <div className="fuentes-cabecera">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="2" y1="12" x2="22" y2="12" />
+              <path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z" />
+            </svg>
+            <span>Fuentes consultadas ({mensaje.searchInfo.fuentes.length})</span>
+          </div>
+          <div className="fuentes-grid">
+            {mensaje.searchInfo.fuentes.map((f, i) => {
+              let host = '';
+              try {
+                host = new URL(f.url).hostname.replace(/^www\./, '');
+              } catch (e) {}
+              return (
+                <a
+                  key={i}
+                  className="fuente-card"
+                  href={f.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    className="fuente-favicon"
+                    src={`https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=32`}
+                    alt=""
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                  <div className="fuente-info">
+                    <span className="fuente-host">{host}</span>
+                    <span className="fuente-titulo">{f.titulo || host}</span>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Límite de mensajes sin sesión: invita a iniciar sesión */}
       {mensaje.limite && (

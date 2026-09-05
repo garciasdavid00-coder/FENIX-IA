@@ -160,6 +160,7 @@ export function useChatStream() {
         modelo: opciones.modelo || 'auto',
         idioma: opciones.idioma || idiomaLocal,
         instruccion,
+        ...(opciones.webSearch !== undefined ? { webSearch: opciones.webSearch } : {}),
       };
 
       const res = await apiFetch('/api/chat', {
@@ -206,6 +207,31 @@ export function useChatStream() {
             if (dataObj.error) {
               throw new Error(dataObj.error);
             }
+
+            // Búsqueda web en vivo
+            if (dataObj.tipo === 'buscando_web' && dataObj.query) {
+              setMensajes((prev) =>
+                prev.map((msg) =>
+                  msg.id === idBot
+                    ? { ...msg, searchInfo: { ...(msg.searchInfo || {}), query: String(dataObj.query), estado: 'buscando' } }
+                    : msg
+                )
+              );
+              continue;
+            }
+
+            // Fuentes citadas al terminar la búsqueda
+            if (dataObj.tipo === 'fuentes' && Array.isArray(dataObj.fuentes)) {
+              setMensajes((prev) =>
+                prev.map((msg) =>
+                  msg.id === idBot
+                    ? { ...msg, searchInfo: { ...(msg.searchInfo || {}), fuentes: dataObj.fuentes, estado: 'completado' } }
+                    : msg
+                )
+              );
+              continue;
+            }
+
             if (typeof dataObj.texto === 'string' && dataObj.texto) {
               acumulado += dataObj.texto;
               // Oculta los marcadores crudos mientras llega el resto de la respuesta

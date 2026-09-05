@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useChat } from '@/context/ChatContext';
 
 export default function GreetingView({ onEnviarMensaje, generando, detener }) {
   const { usuario } = useAuth();
+  const { busquedaWeb, cambiarBusquedaWeb } = useChat();
   const [textoInput, setTextoInput] = useState('');
   const [saludo, setSaludo] = useState('Vamos con todo');
 
@@ -61,6 +63,25 @@ export default function GreetingView({ onEnviarMensaje, generando, detener }) {
             +
           </button>
           <div className="right-actions">
+            <button
+              type="button"
+              className={`web-btn ${busquedaWeb === 'on' ? 'forzado' : busquedaWeb === 'auto' ? 'activo' : 'apagado'}`}
+              onClick={cambiarBusquedaWeb}
+              title={
+                busquedaWeb === 'auto'
+                  ? 'Búsqueda Web: Automática (se activa si la pregunta lo requiere)'
+                  : busquedaWeb === 'on'
+                    ? 'Búsqueda Web: Activada para todos los mensajes'
+                    : 'Búsqueda Web: Desactivada'
+              }
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z" />
+              </svg>
+            </button>
+
             <button
               type="button"
               className="mic-btn"

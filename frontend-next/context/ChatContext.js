@@ -42,6 +42,7 @@ export function ChatProvider({ children }) {
   const [sidebarMobileOpen, setSidebarMobileOpen] = useState(false);
   const [vistaActiva, setVistaActiva] = useState('chat'); // 'chat' | 'proyectos' | 'biblioteca' | 'memoria' | 'configuracion'
   const [modeloSeleccionado, setModeloSeleccionado] = useState('auto');
+  const [busquedaWeb, setBusquedaWeb] = useState('auto'); // 'auto' | 'on' | 'off'
   const [chats, setChats] = useState([]);
   const [chatActualId, setChatActualId] = useState(null);
   const [proyectos, setProyectos] = useState([]);
@@ -60,6 +61,9 @@ export function ChatProvider({ children }) {
 
     const modeloGuardado = localStorage.getItem('fenixModelo') || 'auto';
     setModeloSeleccionado(modeloGuardado);
+
+    const busquedaGuardada = localStorage.getItem('fenixBusquedaWeb') || 'auto';
+    setBusquedaWeb(busquedaGuardada);
 
     // Cargar historial de chats locales (con respaldo a la clave del frontend clásico)
     try {
@@ -105,6 +109,14 @@ export function ChatProvider({ children }) {
   const cambiarModelo = useCallback((nuevoModelo) => {
     setModeloSeleccionado(nuevoModelo);
     localStorage.setItem('fenixModelo', nuevoModelo);
+  }, []);
+
+  const cambiarBusquedaWeb = useCallback(() => {
+    setBusquedaWeb((prev) => {
+      const siguiente = prev === 'auto' ? 'on' : prev === 'on' ? 'off' : 'auto';
+      localStorage.setItem('fenixBusquedaWeb', siguiente);
+      return siguiente;
+    });
   }, []);
 
   const nuevoChat = useCallback(() => {
@@ -263,6 +275,8 @@ export function ChatProvider({ children }) {
         setVistaActiva,
         modeloSeleccionado,
         cambiarModelo,
+        busquedaWeb,
+        cambiarBusquedaWeb,
         chats,
         chatActualId,
         setChatActualId,
