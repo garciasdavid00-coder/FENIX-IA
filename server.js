@@ -1043,10 +1043,10 @@ if (servirNext) {
     res.sendFile(path.join(NEXT_OUT, 'index.html'));
   });
 } else {
-  // Sirve el front-end clásico (HTML, CSS, JS) desde la raíz del proyecto.
-  // El service worker y el manifest no se cachean en el navegador para que
-  // las actualizaciones de la app se propaguen rápido.
-  console.log('[frontend] Sirviendo frontend clásico (raíz del proyecto)');
+  // Respaldo: sirve el frontend clásico (ahora en legacy/) solo si el build
+  // de Next no existe. `legacy/` conserva el código vanilla por referencia.
+  console.log('[frontend] Build de Next no encontrado; sirviendo frontend clásico (legacy/)');
+  const LEGACY_RAIZ = path.join(__dirname, 'legacy');
   app.use('/sw.js', (req, res, next) => {
     res.setHeader('Cache-Control', 'no-store');
     next();
@@ -1055,11 +1055,11 @@ if (servirNext) {
     res.setHeader('Cache-Control', 'no-store');
     next();
   });
-  app.use(express.static(path.join(__dirname)));
+  app.use(express.static(LEGACY_RAIZ));
 
   // Si alguien entra a la raíz o a cualquier ruta no reconocida, manda el index.html
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(LEGACY_RAIZ, 'index.html'));
   });
 }
 
