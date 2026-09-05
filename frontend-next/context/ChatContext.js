@@ -5,6 +5,30 @@ import { apiGet, apiPost } from '@/lib/api';
 
 const ChatContext = createContext(null);
 
+// Convierte mensajes del frontend clásico ({tipo, texto, imagen, documento})
+// al esquema de React ({rol, contenido, imagen, documento}) al cargar historial.
+function normalizarMensaje(m) {
+  if (!m || typeof m !== 'object') return m;
+  if (m.rol === 'user' || m.rol === 'bot') return m;
+  return {
+    id: m.id != null ? m.id : `${Date.now()}-${Math.random()}`,
+    rol: m.tipo === 'user' ? 'user' : 'bot',
+    contenido: m.texto || '',
+    ...(m.fecha ? { fecha: m.fecha } : {}),
+    ...(m.imagen ? { imagen: m.imagen } : {}),
+    ...(m.documento ? { documento: m.documento } : {}),
+    ...(m.edicion ? { edicion: m.edicion } : {}),
+  };
+}
+
+function normalizarChat(c) {
+  if (!c || typeof c !== 'object') return c;
+  return {
+    ...c,
+    mensajes: Array.isArray(c.mensajes) ? c.mensajes.map(normalizarMensaje) : [],
+  };
+}
+
 // Guarda en las dos claves (vista React 'fenixHistorial' y clásica 'fenixChats')
 // para facilitar la migración sin perder datos al cambiar de frontend.
 function persistirChats(chats) {
@@ -26,6 +50,7 @@ export function ChatProvider({ children }) {
   const [filtroBuscar, setFiltroBuscar] = useState('');
   const [busquedaVisible, setBusquedaVisible] = useState(false);
   const [memoriaModal, setMemoriaModal] = useState(null); // null | { texto }
+  const [docModal, setDocModal] = useState(null); // null | { titulo, contenido }
 
   // Cargar tema guardado en localStorage + históricos locales
   useEffect(() => {
@@ -40,7 +65,8 @@ export function ChatProvider({ children }) {
     try {
       const guardado = localStorage.getItem('fenixHistorial');
       const historialLocal = guardado ? guardado : (localStorage.getItem('fenixChats') || '[]');
-      setChats(Array.isArray(JSON.parse(historialLocal)) ? JSON.parse(historialLocal) : []);
+      const arr = JSON.parse(historialLocal);
+      setChats(Array.isArray(arr) ? arr.map(normalizarChat) : []);
     } catch (e) {
       setChats([]);
     }
@@ -216,6 +242,14 @@ export function ChatProvider({ children }) {
     setMemoriaModal(null);
   }, []);
 
+  const abrirDocModal = useCallback((titulo, contenido) => {
+    setDocModal({ titulo: String(titulo || 'Documento'), contenido: String(contenido || '') });
+  }, []);
+
+  const cerrarDocModal = useCallback(() => {
+    setDocModal(null);
+  }, []);
+
   return (
     <ChatContext.Provider
       value={{
@@ -254,6 +288,9 @@ export function ChatProvider({ children }) {
         memoriaModal,
         abrirModalMemoria,
         cerrarModalMemoria,
+        docModal,
+        abrirDocModal,
+        cerrarDocModal,
       }}
     >
       {children}

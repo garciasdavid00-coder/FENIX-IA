@@ -2,10 +2,14 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { apiFetch } from '@/lib/api';
+import { generarImagen, esPeticionImagen } from '@/lib/imagenes';
+import { generarDocumentoReal } from '@/lib/documentos';
 
 /**
  * Hook reactivo para enviar mensajes al chat y consumir el streaming Server-Sent Events (SSE)
  * que emite el backend Express (POST /api/chat) vía fetch + ReadableStream.
+ * Además gestiona la generación de imágenes (Pollinations) y documentos reales
+ * cuando el usuario lo pide o el modelo devuelve los marcadores [GENERAR_*].
  */
 export function useChatStream() {
   const [mensajes, setMensajes] = useState([]);
@@ -13,9 +17,6 @@ export function useChatStream() {
   const [error, setError] = useState(null);
   const abortControllerRef = useRef(null);
 
-  /**
-   * Cancela la respuesta en curso si el usuario lo solicita.
-   */
   const detener = useCallback(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -24,11 +25,6 @@ export function useChatStream() {
     }
   }, []);
 
-  /**
-   * Envía un mensaje y procesa el flujo SSE token por token.
-   * @param {string} textoMensaje - El texto que escribe el usuario
-   * @param {Object} [opciones={}] - Opciones adicionales (modelo, idioma, instruccion)
-   */
   const enviarMensaje = useCallback(async (textoMensaje, opciones = {}) => {
     if (!textoMensaje || !textoMensaje.trim() || generando) return;
 
@@ -49,15 +45,100 @@ export function useChatStream() {
       cargando: true,
     };
 
-    // Añadimos el mensaje del usuario y la burbuja vacía del bot
     setMensajes((prev) => [...prev, mensajeUsuario, mensajeBotInicial]);
     setGenerando(true);
 
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
 
+    const finalizarBurbuja = async (acumulado) => {
+      const final = acumulado;
+      const coincidenciaDoc = final.match(/\[GENERAR_DOC\]\s*:?\s*([^\n]*)\n?([\s\S]*)/i);
+      const coincidenciaImg = final.match(/\[GENERAR_IMAGEN\]\s*:?\s*([\s\S]+)/i);
+
+      if (coincidenciaDoc && coincidenciaDoc[1].trim()) {
+        const titulo = coincidenciaDoc[1].trim();
+        setMensajes((prev) =>
+          prev.map((m) => (m.id === idBot ? { ...m, contenido: 'Generando documento...', cargando: true } : m))
+        );
+        try {
+          const tema = textoMensaje.trim() || titulo;
+          const contenidoReal = await generarDocumentoReal(tema);
+          setMensajes((prev) =>
+            prev.map((m) =>
+              m.id === idBot
+                ? { ...m, contenido: '', cargando: false, documento: { titulo: titulo || 'Documento', contenido: contenidoReal } }
+                : m
+            )
+          );
+        } catch (e) {
+          console.error('[useChatStream] documento:', e);
+          setMensajes((prev) =>
+            prev.map((m) =>
+              m.id === idBot
+                ? { ...m, contenido: `⚠️ ${e.message || 'No se pudo generar el documento'}`, error: true, cargando: false }
+                : m
+            )
+          );
+        }
+      } else if (coincidenciaImg && coincidenciaImg[1].trim()) {
+        const descripcion = coincidenciaImg[1].trim();
+        setMensajes((prev) =>
+          prev.map((m) => (m.id === idBot ? { ...m, contenido: 'Generando imagen...', cargando: true } : m))
+        );
+        try {
+          const urlImagen = await generarImagen(descripcion);
+          setMensajes((prev) =>
+            prev.map((m) =>
+              m.id === idBot ? { ...m, contenido: '', cargando: false, imagen: urlImagen } : m
+            )
+          );
+        } catch (e) {
+          console.error('[useChatStream] imagen:', e);
+          setMensajes((prev) =>
+            prev.map((m) =>
+              m.id === idBot
+                ? { ...m, contenido: `⚠️ ${e.message || 'No se pudo generar la imagen'}`, error: true, cargando: false }
+                : m
+            )
+          );
+        }
+      } else {
+        const limpio = final.replace(/\[(GENERAR_\w*|BUSCAR_WEB)[\s\S]*$/i, '').trim();
+        setMensajes((prev) =>
+          prev.map((m) => (m.id === idBot ? { ...m, contenido: limpio, cargando: false } : m))
+        );
+      }
+    };
+
+    // El usuario pide explícitamente una imagen: va directo por /api/imagen
+    if (esPeticionImagen(textoMensaje)) {
+      try {
+        const urlImagen = await generarImagen(textoMensaje.trim());
+        setMensajes((prev) =>
+          prev.map((m) =>
+            m.id === idBot ? { ...m, contenido: '', cargando: false, imagen: urlImagen } : m
+          )
+        );
+      } catch (e) {
+        console.error('[useChatStream] imagen directa:', e);
+        setMensajes((prev) =>
+          prev.map((m) =>
+            m.id === idBot
+              ? { ...m, contenido: `⚠️ ${e.message || 'No se pudo generar la imagen'}`, error: true, cargando: false }
+              : m
+          )
+        );
+      } finally {
+        setGenerando(false);
+        abortControllerRef.current = null;
+      }
+      return;
+    }
+
+    let acumulado = '';
+
     try {
-      // Historial para contexto del modelo
       const historial = mensajes.map((m) => ({
         role: m.rol === 'user' ? 'user' : 'assistant',
         content: m.contenido,
@@ -104,7 +185,6 @@ export function useChatStream() {
       const reader = res.body.getReader();
       const decoder = new TextDecoder('utf-8');
       let buffer = '';
-      let acumulado = '';
 
       while (true) {
         const { done, value } = await reader.read();
@@ -112,7 +192,6 @@ export function useChatStream() {
 
         buffer += decoder.decode(value, { stream: true });
         const lineas = buffer.split('\n');
-        // El último elemento puede ser una línea incompleta; lo conservamos en el buffer
         buffer = lineas.pop() || '';
 
         for (const linea of lineas) {
@@ -127,13 +206,18 @@ export function useChatStream() {
             if (dataObj.error) {
               throw new Error(dataObj.error);
             }
-            if (typeof dataObj.texto === 'string') {
+            if (typeof dataObj.texto === 'string' && dataObj.texto) {
               acumulado += dataObj.texto;
-              // Actualizamos el mensaje del bot token por token
+              // Oculta los marcadores crudos mientras llega el resto de la respuesta
+              const visible = acumulado
+                .replace(/\[GENERAR_(IMAGEN|DOC)\][\s\S]*$/i, '')
+                .replace(/\[BUSCAR_WEB\][\s\S]*$/i, '')
+                .replace(/^\[IMAGEN\]\s*:?.*$/gim, '');
+              const espera = /\[GENERAR_DOC\]/i.test(acumulado) ? 'Generando documento...' : 'Generando imagen...';
               setMensajes((prev) =>
                 prev.map((msg) =>
                   msg.id === idBot
-                    ? { ...msg, contenido: acumulado, cargando: false }
+                    ? { ...msg, contenido: visible.trim() ? visible : espera, cargando: false }
                     : msg
                 )
               );
@@ -157,16 +241,11 @@ export function useChatStream() {
         }
       }
 
-      setMensajes((prev) =>
-        prev.map((msg) =>
-          msg.id === idBot
-            ? { ...msg, contenido: acumulado, cargando: false }
-            : msg
-        )
-      );
+      await finalizarBurbuja(acumulado);
     } catch (err) {
       if (err.name === 'AbortError') {
-        // Cancelado por el usuario
+        // Cancelado por el usuario: conservar lo que ya llegó
+        await finalizarBurbuja(acumulado);
       } else {
         console.error('[useChatStream] Error:', err);
         const mensajeError = err.message || 'Error al conectar con Fenix IA';

@@ -10,6 +10,7 @@ import BibliotecaView from '@/components/BibliotecaView';
 import SettingsView from '@/components/SettingsView';
 import MemoriasView from '@/components/MemoriasView';
 import ModalMemoria from '@/components/ModalMemoria';
+import ModalDocumento from '@/components/ModalDocumento';
 import { useChat } from '@/context/ChatContext';
 import { useChatStream } from '@/hooks/useChatStream';
 
@@ -97,6 +98,8 @@ export default function HomePage() {
 
       {/* Modal global de memoria (botón "Recordar") */}
       <ModalMemoria />
+      {/* Modal global de vista previa de documentos */}
+      <ModalDocumento />
     </div>
   );
 }

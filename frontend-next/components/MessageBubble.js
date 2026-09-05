@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { useChat } from '@/context/ChatContext';
 import { getGoogleAuthUrl } from '@/lib/api';
+import { descargarDocumento } from '@/lib/documentos';
 
 export default function MessageBubble({ mensaje }) {
-  const { abrirModalMemoria } = useChat();
+  const { abrirModalMemoria, abrirDocModal } = useChat();
   const [copiado, setCopiado] = useState(false);
 
   const copiarTexto = () => {
@@ -31,12 +32,50 @@ export default function MessageBubble({ mensaje }) {
     <div className={`msg ${esUsuario ? 'msg-user' : 'msg-bot'}`}>
       {/* Contenido del mensaje */}
       <div>
-        {mensaje.cargando && !mensaje.contenido ? (
-          <span className="cursor-escribiendo" />
+        {mensaje.imagen ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="msg-imagen"
+              src={mensaje.imagen}
+              alt={mensaje.contenido || 'Imagen generada'}
+              loading="lazy"
+            />
+            {mensaje.contenido && <div className="msg-pie">{mensaje.contenido}</div>}
+          </>
+        ) : mensaje.documento ? (
+          <div className="tarjeta-doc">
+            <div className="tarjeta-doc-icono">📄</div>
+            <div className="tarjeta-doc-info">
+              <div className="tarjeta-doc-nombre">{mensaje.documento.titulo}</div>
+              <div className="tarjeta-doc-botones">
+                <button
+                  type="button"
+                  className="tarjeta-doc-btn tarjeta-doc-btn-sec"
+                  onClick={() => abrirDocModal(mensaje.documento.titulo, mensaje.documento.contenido)}
+                >
+                  👁️ Ver
+                </button>
+                <button
+                  type="button"
+                  className="tarjeta-doc-btn"
+                  onClick={() => descargarDocumento(mensaje.documento.titulo, mensaje.documento.contenido)}
+                >
+                  ⬇️ Descargar
+                </button>
+              </div>
+            </div>
+          </div>
         ) : (
           <>
-            {mensaje.contenido}
-            {mensaje.cargando && <span className="cursor-escribiendo" />}
+            {mensaje.cargando && !mensaje.contenido ? (
+              <span className="cursor-escribiendo" />
+            ) : (
+              <>
+                {mensaje.contenido}
+                {mensaje.cargando && <span className="cursor-escribiendo" />}
+              </>
+            )}
           </>
         )}
       </div>
