@@ -142,6 +142,9 @@
         <div class="chat-actions">
           <button class="plus-btn" onclick="alert('Aquí abrirías el selector de archivos para adjuntar.')">+</button>
           <div class="right-actions">
+            <button class="web-btn activo" id="webBtnInicial" title="Búsqueda Web: Automática" onclick="toggleBusquedaWebManual()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="19" height="19"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z"/></svg>
+            </button>
             <button class="mic-btn" onclick="usarMicrofono()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
             </button>
@@ -178,6 +181,9 @@
         <div class="chat-actions">
           <button class="plus-btn" onclick="alert('Aquí abrirías el selector de archivos para adjuntar.')">+</button>
           <div class="right-actions">
+            <button class="web-btn activo" id="webBtnChat" title="Búsqueda Web: Automática" onclick="toggleBusquedaWebManual()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="19" height="19"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z"/></svg>
+            </button>
             <button class="mic-btn" onclick="usarMicrofono()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
             </button>
@@ -194,6 +200,7 @@
         </div>
       </div>
     </div>
+
 
     <!-- Vista de Proyectos -->
     <div class="panel-view" id="vistaProyectos" style="display:none;">

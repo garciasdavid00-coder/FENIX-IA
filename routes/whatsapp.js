@@ -23,19 +23,20 @@ const chatEngine = require('../backend/chatEngine');
 
 const router = express.Router();
 
-const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
-const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
-const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
-const APP_SECRET = process.env.WHATSAPP_APP_SECRET;
-const GRAPH_VERSION = process.env.WHATSAPP_GRAPH_VERSION || 'v23.0';
+const getVerifyToken = () => process.env.WHATSAPP_VERIFY_TOKEN;
+const getAccessToken = () => process.env.WHATSAPP_ACCESS_TOKEN;
+const getPhoneNumberId = () => process.env.WHATSAPP_PHONE_NUMBER_ID;
+const getAppSecret = () => process.env.WHATSAPP_APP_SECRET;
+const getGraphVersion = () => process.env.WHATSAPP_GRAPH_VERSION || 'v21.0';
 
-const GRAPH_URL = () => `https://graph.facebook.com/${GRAPH_VERSION}/${PHONE_NUMBER_ID}/messages`;
+const GRAPH_URL = () => `https://graph.facebook.com/${getGraphVersion()}/${getPhoneNumberId()}/messages`;
 
 const LIMITE_POR_HORA = 20;          // máximo de mensajes por número y por hora
 const HISTORIAL_GUARDADO = 60;       // líneas que se conservan en Neon
 const HISTORIAL_CONTEXTO = 12;       // últimas líneas que se mandan al modelo
 const TIME_OUT_IA = 90000;           // ms de espera del modelo
 const CONTADOR_EN_MEMORIA = new Map(); // rate limiting de respaldo si no hay BD
+const MENSAJES_PROCESADOS = new Set(); // deduplicación de webhooks de Meta
 let avisadoDesconfigurado = false;
 
 // ------------------------------------------------------------
@@ -43,8 +44,8 @@ let avisadoDesconfigurado = false;
 // ------------------------------------------------------------
 
 function logCuandoFaltaConfig() {
-  if (avisoDesconfigurado) return;
-  avisoDesconfigurado = true;
+  if (avisadoDesconfigurado) return;
+  avisadoDesconfigurado = true;
   console.warn('[WhatsApp] Falta configurar WHATSAPP_VERIFY_TOKEN / WHATSAPP_ACCESS_TOKEN / WHATSAPP_PHONE_NUMBER_ID en .env');
 }
 
@@ -52,11 +53,12 @@ function logCuandoFaltaConfig() {
 // cuerpo con WHATSAPP_APP_SECRET). Si no hay APP_SECRET configurado, se
 // omite la verificación (se registra un aviso una sola vez).
 function firmaValida(req) {
-  if (!APP_SECRET) return true;
+  const secret = getAppSecret();
+  if (!secret) return true;
   const firma = req.headers['x-hub-signature-256'];
   if (!firma) return false;
   const esperada = 'sha256=' + crypto
-    .createHmac('sha256', APP_SECRET)
+    .createHmac('sha256', secret)
     .update(req.rawBody || '')
     .digest('hex');
   try {
@@ -65,6 +67,7 @@ function firmaValida(req) {
     return false;
   }
 }
+
 
 // Convierte Markdown común a lo que WhatsApp SÍ renderiza:
 // negritas *texto*, cursivas _texto_, y quita headers y otras estructuras
@@ -131,7 +134,9 @@ async function permiteEnviar(numero) {
 
 // Envía un mensaje de texto por la API de WhatsApp con un reintento simple.
 async function enviarMensajeWhatsApp(para, texto) {
-  if (!ACCESS_TOKEN || !PHONE_NUMBER_ID) {
+  const token = getAccessToken();
+  const phoneId = getPhoneNumberId();
+  if (!token || !phoneId) {
     logCuandoFaltaConfig();
     return null;
   }
@@ -148,7 +153,7 @@ async function enviarMensajeWhatsApp(para, texto) {
       const res = await fetch(GRAPH_URL(), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${ACCESS_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(cuerpo)
@@ -171,11 +176,21 @@ async function enviarMensajeWhatsApp(para, texto) {
 // NOTA: se corre en segundo plano DESPUÉS de contestar 200 a Meta.
 // ------------------------------------------------------------
 async function procesarMensajeEntrante(message, value) {
+  const msgId = message.id;
+  if (msgId) {
+    if (MENSAJES_PROCESADOS.has(msgId)) return; // Evitar procesar duplicados
+    MENSAJES_PROCESADOS.add(msgId);
+    if (MENSAJES_PROCESADOS.size > 2000) {
+      const primerElemento = MENSAJES_PROCESADOS.values().next().value;
+      MENSAJES_PROCESADOS.delete(primerElemento);
+    }
+  }
+
   const numero = message.from;
   const texto = (message.text && message.text.body || '').trim();
   if (!numero || !texto) return;
 
-  if (!ACCESS_TOKEN || !PHONE_NUMBER_ID) {
+  if (!getAccessToken() || !getPhoneNumberId()) {
     logCuandoFaltaConfig();
     return;
   }
@@ -255,13 +270,14 @@ router.get('/webhook/whatsapp', (req, res) => {
   const modo = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];
+  const verifyToken = getVerifyToken();
 
-  if (!VERIFY_TOKEN) {
+  if (!verifyToken) {
     logCuandoFaltaConfig();
     return res.status(503).send('WHATSAPP_VERIFY_TOKEN no configurado');
   }
 
-  if (modo === 'subscribe' && token === VERIFY_TOKEN) {
+  if (modo === 'subscribe' && token === verifyToken) {
     console.log('[WhatsApp] Webhook verificado con éxito por Meta.');
     return res.status(200).send(challenge);
   }
@@ -276,7 +292,7 @@ router.post('/webhook/whatsapp', (req, res) => {
     return res.sendStatus(401);
   }
 
-  if (!ACCESS_TOKEN || !PHONE_NUMBER_ID) {
+  if (!getAccessToken() || !getPhoneNumberId()) {
     logCuandoFaltaConfig();
   }
   res.sendStatus(200);
@@ -297,6 +313,7 @@ router.post('/webhook/whatsapp', (req, res) => {
     }
   }
 });
+
 
 module.exports = router;
 module.exports.sanitizarParaWhatsApp = sanitizarParaWhatsApp;

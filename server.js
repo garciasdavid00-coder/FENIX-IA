@@ -5,12 +5,14 @@ const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const path = require('path');
+const fs = require('fs');
 const db = require('./db');
 const { selectModel } = require('./modelRouter');
 const { generarDocumentoConHechosReales } = require('./services/promptDocumentos');
 const { router: imagenesRealesRouter, buscarImagenReal } = require('./routes/imagenesReales');
 const memory = require('./backend/memoryManager');
 const chatEngine = require('./backend/chatEngine');
+const webSearch = require('./backend/webSearch');
 const whatsappRouter = require('./routes/whatsapp');
 
 const app = express();
@@ -47,7 +49,26 @@ if (!googleHabilitado) {
 // Express detecte correctamente que la conexión es HTTPS.
 app.set('trust proxy', 1);
 
-app.use(cors({ credentials: true }));
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+// Lista de orígenes permitidos para peticiones con credenciales (cookies)
+const origenesPermitidos = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Permitir peticiones sin cabecera origin (ej: curl, scripts internos) o si coincide con la lista blanca
+    if (!origin || origenesPermitidos.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por CORS'));
+    }
+  },
+  credentials: true
+}));
 // El `verify` guarda el cuerpo crudo (req.rawBody) para poder verificar la
 // firma X-Hub-Signature-256 de los webhooks de WhatsApp.
 app.use(express.json({ limit: '5mb', verify: (req, res, buf) => { req.rawBody = buf; } }));
@@ -58,8 +79,8 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 días
-    secure: enProduccion,            // la cookie solo viaja por HTTPS en producción
-    sameSite: 'lax'                  // front-end y backend viven en el mismo dominio, así que 'lax' basta
+    secure: enProduccion,            // HTTPS en producción, HTTP en localhost
+    sameSite: enProduccion ? 'none' : 'lax' // 'none' para cross-site en prod, 'lax' para localhost
   }
 }));
 
@@ -126,12 +147,12 @@ if (googleHabilitado) {
   }));
 
   app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/' }),
+    passport.authenticate('google', { failureRedirect: `${FRONTEND_URL}/login?error=auth_failed` }),
     (req, res) => {
       // Al iniciar sesión se reinicia el contador de mensajes gratuitos
       req.session.mensajesSinLogin = 0;
-      // Login exitoso, regresa a la página principal (mismo servidor, misma URL)
-      res.redirect('/');
+      // Login exitoso, redirige al frontend Next.js
+      res.redirect(FRONTEND_URL);
     }
   );
 }
@@ -676,7 +697,7 @@ app.delete('/api/memories/:id', async (req, res) => {
 
 app.post('/api/chat', async (req, res) => {
   try {
-    const { mensaje, historial, modelo, idioma, instruccion } = req.body;
+    const { mensaje, historial, modelo, idioma, instruccion, webSearch: forzarWebSearch } = req.body;
 
     if (!mensaje || typeof mensaje !== 'string') {
       return res.status(400).json({ error: 'Falta el campo "mensaje"' });
@@ -694,24 +715,10 @@ app.post('/api/chat', async (req, res) => {
       req.session.mensajesSinLogin = usados + 1;
     }
 
-    // Si el usuario eligió un modelo en el dropdown (groq/gemini/deepseek),
-    // respetamos su elección. Si mandó "auto" o no mandó nada, el router decide.
-    const MODELOS_MANUALES = ['groq', 'gemini', 'deepseek'];
-    const proveedor = MODELOS_MANUALES.includes(modelo)
-      ? modelo
-      : selectModel(mensaje, historial);
-
     const lang = chatEngine.lenguajeDe(idioma);
-
-    // Instrucción del sistema personalizada que el usuario escribe en Configuración
     const instruccionUsuario = chatEngine.instruccionUsuarioDe(instruccion);
 
-    // Construimos el historial de mensajes para dar contexto a la IA
-    // ----------------------------------------------------------
-    // MEMORIA PERSISTENTE: si el usuario está conectado, cargamos lo que
-    // recordamos de él (hechos y preferencias) y lo inyectamos AL INICIO del
-    // system prompt para personalizar la conversación.
-    // ----------------------------------------------------------
+    // Memoria persistente del usuario
     let bloqueMemorias = '';
     if (userId) {
       try {
@@ -720,6 +727,70 @@ app.post('/api/chat', async (req, res) => {
         console.error('Error cargando memorias del usuario:', e.message);
       }
     }
+
+    // ==========================================================
+    // BÚSQUEDA WEB EN TIEMPO REAL — SOLO BAJO DEMANDA EXPLÍCITA
+    // (forzarWebSearch === true desde el frontend) O vía marcador
+    // [BUSCAR_WEB] que decide el modelo. Sin auto-detección.
+    // ==========================================================
+    const necesitaBusquedaAutomatica = forzarWebSearch === true;
+
+    if (necesitaBusquedaAutomatica) {
+      res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no');
+
+      const queryLimpia = webSearch.extraerQueryBusqueda(mensaje);
+      res.write(`data: ${JSON.stringify({ tipo: 'buscando_web', query: queryLimpia })}\n\n`);
+
+      try {
+        const resBusqueda = await webSearch.ejecutarBusquedaWebCompleta({
+          mensaje,
+          historial,
+          lang,
+          apiKey: process.env.GEMINI_API_KEY,
+          instruccionExtra: instruccionUsuario,
+          memoriaContexto: bloqueMemorias
+        });
+
+        // Emisión en pequeños bloques fluidos (efecto máquina de escribir)
+        const palabras = resBusqueda.texto.split(/(\s+)/);
+        for (const p of palabras) {
+          if (!p) continue;
+          res.write(`data: ${JSON.stringify({ texto: p })}\n\n`);
+          await new Promise(r => setTimeout(r, 12));
+        }
+
+        // Emite las fuentes citadas si existen
+        if (resBusqueda.fuentes && resBusqueda.fuentes.length) {
+          res.write(`data: ${JSON.stringify({ tipo: 'fuentes', fuentes: resBusqueda.fuentes })}\n\n`);
+        }
+
+        res.write('data: [DONE]\n\n');
+        res.end();
+
+        if (userId) {
+          memory.notificarMensaje(userId, [
+            ...(Array.isArray(historial) ? historial : []),
+            { role: 'user', content: mensaje },
+            { role: 'assistant', content: resBusqueda.texto }
+          ]);
+        }
+        return;
+      } catch (errWeb) {
+        console.error('[WebSearch] Error en búsqueda web; continuando con modelo estándar:', errWeb.message);
+        // Si falla la búsqueda, el flujo continúa hacia el modelo de chat normal
+      }
+    }
+
+
+    // Si el usuario eligió un modelo en el dropdown (groq/gemini/deepseek),
+    // respetamos su elección. Si mandó "auto" o no mandó nada, el router decide.
+    const MODELOS_MANUALES = ['groq', 'gemini', 'deepseek'];
+    const proveedor = MODELOS_MANUALES.includes(modelo)
+      ? modelo
+      : selectModel(mensaje, historial);
 
     // Prompt de sistema, historial de mensajes y copia para extraer memorias
     // (compartidos con el bot de WhatsApp en backend/chatEngine.js).
@@ -733,6 +804,7 @@ app.post('/api/chat', async (req, res) => {
       historial,
       sistemaFinal
     });
+
 
     let url, apiKey, modeloIA;
     try {
@@ -764,65 +836,160 @@ app.post('/api/chat', async (req, res) => {
       return res.status(respuestaIA.status).json({ error: chatEngine.mensajeErrorIA(proveedor, respuestaIA.status, errorData) });
     }
 
-    // Stream real (SSE): cada fragmento que llega del modelo se reenvía al navegador
-    // apenas se produce, para que la respuesta se vaya viendo en pantalla.
+    // ============================================================
+    // STREAMING EN DOS FASES: detecta [BUSCAR_WEB] y reinyecta búsqueda
+    // ============================================================
     res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
-    res.setHeader('X-Accel-Buffering', 'no'); // evita que proxies como nginx buffericen el stream
+    res.setHeader('X-Accel-Buffering', 'no');
 
     const filtro = crearFiltroRazonamiento();
-    let emitidoHasta = 0;
+    let bufferRespuesta = '';
     let primeraEmision = true;
+    let lectorAbortado = false;
+    let lector = null;
 
-    function enviarTexto(texto){
-      if(!texto) return;
-      let nuevo = texto.slice(emitidoHasta);
-      emitidoHasta = texto.length;
-      if(!nuevo) return;
-      // El primer fragmento no debe empezar con espacios en blanco sobrantes
-      if(primeraEmision){
+    function enviarTexto(texto) {
+      if (!texto) return;
+      let nuevo = texto.slice(bufferRespuesta.length);
+      bufferRespuesta = texto;
+      if (!nuevo) return;
+      if (primeraEmision) {
         primeraEmision = false;
         const limpio = nuevo.replace(/^\s+/, '');
-        if(!limpio) return; // era solo espacios en blanco
+        if (!limpio) return;
         nuevo = limpio;
       }
       try {
         res.write(`data: ${JSON.stringify({ texto: nuevo })}\n\n`);
-      } catch(e){ /* el cliente cerró la conexión */ }
+      } catch (e) { /* cliente cerró */ }
     }
 
-    // Si el usuario cierra el chat, cortamos la petición al modelo para no gastar tokens.
-    let lectorAbortado = false;
-    let lector = null;
     res.on('close', () => {
-      if(!res.writableEnded && lector && !lectorAbortado){
+      if (!res.writableEnded && lector && !lectorAbortado) {
         lectorAbortado = true;
         lector.cancel().catch(() => {});
       }
     });
 
-    try {
-      await leerStreamSSE(respuestaIA, delta => enviarTexto(filtro.push(delta)), {
+    async function procesarStreamConBusqueda(stream, mensajesOriginales, sistemaFinal) {
+      // Fase 1: leer stream completo y filtrar razonamiento
+      // El filtro devuelve texto acumulado; usamos el mismo patrón que el streaming original
+      // (trackear longitud emitida) para obtener solo el texto nuevo de cada chunk.
+      let respuestaCompleta = '';
+      let emitidoHasta = 0;
+      await leerStreamSSE(stream, delta => {
+        const filtrado = filtro.push(delta);
+        const nuevo = filtrado.slice(emitidoHasta);
+        emitidoHasta = filtrado.length;
+        if (nuevo) respuestaCompleta += nuevo;
+      }, { esActivo: () => !lectorAbortado, setLector: (r) => { lector = r; } });
+      const resto = filtro.final().slice(emitidoHasta);
+      if (resto) respuestaCompleta += resto;
+
+      // Detectar marcador [BUSCAR_WEB]: consulta
+      const matchBuscar = respuestaCompleta.match(/\[BUSCAR_WEB\]\s*:\s*([^\n]+)/i);
+      if (!matchBuscar) {
+        // Sin marcador → emitir respuesta completa y terminar
+        enviarTexto(respuestaCompleta);
+        res.write('data: [DONE]\n\n');
+        res.end();
+        return;
+      }
+
+      const query = matchBuscar[1].trim();
+      console.log('[chat] [BUSCAR_WEB] detectado, consulta:', query);
+
+      // Fase 2: búsqueda web con Gemini Grounding
+      let resultadoBusqueda = { texto: '', fuentes: [] };
+      try {
+        resultadoBusqueda = await webSearch.buscarEnWeb({
+          consulta: query,
+          apiKey: process.env.GEMINI_API_KEY,
+          modelo: 'gemini-3.6-flash',
+          lang
+        });
+      } catch (e) {
+        console.warn('[chat] Error en búsqueda web, continuando sin datos frescos:', e.message);
+      }
+
+      // Fase 3: segunda llamada al modelo con resultados de búsqueda
+      const contextoBusqueda = resultadoBusqueda.fuentes.length
+        ? `\n\n--- INFORMACIÓN EN TIEMPO REAL (Google Search Grounding) ---\n${resultadoBusqueda.texto}\n\nFuentes: ${resultadoBusqueda.fuentes.map(f => f.titulo + ' - ' + f.url).join('; ')}`
+        : '';
+
+      const mensajesConBusqueda = [
+        { role: 'system', content: sistemaFinal },
+        ...mensajesOriginales.slice(1), // sin el system prompt duplicado
+        { role: 'user', content: mensaje },
+        { role: 'assistant', content: respuestaCompleta.replace(/\[BUSCAR_WEB\][\s\S]*$/i, '').trim() || 'Buscando información...' },
+        { role: 'user', content: 'Aquí tienes la información actualizada de la web para responder con precisión:' + contextoBusqueda }
+      ];
+
+      const bodyIA2 = chatEngine.crearCuerpoIA({ modeloIA, mensajes: mensajesConBusqueda, stream: true, proveedor });
+      const respuestaIA2 = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify(bodyIA2)
+      });
+
+      if (!respuestaIA2.ok) {
+        const errorData = await respuestaIA2.text();
+        console.error(`Error en 2ª llamada (${proveedor}):`, errorData);
+        enviarTexto(respuestaCompleta); // fallback: respuesta original
+        res.write('data: [DONE]\n\n');
+        res.end();
+        return;
+      }
+
+      // Stream de la respuesta final
+      const filtro2 = crearFiltroRazonamiento();
+      let bufferFinal = '';
+      let primeraEmision2 = true;
+
+      function enviarTextoFinal(texto) {
+        if (!texto) return;
+        let nuevo = texto.slice(bufferFinal.length);
+        bufferFinal = texto;
+        if (!nuevo) return;
+        if (primeraEmision2) {
+          primeraEmision2 = false;
+          const limpio = nuevo.replace(/^\s+/, '');
+          if (!limpio) return;
+          nuevo = limpio;
+        }
+        try {
+          res.write(`data: ${JSON.stringify({ texto: nuevo })}\n\n`);
+        } catch (e) { /* cliente cerró */ }
+      }
+
+      await leerStreamSSE(respuestaIA2, delta => enviarTextoFinal(filtro2.push(delta)), {
         esActivo: () => !lectorAbortado,
         setLector: (r) => { lector = r; }
       });
-      enviarTexto(filtro.final());
-      if(emitidoHasta === 0){
-        enviarTexto('No se recibió respuesta.');
+      enviarTextoFinal(filtro2.final());
+
+      // Emitir fuentes al final si las hay
+      if (resultadoBusqueda.fuentes && resultadoBusqueda.fuentes.length) {
+        res.write(`data: ${JSON.stringify({ tipo: 'fuentes', fuentes: resultadoBusqueda.fuentes })}\n\n`);
       }
+
       res.write('data: [DONE]\n\n');
       res.end();
+    }
+
+    try {
+      await procesarStreamConBusqueda(respuestaIA, mensajes, sistemaFinal);
     } catch (e) {
-      console.error('Error durante el stream:', e.message);
-      if(!res.writableEnded){
+      console.error('Error en streaming con búsqueda:', e.message);
+      if (!res.writableEnded) {
         res.write(`data: ${JSON.stringify({ error: 'Error interno del servidor' })}\n\n`);
         res.end();
       }
     }
 
-    // Extracción de memorias en segundo plano (cada MEMORY_EXTRACTION_INTERVAL
-    // mensajes) — no bloquea la respuesta; si falla, solo se registra el error.
+    // Extracción de memorias en segundo plano
     if (userId && mensajesConversacion.length) {
       memory.notificarMensaje(userId, mensajesConversacion);
     }
@@ -836,23 +1003,65 @@ app.post('/api/chat', async (req, res) => {
 // Bot de WhatsApp (webhook de Meta). Debe montarse ANTES del fallback SPA.
 app.use(whatsappRouter);
 
-// Sirve el front-end (HTML, CSS, JS) — deben estar en la misma carpeta que este archivo
-// El service worker y el manifest no se cachean en el navegador para que las
-// actualizaciones de la app se propaguen rápido.
-app.use('/sw.js', (req, res, next) => {
-  res.setHeader('Cache-Control', 'no-store');
-  next();
-});
-app.use('/manifest.json', (req, res, next) => {
-  res.setHeader('Cache-Control', 'no-store');
-  next();
-});
-app.use(express.static(path.join(__dirname)));
+// =====================================================================
+// FRONTEND: build estático de Next.js (frontend-next/out) si existe.
+// La app Next (React) sirve las páginas '/' (chat) y '/login' y reemplaza
+// al frontend clásico. Si el export no está compilado, seguimos sirviendo
+// el frontend vanilla (index.html de la raíz).
+// Desactivable con SERVE_NEXT=0.
+// =====================================================================
+const NEXT_OUT = path.join(__dirname, 'frontend-next', 'out');
+const tieneNextExport = fs.existsSync(path.join(NEXT_OUT, 'index.html'));
+const servirNext = process.env.SERVE_NEXT !== '0' && tieneNextExport;
 
-// Si alguien entra a la raíz o a cualquier ruta no reconocida, manda el index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+if (servirNext) {
+  console.log('[frontend] Sirviendo app React/Next.js (frontend-next/out)');
+  // El service worker y el manifest no se cachean para que las
+  // actualizaciones de la app se propaguen rápido.
+  app.use('/sw.js', (req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store');
+    next();
+  });
+
+  app.use(express.static(NEXT_OUT, {
+    // Evita que headers de sesión/cookies queden cacheados en HTML
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+    }
+  }));
+
+  // Cada página del export es un HTML propio (/, /login). Para rutas
+  // directas sin extensión intentamos <ruta>.html y, si no existe,
+  // mandamos index.html (SPA). Express.static ya sirvió los assets reales.
+  app.get('*', (req, res) => {
+    let ruta = decodeURIComponent(req.path || '/');
+    if (ruta.endsWith('/')) ruta += 'index';
+    const htmlCandidato = path.join(NEXT_OUT, ruta.replace(/^\/+/, '') + '.html');
+    if (fs.existsSync(htmlCandidato)) {
+      return res.sendFile(htmlCandidato);
+    }
+    res.sendFile(path.join(NEXT_OUT, 'index.html'));
+  });
+} else {
+  // Sirve el front-end clásico (HTML, CSS, JS) desde la raíz del proyecto.
+  // El service worker y el manifest no se cachean en el navegador para que
+  // las actualizaciones de la app se propaguen rápido.
+  console.log('[frontend] Sirviendo frontend clásico (raíz del proyecto)');
+  app.use('/sw.js', (req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store');
+    next();
+  });
+  app.use('/manifest.json', (req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store');
+    next();
+  });
+  app.use(express.static(path.join(__dirname)));
+
+  // Si alguien entra a la raíz o a cualquier ruta no reconocida, manda el index.html
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);

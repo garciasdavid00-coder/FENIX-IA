@@ -80,8 +80,9 @@ async function inicializar() {
     await pool.query(`ALTER TABLE usuarios ALTER COLUMN google_id DROP NOT NULL`);
     await pool.query(`
       CREATE UNIQUE INDEX IF NOT EXISTS idx_usuarios_phone_number
-        ON usuarios(phone_number) WHERE phone_number IS NOT NULL
+        ON usuarios(phone_number)
     `);
+
     await pool.query(`
       ALTER TABLE user_memories DROP CONSTRAINT IF EXISTS user_memories_user_id_fkey
     `);

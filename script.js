@@ -1877,6 +1877,78 @@ function sendMessage(desdeVistaChat){
   // URL de tu backend local. Si lo subes a un servidor real, cambia esto por esa URL.
   const BACKEND_URL = '/api/chat';
 
+// ======================
+// BÚSQUEDA WEB EN TIEMPO REAL
+// ======================
+let busquedaWebEstado = 'auto'; // 'auto' | 'on' | 'off'
+
+function toggleBusquedaWebManual(){
+  if(busquedaWebEstado === 'auto'){
+    busquedaWebEstado = 'on';
+  } else if(busquedaWebEstado === 'on'){
+    busquedaWebEstado = 'off';
+  } else {
+    busquedaWebEstado = 'auto';
+  }
+  actualizarBotonesBusquedaWeb();
+}
+
+function actualizarBotonesBusquedaWeb(){
+  ['webBtnInicial', 'webBtnChat'].forEach(function(id){
+    const b = document.getElementById(id);
+    if(!b) return;
+    b.classList.remove('activo', 'apagado', 'forzado');
+    if(busquedaWebEstado === 'auto'){
+      b.classList.add('activo');
+      b.title = 'Búsqueda Web: Automática (se activa si la pregunta lo requiere)';
+    } else if(busquedaWebEstado === 'on'){
+      b.classList.add('forzado');
+      b.title = 'Búsqueda Web: Activada para todos los mensajes';
+    } else {
+      b.classList.add('apagado');
+      b.title = 'Búsqueda Web: Desactivada';
+    }
+  });
+}
+
+function renderizarFuentes(burbujaBot, fuentes){
+  if(!burbujaBot || !Array.isArray(fuentes) || !fuentes.length) return;
+  if(burbujaBot.querySelector('.fuentes-container')) return;
+
+  const cont = document.createElement('div');
+  cont.className = 'fuentes-container';
+
+  const cabecera = document.createElement('div');
+  cabecera.className = 'fuentes-cabecera';
+  cabecera.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z"/></svg> <span>Fuentes consultadas (' + fuentes.length + ')</span>';
+  cont.appendChild(cabecera);
+
+  const grid = document.createElement('div');
+  grid.className = 'fuentes-grid';
+
+  fuentes.forEach(function(f){
+    try {
+      const u = new URL(f.url);
+      const host = u.hostname.replace(/^www\./, '');
+      const a = document.createElement('a');
+      a.className = 'fuente-card';
+      a.href = f.url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.innerHTML =
+        '<img src="https://www.google.com/s2/favicons?domain=' + encodeURIComponent(host) + '&sz=32" class="fuente-favicon" alt="" onerror="this.style.display=\'none\'">' +
+        '<div class="fuente-info">' +
+          '<span class="fuente-host">' + escaparHTML(host) + '</span>' +
+          '<span class="fuente-titulo">' + escaparHTML(f.titulo || host) + '</span>' +
+        '</div>';
+      grid.appendChild(a);
+    } catch(e) {}
+  });
+
+  cont.appendChild(grid);
+  burbujaBot.appendChild(cont);
+}
+
   let historialParaAPI = [];
   try {
     // Armamos el historial en formato que espera la API (role/content)
@@ -1897,7 +1969,8 @@ function sendMessage(desdeVistaChat){
     historial: historialParaAPI,
     modelo: modeloSeleccionado,
     idioma: idiomaSeleccionado,
-    instruccion: localStorage.getItem('fenixSystemPrompt') || ''
+    instruccion: localStorage.getItem('fenixSystemPrompt') || '',
+    webSearch: busquedaWebEstado === 'auto' ? undefined : (busquedaWebEstado === 'on')
   };
 
   const controlador = new AbortController();
@@ -1934,6 +2007,9 @@ function sendMessage(desdeVistaChat){
       cursor.className = 'cursor-escribiendo';
       burbujaBot.appendChild(cursor);
 
+      let badgeBusqueda = null;
+      let fuentesRecibidas = null;
+
       const reader = res.body.getReader();
       const dec = new TextDecoder();
       let buffer = '';
@@ -1951,12 +2027,32 @@ function sendMessage(desdeVistaChat){
             errorStream = obj.error;
             return;
           }
+
+          // Notificación de búsqueda web en vivo
+          if(obj.tipo === 'buscando_web'){
+            if(!badgeBusqueda){
+              badgeBusqueda = document.createElement('div');
+              badgeBusqueda.className = 'busqueda-web-badge anim-pulse';
+              badgeBusqueda.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z"/></svg> <span>Buscando en la web: <i>' + escaparHTML(obj.query) + '</i></span>';
+              if(burbujaBot.parentNode) burbujaBot.parentNode.insertBefore(badgeBusqueda, burbujaBot);
+              if(estaCercaDelFinalDelChat(contenedor)) contenedor.scrollTop = contenedor.scrollHeight;
+            }
+            return;
+          }
+
+          // Fuentes citadas
+          if(obj.tipo === 'fuentes' && Array.isArray(obj.fuentes)){
+            fuentesRecibidas = obj.fuentes;
+            return;
+          }
+
           if(typeof obj.texto === 'string' && obj.texto){
             textoAcumulado += obj.texto;
             // Si el modelo pidió una imagen o un documento, no mostramos
             // los marcadores crudos mientras llega el resto.
             const visible = textoAcumulado
               .replace(/\[GENERAR_(IMAGEN|DOC)\][\s\S]*$/i, '')
+              .replace(/\[BUSCAR_WEB\][\s\S]*$/i, '')
               .replace(/^\[IMAGEN\]\s*:?.*$/gim, '');
             const espera = /\[GENERAR_DOC\]/i.test(textoAcumulado) ? t('doc.generando') : t('imagen.generando');
             burbujaBot.textContent = visible.trim() ? visible : espera;
@@ -1968,6 +2064,10 @@ function sendMessage(desdeVistaChat){
 
       function finalizarBurbuja(){
         cursor.remove();
+        if(badgeBusqueda){
+          badgeBusqueda.classList.remove('anim-pulse');
+          badgeBusqueda.classList.add('completado');
+        }
         if(controladorAbort === controlador){
           controladorAbort = null;
           mostrarBotonDetener(false);
@@ -1975,10 +2075,6 @@ function sendMessage(desdeVistaChat){
         if(errorStream){
           burbujaBot.textContent = '⚠️ ' + errorStream;
         } else if(textoAcumulado){
-          // El modelo puede responder con [GENERAR_IMAGEN]: descripcion o
-          // con [GENERAR_DOC]: Título. En el caso del documento, el modelo
-          // solo aporta el título: el cuerpo lo redacta el servidor con
-          // hechos reales y fotos reales (ver /api/documento-real).
           const coincidenciaDoc = textoAcumulado.match(/\[GENERAR_DOC\]\s*:?\s*([^\n]*)\n?([\s\S]*)/i);
           const coincidenciaImg = textoAcumulado.match(/\[GENERAR_IMAGEN\]\s*:?\s*([\s\S]+)/i);
           if(coincidenciaDoc && coincidenciaDoc[1].trim()){
@@ -1986,11 +2082,13 @@ function sendMessage(desdeVistaChat){
           } else if(coincidenciaImg && coincidenciaImg[1].trim()){
             generarImagenEnBurbuja(burbujaBot, coincidenciaImg[1].trim(), t('chat.imagenLista'));
           } else {
-            // Marcador a medias (usuario detuvo la generación): limpiamos.
-            const limpio = textoAcumulado.replace(/\[GENERAR_\w*[\s\S]*$/i, '').trim();
+            const limpio = textoAcumulado.replace(/\[(GENERAR_\w*|BUSCAR_WEB)[\s\S]*$/i, '').trim();
             if(limpio){
               burbujaBot.textContent = limpio;
               guardarMensajeEnHistorial('bot', limpio);
+              if(fuentesRecibidas && fuentesRecibidas.length){
+                renderizarFuentes(burbujaBot, fuentesRecibidas);
+              }
               agregarMenuMensaje(burbujaBot, limpio, null);
             } else {
               burbujaBot.remove();
@@ -2042,6 +2140,7 @@ function sendMessage(desdeVistaChat){
       console.error(err);
     });
 }
+
 
 /* ======================
    GENERACIÓN DE IMÁGENES
