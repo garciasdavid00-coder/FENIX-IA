@@ -63,12 +63,22 @@ export function useChatStream() {
         content: m.contenido,
       }));
 
+      let instruccion = opciones.instruccion || '';
+      try {
+        instruccion = instruccion || localStorage.getItem('fenixSystemPrompt') || '';
+      } catch (e) {}
+
+      let idiomaLocal = 'es';
+      try {
+        idiomaLocal = localStorage.getItem('fenixIdioma') || 'es';
+      } catch (e) {}
+
       const payload = {
         mensaje: textoMensaje.trim(),
         historial,
         modelo: opciones.modelo || 'auto',
-        idioma: opciones.idioma || 'es',
-        instruccion: opciones.instruccion || '',
+        idioma: opciones.idioma || idiomaLocal,
+        instruccion,
       };
 
       const res = await apiFetch('/api/chat', {

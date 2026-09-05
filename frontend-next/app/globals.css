@@ -718,6 +718,16 @@ body{
   cursor:pointer;
 }
 .btn-primario:hover{ opacity:.85; }
+.btn-peligro{
+  background:none;
+  border:1px solid #dc2626;
+  color:#dc2626;
+  padding:9px 16px;
+  border-radius:10px;
+  font-size:14px;
+  cursor:pointer;
+}
+.btn-peligro:hover{ background:#dc2626; color:#fff; }
 .btn-volver{
   background:none;
   border:none;
