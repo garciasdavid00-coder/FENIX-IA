@@ -4,3 +4,11 @@ node_modules/
 npm-debug.log*
 .DS_Store
 Thumbs.db
+
+# Builds de Next.js (el backend Express se encarga de servirlos)
+.next/
+out/
+.next/
+frontend-next/.next/
+frontend-next/out/
+frontend-next/.env.local
