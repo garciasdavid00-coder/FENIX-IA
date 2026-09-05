@@ -5,6 +5,13 @@ import { apiGet, apiPost } from '@/lib/api';
 
 const ChatContext = createContext(null);
 
+// Guarda en las dos claves (vista React 'fenixHistorial' y clásica 'fenixChats')
+// para facilitar la migración sin perder datos al cambiar de frontend.
+function persistirChats(chats) {
+  localStorage.setItem('fenixHistorial', JSON.stringify(chats));
+  localStorage.setItem('fenixChats', JSON.stringify(chats));
+}
+
 export function ChatProvider({ children }) {
   const [tema, setTema] = useState('light');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -13,11 +20,14 @@ export function ChatProvider({ children }) {
   const [modeloSeleccionado, setModeloSeleccionado] = useState('auto');
   const [chats, setChats] = useState([]);
   const [chatActualId, setChatActualId] = useState(null);
+  const [proyectos, setProyectos] = useState([]);
+  const [proyectoActualId, setProyectoActualId] = useState(null);
+  const [archivosBiblioteca, setArchivosBiblioteca] = useState([]); // [{id, nombre, tipo, tamanoKB, url}] efímeros (blobs)
   const [filtroBuscar, setFiltroBuscar] = useState('');
   const [busquedaVisible, setBusquedaVisible] = useState(false);
   const [memoriaModal, setMemoriaModal] = useState(null); // null | { texto }
 
-  // Cargar tema guardado en localStorage
+  // Cargar tema guardado en localStorage + históricos locales
   useEffect(() => {
     const temaGuardado = localStorage.getItem('fenixTema') || 'light';
     setTema(temaGuardado);
@@ -26,14 +36,28 @@ export function ChatProvider({ children }) {
     const modeloGuardado = localStorage.getItem('fenixModelo') || 'auto';
     setModeloSeleccionado(modeloGuardado);
 
-    // Cargar historial de chats locales
+    // Cargar historial de chats locales (con respaldo a la clave del frontend clásico)
     try {
-      const historialLocal = JSON.parse(localStorage.getItem('fenixHistorial') || '[]');
-      setChats(Array.isArray(historialLocal) ? historialLocal : []);
+      const guardado = localStorage.getItem('fenixHistorial');
+      const historialLocal = guardado ? guardado : (localStorage.getItem('fenixChats') || '[]');
+      setChats(Array.isArray(JSON.parse(historialLocal)) ? JSON.parse(historialLocal) : []);
     } catch (e) {
       setChats([]);
     }
+
+    // Cargar proyectos locales
+    try {
+      const proyectosGuardados = JSON.parse(localStorage.getItem('fenixProyectos') || '[]');
+      setProyectos(Array.isArray(proyectosGuardados) ? proyectosGuardados : []);
+    } catch (e) {
+      setProyectos([]);
+    }
   }, []);
+
+  // Persistir proyectos cuando cambian
+  useEffect(() => {
+    localStorage.setItem('fenixProyectos', JSON.stringify(proyectos));
+  }, [proyectos]);
 
   const toggleTema = useCallback(() => {
     setTema((prev) => {
@@ -72,7 +96,7 @@ export function ChatProvider({ children }) {
   const eliminarChat = useCallback((id) => {
     setChats((prev) => {
       const actualizados = prev.filter((c) => c.id !== id);
-      localStorage.setItem('fenixHistorial', JSON.stringify(actualizados));
+      persistirChats(actualizados);
       return actualizados;
     });
     if (chatActualId === id) {
@@ -85,8 +109,75 @@ export function ChatProvider({ children }) {
       const actualizados = prev.map((c) =>
         c.id === id ? { ...c, pinned: !c.pinned } : c
       );
-      localStorage.setItem('fenixHistorial', JSON.stringify(actualizados));
+      persistirChats(actualizados);
       return actualizados;
+    });
+  }, []);
+
+  // ========================================
+  // PROYECTOS (igual que el frontend clásico: localStorage 'fenixProyectos')
+  // ========================================
+  const crearProyecto = useCallback((nombre) => {
+    const limpio = String(nombre || '').trim();
+    if (!limpio) return null;
+    let nuevoProyecto = null;
+    setProyectos((prev) => {
+      nuevoProyecto = { id: Date.now().toString(), nombre: limpio };
+      return [nuevoProyecto, ...prev];
+    });
+    return nuevoProyecto;
+  }, []);
+
+  const eliminarProyecto = useCallback((id) => {
+    setProyectos((prev) => prev.filter((p) => p.id !== id));
+    // Los chats del proyecto quedan huérfanos pero no se borran
+    setChats((prev) => {
+      const actualizados = prev.map((c) =>
+        c.proyectoId === id ? { ...c, proyectoId: null } : c
+      );
+      persistirChats(actualizados);
+      return actualizados;
+    });
+    if (proyectoActualId === id) setProyectoActualId(null);
+  }, [proyectoActualId]);
+
+  const abrirProyecto = useCallback((id) => {
+    setProyectoActualId(id);
+    setVistaActiva('proyectos');
+  }, []);
+
+  const cerrarProyecto = useCallback(() => {
+    setProyectoActualId(null);
+    setVistaActiva('proyectos');
+  }, []);
+
+  const nuevoChatEnProyecto = useCallback(() => {
+    setChatActualId(null);
+    setVistaActiva('chat');
+    if (sidebarMobileOpen) setSidebarMobileOpen(false);
+  }, [sidebarMobileOpen]);
+
+  // ========================================
+  // BIBLIOTECA (archivos efímeros con object URL, como el clásico)
+  // ========================================
+  const subirArchivos = useCallback((archivos) => {
+    const lista = Array.from(archivos || []);
+    if (!lista.length) return;
+    const items = lista.map((file) => ({
+      id: Date.now() + Math.random().toString(36).slice(2, 8),
+      nombre: file.name,
+      tipo: file.type,
+      tamanoKB: Math.round(file.size / 1024),
+      url: URL.createObjectURL(file),
+    }));
+    setArchivosBiblioteca((prev) => [...items, ...prev]);
+  }, []);
+
+  const eliminarArchivoBiblioteca = useCallback((id) => {
+    setArchivosBiblioteca((prev) => {
+      const archivo = prev.find((a) => a.id === id);
+      if (archivo) URL.revokeObjectURL(archivo.url);
+      return prev.filter((a) => a.id !== id);
     });
   }, []);
 
@@ -107,14 +198,15 @@ export function ChatProvider({ children }) {
           titulo,
           fecha: new Date().toISOString(),
           pinned: false,
+          proyectoId: proyectoActualId, // si entramos al chat desde un proyecto, queda asociado
           mensajes: nuevosMensajes,
         };
         actualizados = [nuevo, ...prev];
       }
-      localStorage.setItem('fenixHistorial', JSON.stringify(actualizados));
+      persistirChats(actualizados);
       return actualizados;
     });
-  }, []);
+  }, [proyectoActualId]);
 
   const abrirModalMemoria = useCallback((texto) => {
     setMemoriaModal({ texto: String(texto || '') });
@@ -145,6 +237,16 @@ export function ChatProvider({ children }) {
         eliminarChat,
         togglePinChat,
         guardarMensajesEnHistorial,
+        proyectos,
+        crearProyecto,
+        eliminarProyecto,
+        abrirProyecto,
+        cerrarProyecto,
+        proyectoActualId,
+        nuevoChatEnProyecto,
+        archivosBiblioteca,
+        subirArchivos,
+        eliminarArchivoBiblioteca,
         filtroBuscar,
         setFiltroBuscar,
         busquedaVisible,

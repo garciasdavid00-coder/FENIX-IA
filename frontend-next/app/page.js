@@ -6,6 +6,7 @@ import Topbar from '@/components/Topbar';
 import GreetingView from '@/components/GreetingView';
 import ChatView from '@/components/ChatView';
 import ProjectsView from '@/components/ProjectsView';
+import BibliotecaView from '@/components/BibliotecaView';
 import SettingsView from '@/components/SettingsView';
 import MemoriasView from '@/components/MemoriasView';
 import ModalMemoria from '@/components/ModalMemoria';
@@ -70,6 +71,7 @@ export default function HomePage() {
 
         {/* Vistas dinámicas */}
         {vistaActiva === 'proyectos' && <ProjectsView />}
+        {vistaActiva === 'biblioteca' && <BibliotecaView />}
         {vistaActiva === 'configuracion' && <SettingsView />}
         {vistaActiva === 'memoria' && <MemoriasView />}
 
