@@ -705,7 +705,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     // MODERACIÓN: verifica bloqueo y prepara contexto de moderación
-    moderationMiddleware()(req, res);
+    moderationMiddleware()(req, res, () => {});
 
     // Si el middleware ya envió una respuesta (chat bloqueado), short-circuit
     if (res.headersSent) return;
