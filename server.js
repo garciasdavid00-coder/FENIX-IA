@@ -14,6 +14,7 @@ const memory = require('./backend/memoryManager');
 const chatEngine = require('./backend/chatEngine');
 const webSearch = require('./backend/webSearch');
 const whatsappRouter = require('./routes/whatsapp');
+const moderationMiddleware = require('./backend/moderationMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -703,7 +704,13 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: 'Falta el campo "mensaje"' });
     }
 
-    // Límite de mensajes sin iniciar sesión (3 gratis por sesión)
+    // MODERACIÓN: verifica bloqueo y prepara contexto de moderación
+    moderationMiddleware()(req, res);
+
+    // Si el middleware ya envió una respuesta (chat bloqueado), short-circuit
+    if (res.headersSent) return;
+
+    // Resto de la lógica original
     const autenticado = !!(req.isAuthenticated && req.isAuthenticated());
     const userId = req.user ? req.user.id : null;
     const LIMITE_SIN_LOGIN = 3;
@@ -733,7 +740,7 @@ app.post('/api/chat', async (req, res) => {
     // (forzarWebSearch === true desde el frontend) O vía marcador
     // [BUSCAR_WEB] que decide el modelo. Sin auto-detección.
     // ==========================================================
-    const necesitaBusquedaAutomatica = forzarWebSearch === true;
+    const necesitaBusquedaAutomatica = forzarWebSearch === true || (forzarWebSearch !== false && webSearch.detectarNecesidadBusqueda(mensaje, historial));
 
     if (necesitaBusquedaAutomatica) {
       res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');

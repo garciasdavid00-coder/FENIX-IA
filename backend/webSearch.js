@@ -118,6 +118,12 @@ async function ejecutarBusquedaWebCompleta({
   memoriaContexto = ''
 }) {
   const query = extraerQueryBusqueda(mensaje);
+  if (!query || !String(query).trim()) {
+    return {
+      texto: 'No pude extraer una consulta válida para buscar en la web.',
+      fuentes: []
+    };
+  }
 
   // 1) Intentar Gemini Grounding si hay API Key disponible
   if (apiKey) {
@@ -171,7 +177,15 @@ Tienes acceso a Google Search Grounding.
   }
 
   // 2) Fallback Universal Multi-Fuente con Groq / DeepSeek
-  const { hechos, fuentes } = await buscarWebMultiFuente(query);
+  let hechos = [];
+  let fuentes = [];
+  try {
+    const resultado = await buscarWebMultiFuente(query);
+    hechos = Array.isArray(resultado.hechos) ? resultado.hechos : [];
+    fuentes = Array.isArray(resultado.fuentes) ? resultado.fuentes : [];
+  } catch (e) {
+    console.error('[WebSearch] Error al ejecutar la búsqueda multi-fuente:', e.message);
+  }
 
   const fechaHoy = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -196,109 +210,132 @@ INSTRUCCIONES:
   const { url: urlIA, apiKey: keyIA, modeloIA } = chatEngine.configurarProveedor(proveedor);
   const cuerpoIA = chatEngine.crearCuerpoIA({ modeloIA, mensajes, stream: false, proveedor });
 
-  const resIA = await fetch(urlIA, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keyIA}` },
-    body: JSON.stringify(cuerpoIA)
-  });
+  let rawText = 'No se pudo generar la respuesta con la búsqueda.';
+  try {
+    const resIA = await fetch(urlIA, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keyIA}` },
+      body: JSON.stringify(cuerpoIA)
+    });
 
-  const dataIA = await resIA.json();
-  const rawText = dataIA.choices?.[0]?.message?.content || 'No se pudo generar la respuesta con la búsqueda.';
+    if (!resIA.ok) {
+      const detalle = await resIA.text().catch(() => '');
+      console.warn('[WebSearch] El proveedor de respaldo devolvió error:', resIA.status, detalle.slice(0, 200));
+      return {
+        texto: 'He intentado buscar información actualizada, pero el proveedor de respuesta no está disponible en este momento.',
+        fuentes: fuentes.slice(0, 6)
+      };
+    }
+
+    const dataIA = await resIA.json();
+    rawText = dataIA.choices?.[0]?.message?.content || rawText;
+  } catch (e) {
+    console.error('[WebSearch] Error al pedir respuesta al proveedor de respaldo:', e.message);
+    return {
+      texto: 'He intentado buscar información actualizada, pero la respuesta final no pudo generarse por un error temporal del servicio.',
+      fuentes: fuentes.slice(0, 6)
+    };
+  }
+
   const textoLimpio = chatEngine.limpiarRazonamiento(rawText);
 
   return {
-    texto: textoLimpio,
-    fuentes
+    texto: textoLimpio || 'No se pudo generar la respuesta con la búsqueda.',
+    fuentes: fuentes.slice(0, 6)
   };
 }
 
 /**
- * Busca en la web usando Gemini con Grounding de Google Search.
- * Patrón idéntico a generarDocumentoConHechosReales (promptDocumentos.js).
- * Devuelve el texto de respuesta resumido + array de fuentes reales.
- * @param {{ consulta: string, apiKey: string, modelo?: string, lang?: string }} opts
+ * Busca en la web usando la API de Searlo (SERP de Google) y devuelve
+ * un contexto de texto + array de fuentes reales clicables.
+ * El modelo de chat redacta la respuesta final con ese contexto.
+ * @param {{ consulta: string, apiKey?: string, lang?: string }} opts
  * @returns {Promise<{ texto: string, fuentes: {titulo: string, url: string}[] }>}
  */
-async function buscarEnWeb({ consulta, apiKey, modelo, lang = 'español' }) {
+async function buscarEnWeb({ consulta, apiKey, lang = 'español' }) {
   const query = String(consulta || '').trim();
   if (!query) {
-    throw new Error('buscarEnWeb: falta la "consulta".');
+    console.warn('[buscarEnWeb] Consulta vacía; devolviendo respuesta segura.');
+    return {
+      texto: 'No pude extraer una consulta válida para buscar en la web.',
+      fuentes: []
+    };
   }
-  if (!apiKey) {
-    throw new Error('buscarEnWeb: falta la GEMINI_API_KEY.');
+
+  const key = apiKey || process.env.SEARLO_API_KEY;
+  if (!key) {
+    console.warn('[buscarEnWeb] falta la SEARLO_API_KEY en .env; devolviendo respuesta segura.');
+    return {
+      texto: 'La búsqueda en la web no está disponible porque falta la clave del servicio externo.',
+      fuentes: []
+    };
   }
 
-  const modeloIA = modelo || 'gemini-3.6-flash';
-  const urlApi = 'https://generativelanguage.googleapis.com/v1beta/models/'
-    + encodeURIComponent(modeloIA)
-    + ':generateContent?key=' + encodeURIComponent(apiKey);
+  try {
+    const urlApi = new URL('https://api.searlo.tech/api/v1/search/web');
+    urlApi.searchParams.set('q', query.slice(0, 500));
+    urlApi.searchParams.set('limit', '8');
+    urlApi.searchParams.set('gl', 'us');
+    urlApi.searchParams.set('hl', 'es');
 
-  const promptSistema = `Eres Fenix IA, un asistente de búsqueda web preciso y actualizado. Responde siempre en ${lang}. Tu creador es Joshua Blandon Gonzales.
-Tienes acceso a Google Search Grounding para obtener información en tiempo real.
+    console.log('[buscarEnWeb] Consultando Searlo para: ' + query.slice(0, 80));
 
-REGLAS:
-1) Basa tu respuesta EXCLUSIVAMENTE en los resultados de búsqueda reales (grounding).
-2) NO inventes datos, fechas, precios, cifras, nombres ni eventos.
-3) Si el buscador no da información sobre algo, omítelo o indica que no hay dato verificado.
-4) Sé conciso, directo y útil. Responde a lo que se preguntó sin relleno.
-5) Cita hechos, precios, fechas y nombres comprobables que aparezcan en las fuentes.
-6) Máximo 3-4 párrafos. Usa lenguaje natural, no listes las fuentes en el texto (se añaden aparte).`;
+    const respuesta = await fetch(urlApi, {
+      headers: { 'x-api-key': key }
+    });
 
-  const cuerpo = {
-    systemInstruction: { parts: [{ text: promptSistema }] },
-    contents: [{ role: 'user', parts: [{ text: query.slice(0, 2000) }] }],
-    tools: [{ google_search: {} }],
-    generationConfig: {
-      temperature: 0.3,
-      maxOutputTokens: 2048
+    const data = await respuesta.json().catch(() => ({}));
+
+    if (!respuesta.ok) {
+      const detalle =
+        (data && data.message) || (data && data.error) || String(respuesta.status);
+      console.error('[buscarEnWeb] Searlo respondió ' + respuesta.status + ': ' + detalle);
+      if (respuesta.status === 402) {
+        console.warn('[buscarEnWeb] CRÉDITOS DE SEARLO AGOTADOS (402). Revisa dashboard.searlo.tech');
+      }
+      if (respuesta.status === 429) {
+        console.warn('[buscarEnWeb] RATE LIMIT DE SEARLO (429). Espera un momento e intenta de nuevo.');
+      }
+      return {
+        texto: 'He intentado buscar información actualizada, pero el servicio de búsqueda web respondió con error temporal.',
+        fuentes: []
+      };
     }
-  };
 
-  console.log('[buscarEnWeb] Consultando Gemini (' + modeloIA + ') con grounding para: ' + query.slice(0, 80));
+    const items = (data && (Array.isArray(data.organic) ? data.organic : (Array.isArray(data.items) ? data.items : [])))
+      .filter(it => it && it.title && it.link);
 
-  const respuesta = await fetch(urlApi, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(cuerpo)
-  });
-
-  const data = await respuesta.json().catch(() => ({}));
-
-  if (!respuesta.ok) {
-    const detalle = (data && data.error && data.error.message) ||
-      JSON.stringify(data).slice(0, 400) || respuesta.statusText;
-    console.error('[buscarEnWeb] Gemini respondió', respuesta.status + ':', detalle);
-    // Cuota agotada (429) → aviso en logs pero no falla silenciosamente
-    if (respuesta.status === 429) {
-      console.warn('[buscarEnWeb] CUOTA DE GROUNDING AGOTADA (429). Límite gratis superado.');
+    if (!items.length) {
+      console.error('[buscarEnWeb] Searlo devolvió resultados vacíos.');
+      return {
+        texto: 'La búsqueda web respondió sin resultados útiles en este momento.',
+        fuentes: []
+      };
     }
-    throw new Error('Gemini respondió ' + respuesta.status + ': ' + detalle);
+
+    const fuentes = items.slice(0, 6).map(it => ({
+      titulo: String(it.title).trim(),
+      url: it.link
+    }));
+
+    const texto = items
+      .slice(0, 5)
+      .map((it, i) => {
+        const snippet = (it.snippet || '').trim();
+        return `${i + 1}. ${it.title}${snippet ? ' — ' + snippet : ''}`;
+      })
+      .join('\n');
+
+    console.log('[buscarEnWeb] Búsqueda lista (' + items.length + ' resultados, ' + fuentes.length + ' fuentes).');
+
+    return { texto, fuentes };
+  } catch (e) {
+    console.error('[buscarEnWeb] Error inesperado en la búsqueda web:', e && e.message ? e.message : e);
+    return {
+      texto: 'La búsqueda web no pudo completarse por un error temporal del servicio externo.',
+      fuentes: []
+    };
   }
-
-  const candidato = data && data.candidates && data.candidates[0];
-  const partes = (candidato && candidato.content && candidato.content.parts) || [];
-
-  const texto = partes
-    .filter(p => typeof p.text === 'string')
-    .map(p => p.text)
-    .join('')
-    .trim();
-
-  if (!texto) {
-    const motivoBloqueo = (candidato && candidato.finishReason) || 'desconocido';
-    console.error('[buscarEnWeb] Gemini devolvió respuesta vacía. finishReason =', motivoBloqueo);
-    throw new Error('La búsqueda salió vacía de la API de Gemini (finishReason: ' + motivoBloqueo + ').');
-  }
-
-  // Fuentes REALES del grounding
-  const chunks = (candidato && candidato.groundingMetadata && candidato.groundingMetadata.groundingChunks) || [];
-  const fuentes = chunks
-    .map(c => ({ titulo: (c.web && c.web.title) || '', url: (c.web && c.web.uri) || '' }))
-    .filter(f => f.url && f.url.startsWith('http'));
-
-  console.log('[buscarEnWeb] Búsqueda lista (' + texto.length + ' caracteres, ' + fuentes.length + ' fuentes).');
-
-  return { texto, fuentes: fuentes.slice(0, 6) };
 }
 
 module.exports = {

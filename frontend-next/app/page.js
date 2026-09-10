@@ -59,7 +59,7 @@ export default function HomePage() {
   const manejarEnvio = (texto) => {
     enviarAlStream(texto, {
       modelo: modeloSeleccionado,
-      webSearch: busquedaWeb === 'auto' ? undefined : busquedaWeb === 'on',
+      webSearch: busquedaWeb,
     });
   };
 
