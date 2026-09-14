@@ -18,7 +18,12 @@ export async function generarDocumentoReal(tema) {
   return String(data.contenido).replace(/\n{3,}/g, '\n\n').trim();
 }
 
-const escapar = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const escapar = (s) => s
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
 
 const enLinea = (s) => escapar(s)
   .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
