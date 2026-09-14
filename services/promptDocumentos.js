@@ -12,6 +12,8 @@
    routes/imagenesReales.js).
    ============================================================ */
 
+const { fetchWithTimeout } = require('../utils/fetchWithTimeout');
+
 // Instrucciones de sistema que fijan la personalidad del redactor.
 const SYSTEM_PROMPT_DOCUMENTOS = `Eres Fenix IA, un redactor de documentos profesional, honesto y preciso. Redactas informes, biografías, ensayos y reportes basándote SIEMPRE en información REAL verificada que obtienes del buscador.
 
@@ -71,11 +73,12 @@ async function generarDocumentoConHechosReales({ tema, apiKey, modelo }) {
 
   console.log('[documento-real] Consultando Gemini (' + modeloIA + ') con grounding...');
 
-  const respuesta = await fetch(urlApi, {
+  // 30s: las respuestas con grounding de Google Search pueden tardar.
+  const respuesta = await fetchWithTimeout(urlApi, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(cuerpo)
-  });
+  }, 30000);
 
   // Leemos el cuerpo (aunque falle) para poder loguear el detalle en Render.
   const data = await respuesta.json().catch(() => ({}));

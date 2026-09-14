@@ -16,6 +16,8 @@
 
 const express = require('express');
 
+const { fetchWithTimeout } = require('../utils/fetchWithTimeout');
+
 // User-Agent obligatorio: Wikimedia lo exige para no bloquearte.
 // Cámbialo por un correo de contacto real en producción.
 const USER_AGENT = 'FenixIA-documentos/1.0 (contacto: joshua@fenixia.app; busca fotos reales de Wikimedia Commons)';
@@ -65,9 +67,10 @@ async function buscarImagenReal(consulta, limite = LIMITE_RESULTADOS) {
   const urlApi = 'https://commons.wikimedia.org/w/api.php?' + params.toString();
   console.log('[imagen-real] Buscando en Commons:', q);
 
-  const respuesta = await fetch(urlApi, {
+  // 8s: Wikimedia responde rápido; si se cuelga, no bloqueamos el flujo.
+  const respuesta = await fetchWithTimeout(urlApi, {
     headers: { 'User-Agent': USER_AGENT, 'Accept': 'application/json' }
-  });
+  }, 8000);
 
   if (!respuesta.ok) {
     console.error('[imagen-real] Wikimedia respondió', respuesta.status, 'para:', q);

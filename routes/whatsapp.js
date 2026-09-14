@@ -20,6 +20,7 @@ const crypto = require('crypto');
 const db = require('../db');
 const memory = require('../backend/memoryManager');
 const chatEngine = require('../backend/chatEngine');
+const { fetchWithTimeout } = require('../utils/fetchWithTimeout');
 
 const router = express.Router();
 
@@ -150,14 +151,16 @@ async function enviarMensajeWhatsApp(para, texto) {
   let ultimoError = null;
   for (let intento = 0; intento < 2; intento++) {
     try {
-      const res = await fetch(GRAPH_URL(), {
+      // 10s: si Meta no responde, abortamos y reintentamos; así no queda un
+      // socket colgado esperando para siempre (el AbortController libera la conexión).
+      const res = await fetchWithTimeout(GRAPH_URL(), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(cuerpo)
-      });
+      }, 10000);
       const datos = await res.text();
       if (res.ok) return datos;
       ultimoError = `[WhatsApp] Error al enviar a ${para} (intento ${intento + 1}): status ${res.status} — ${datos}`;
