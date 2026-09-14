@@ -357,7 +357,27 @@ app.get('/api/imagen-archivo', async (req, res) => {
 // Genera un documento con HECHOS REALES: el modelo usa el grounding de
 // Google Search (no inventa fechas/nombres/cifras) y las ilustraciones
 // son FOTOS REALES de Wikimedia Commons, nunca imágenes generadas por IA.
+// Cada llamada tiene costo real (Gemini con grounding + Wikimedia), así que
+// además de exigir sesión se limita a N documentos por usuario y por hora.
+const LIMITE_DOCUMENTOS_POR_HORA = 5;
+const CONTADOR_DOCUMENTOS = new Map(); // rate limiting por usuario (ventana de 1 hora)
+
+function permiteGenerarDocumento(userId) {
+  if (!userId) return false;
+  const clave = String(userId) + ':' + Math.floor(Date.now() / 3600000);
+  const usos = CONTADOR_DOCUMENTOS.get(clave) || 0;
+  if (usos >= LIMITE_DOCUMENTOS_POR_HORA) return false;
+  CONTADOR_DOCUMENTOS.set(clave, usos + 1);
+  return true;
+}
+
 app.post('/api/documento-real', async (req, res) => {
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
+    return res.status(401).json({ error: 'Debes iniciar sesión para generar documentos con hechos reales.' });
+  }
+  if (!permiteGenerarDocumento(req.user && req.user.id)) {
+    return res.status(429).json({ error: 'Alcanzaste el límite de ' + LIMITE_DOCUMENTOS_POR_HORA + ' documentos con hechos reales por hora. Vuelve a intentar en un rato.' });
+  }
   try {
     const tema = ((req.body && req.body.tema) || '').toString().trim().slice(0, 1000);
     if (!tema) {
