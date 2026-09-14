@@ -9,6 +9,16 @@ const pool = process.env.DATABASE_URL
     })
   : null;
 
+// Si la conexi├│n del pool falla sola (Neon reinicia, timeout de red...),
+// pg emite 'error' a nivel de pool. Sin listener, Node lo trata como
+// excepci├│n no capturada y tumba TODO el proceso. Con esto solo logueamos
+// y el pool sigue abriendo conexiones nuevas en las siguientes queries.
+if (pool) {
+  pool.on('error', (err) => {
+    console.error('Error inesperado en el pool de PostgreSQL:', err);
+  });
+}
+
 // Crea la tabla si no existe. Se ejecuta al arrancar el servidor.
 async function inicializar() {
   if (!pool) {
