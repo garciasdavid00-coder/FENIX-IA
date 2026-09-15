@@ -285,7 +285,14 @@ async function guardarConversacionWhatsapp(phone, mensajes) {
 // Cuenta el uso del número dentro de la hora actual (rate limiting por hora).
 // Devuelve el contador ya incrementado: > LIMITE_HORA significa bloqueado.
 async function contarUsoWhatsapp(phone) {
-  if (!pool || !phone) return 1; // si no hay BD, el router usa un contador en memoria
+  // Fail-closed: sin BD (pool nulo) o sin número se LANZA un error en vez de
+  // devolver 1 (que desactivaba el rate limit y abría un vector de costo).
+  // El catch en permiteEnviar (routes/whatsapp.js) decide el fallback:
+  //   - Opción A: denegar de plano mientras la BD no responda.
+  //   - Opción B (recomendada): límite local en memoria (ver ahí).
+  if (!pool || !phone) {
+    throw new Error('BD no disponible: no se puede verificar el rate limit de WhatsApp');
+  }
   const { rows } = await pool.query(
     `INSERT INTO whatsapp_rate_limit (phone_number, contador_hora, ventana_hora)
      VALUES ($1, 1, date_trunc('hour', now()))

@@ -33,6 +33,8 @@ const getGraphVersion = () => process.env.WHATSAPP_GRAPH_VERSION || 'v21.0';
 const GRAPH_URL = () => `https://graph.facebook.com/${getGraphVersion()}/${getPhoneNumberId()}/messages`;
 
 const LIMITE_POR_HORA = 20;          // máximo de mensajes por número y por hora
+// Fallback SOLO si la BD no está disponible: tope corto por minuto en memoria.
+const LIMITE_MEMORIA_POR_MINUTO = 4;
 const HISTORIAL_GUARDADO = 60;       // líneas que se conservan en Neon
 const HISTORIAL_CONTEXTO = 12;       // últimas líneas que se mandan al modelo
 const TIME_OUT_IA = 90000;           // ms de espera del modelo
@@ -121,16 +123,22 @@ function sanitizarParaWhatsApp(texto) {
 
 // Rate limiting por número y hora (contador en Neon; si falla, en memoria).
 async function permiteEnviar(numero) {
-  let usos = 0;
   try {
-    usos = await db.contarUsoWhatsapp(numero);
+    const usos = await db.contarUsoWhatsapp(numero);
+    return usos <= LIMITE_POR_HORA;
   } catch (e) {
     console.error('[WhatsApp] Error en rate limiting en BD; usando contador en memoria:', e.message);
-    const clave = numero + ':' + Math.floor(Date.now() / 3600000);
-    usos = (CONTADOR_EN_MEMORIA.get(clave) || 0) + 1;
-    CONTADOR_EN_MEMORIA.set(clave, usos);
+    // OPCIÓN A (fail-closed total): sin BD se DENIEGA el envío de plano.
+    // El bot queda fuera de servicio durante el corte (más seguro ante costo).
+    //   return false;
+    //
+    // OPCIÓN B (recomendada): fallback en memoria con tope corto por MINUTO,
+    // para que el bot siga vivo pero sin gasto descontrolado de IA. Activa.
+    const clave = numero + ':' + Math.floor(Date.now() / 60000);
+    const usosMemoria = (CONTADOR_EN_MEMORIA.get(clave) || 0) + 1;
+    CONTADOR_EN_MEMORIA.set(clave, usosMemoria);
+    return usosMemoria <= LIMITE_MEMORIA_POR_MINUTO;
   }
-  return usos <= LIMITE_POR_HORA;
 }
 
 // Envía un mensaje de texto por la API de WhatsApp con un reintento simple.
