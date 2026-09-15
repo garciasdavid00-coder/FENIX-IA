@@ -1,5 +1,6 @@
 import './globals.css';
 import { ChatProvider } from '@/context/ChatContext';
+import { AuthProvider } from '@/hooks/useAuth';
 
 export const metadata = {
   title: 'Fenix IA',
@@ -18,9 +19,11 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
-        <ChatProvider>
-          {children}
-        </ChatProvider>
+        <AuthProvider>
+          <ChatProvider>
+            {children}
+          </ChatProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -53,11 +53,11 @@ function logCuandoFaltaConfig() {
 }
 
 // Verifica la firma `X-Hub-Signature-256` que manda Meta (HMAC-SHA256 del
-// cuerpo con WHATSAPP_APP_SECRET). Si no hay APP_SECRET configurado, se
-// omite la verificación (se registra un aviso una sola vez).
+// cuerpo con WHATSAPP_APP_SECRET). Sin APP_SECRET no hay forma de autenticar
+// el webhook, así que la firma NO se considera válida (fail-closed).
 function firmaValida(req) {
   const secret = getAppSecret();
-  if (!secret) return true;
+  if (!secret) return false;
   const firma = req.headers['x-hub-signature-256'];
   if (!firma) return false;
   const esperada = 'sha256=' + crypto
@@ -298,6 +298,12 @@ router.get('/webhook/whatsapp', (req, res) => {
 // Mensajes entrantes. Se responde 200 inmediatamente para que Meta no
 // reintente, y el procesamiento corre en segundo plano.
 router.post('/webhook/whatsapp', (req, res) => {
+  // Sin WHATSAPP_APP_SECRET el webhook es inautenticable: se rechaza SIEMPRE.
+  if (!getAppSecret()) {
+    console.error('[WhatsApp] WHATSAPP_APP_SECRET no configurado; webhook rechazado (403).');
+    return res.sendStatus(403);
+  }
+
   if (!firmaValida(req)) {
     console.error('[WhatsApp] Firma de webhook inválida (rechazado).');
     return res.sendStatus(401);

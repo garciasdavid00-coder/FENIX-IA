@@ -1,7 +1,8 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { apiGet, apiPost } from '@/lib/api';
+import { useAuth } from '@/hooks/useAuth';
 
 const ChatContext = createContext(null);
 
@@ -40,7 +41,7 @@ export function ChatProvider({ children }) {
   const [tema, setTema] = useState('light');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarMobileOpen, setSidebarMobileOpen] = useState(false);
-  const [vistaActiva, setVistaActiva] = useState('chat'); // 'chat' | 'proyectos' | 'biblioteca' | 'memoria' | 'configuracion'
+  const [vistaActiva, setVistaActiva] = useState('chat'); // 'chat' | 'proyectos' | 'biblioteca' | 'memoria' | 'configuracion' | 'idioma'
   const [modeloSeleccionado, setModeloSeleccionado] = useState('auto');
   const [busquedaWeb, setBusquedaWeb] = useState('auto'); // 'auto' | 'on' | 'off'
   const [chats, setChats] = useState([]);
@@ -88,6 +89,82 @@ export function ChatProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('fenixProyectos', JSON.stringify(proyectos));
   }, [proyectos]);
+
+  // ========================================
+  // SINCRONIZACIÓN CON EL SERVIDOR (/api/sincronizar)
+  // - Sin sesión: se guarda solo en localStorage.
+  // - Con sesión: además se sube a la base de datos con debounce, y al iniciar
+  //   sesión se descarga el historial de ESA cuenta. Si la cuenta está vacía
+  //   pero el dispositivo tiene chats de invitado, se suben automáticamente.
+  // ========================================
+  const { autenticado, usuario } = useAuth();
+  const chatsRef = useRef(chats);
+  const proyectosRef = useRef(proyectos);
+  const timerSyncRef = useRef(null);
+  const sincronizandoRef = useRef(false);
+  const cuentaCargadaRef = useRef({});
+
+  useEffect(() => { chatsRef.current = chats; }, [chats]);
+  useEffect(() => { proyectosRef.current = proyectos; }, [proyectos]);
+
+  const historialHabilitado = useCallback(() => {
+    try {
+      return localStorage.getItem('fenixGuardarHistorial') !== 'no';
+    } catch (e) {
+      return true;
+    }
+  }, []);
+
+  const subirDatosAlServidor = useCallback(async () => {
+    if (!autenticado || sincronizandoRef.current) return;
+    if (!historialHabilitado()) return;
+    sincronizandoRef.current = true;
+    try {
+      await apiPost('/api/sincronizar', {
+        chats: chatsRef.current,
+        proyectos: proyectosRef.current,
+      });
+    } catch (e) {
+      console.error('[ChatContext] Error al guardar historial en el servidor:', e.message);
+    } finally {
+      sincronizandoRef.current = false;
+    }
+  }, [autenticado, historialHabilitado]);
+
+  // Sube los cambios después de una pausa (debounce) para no saturar al servidor
+  useEffect(() => {
+    if (!autenticado || !historialHabilitado()) return;
+    clearTimeout(timerSyncRef.current);
+    timerSyncRef.current = setTimeout(subirDatosAlServidor, 1200);
+    return () => clearTimeout(timerSyncRef.current);
+  }, [chats, proyectos, autenticado, historialHabilitado, subirDatosAlServidor]);
+
+  // Al iniciar sesión: descarga el historial de esa cuenta desde el servidor.
+  // Si la cuenta no tiene nada pero hay chats locales de invitado, los sube.
+  useEffect(() => {
+    if (!autenticado || !usuario?.id) return;
+    if (cuentaCargadaRef.current[usuario.id]) return;
+    cuentaCargadaRef.current[usuario.id] = true;
+    if (!historialHabilitado()) return;
+    (async () => {
+      try {
+        const datos = await apiGet('/api/sincronizar');
+        if (!datos || !Array.isArray(datos.chats)) return;
+        const chatsServidor = datos.chats.map(normalizarChat);
+        const proyectosServidor = Array.isArray(datos.proyectos) ? datos.proyectos : [];
+        if (chatsServidor.length === 0 && proyectosServidor.length === 0 && chatsRef.current.length > 0) {
+          subirDatosAlServidor();
+        } else if (chatsServidor.length || proyectosServidor.length) {
+          setChats(chatsServidor);
+          setProyectos(proyectosServidor);
+          persistirChats(chatsServidor);
+          try { localStorage.setItem('fenixProyectos', JSON.stringify(proyectosServidor)); } catch (e) {}
+        }
+      } catch (e) {
+        console.error('[ChatContext] Error al cargar historial del servidor:', e.message);
+      }
+    })();
+  }, [autenticado, usuario?.id, historialHabilitado, subirDatosAlServidor]);
 
   const toggleTema = useCallback(() => {
     setTema((prev) => {

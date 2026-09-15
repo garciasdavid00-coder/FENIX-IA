@@ -169,6 +169,7 @@ export function useChatStream() {
         idioma: opciones.idioma || idiomaLocal,
         instruccion,
         ...(opciones.webSearch !== undefined ? { webSearch: opciones.webSearch } : {}),
+        ...(opciones.chatId !== undefined ? { chatId: opciones.chatId } : {}),
       };
 
       const res = await apiFetch('/api/chat', {

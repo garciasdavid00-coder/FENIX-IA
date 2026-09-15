@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useChat } from '@/context/ChatContext';
 import { useAuth } from '@/hooks/useAuth';
-import { getGoogleAuthUrl } from '@/lib/api';
+import UserMenu from '@/components/UserMenu';
 
 export default function Sidebar() {
   const {
@@ -24,7 +24,7 @@ export default function Sidebar() {
     setVistaActiva,
   } = useChat();
 
-  const { usuario, autenticado, logout } = useAuth();
+  const { usuario, autenticado } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [menuChatAbierto, setMenuChatAbierto] = useState(null);
   const userMenuRef = useRef(null);
@@ -242,62 +242,8 @@ export default function Sidebar() {
             </svg>
           </div>
 
-          {/* Menú emergente hacia arriba */}
-          <div className={`sidebar-user-menu ${userMenuOpen ? 'open' : ''}`}>
-            <div
-              className="sidebar-user-menu-item"
-              onClick={() => {
-                setVistaActiva('configuracion');
-                setUserMenuOpen(false);
-              }}
-            >
-              <span className="sidebar-menu-emoji">⚙️</span>
-              <span>Configuración</span>
-            </div>
-
-            <div
-              className="sidebar-user-menu-item"
-              onClick={() => {
-                setVistaActiva('proyectos');
-                setUserMenuOpen(false);
-              }}
-            >
-              <span className="sidebar-menu-emoji">📁</span>
-              <span>Mis Proyectos</span>
-            </div>
-
-            <div className="sidebar-user-menu-divider" />
-
-            {autenticado ? (
-              <div
-                className="sidebar-user-menu-item sidebar-user-menu-danger"
-                onClick={() => {
-                  logout();
-                  setUserMenuOpen(false);
-                }}
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                  <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-                  <polyline points="16 17 21 12 16 7" />
-                  <line x1="21" y1="12" x2="9" y2="12" />
-                </svg>
-                <span>Cerrar sesión</span>
-              </div>
-            ) : (
-              <a
-                href={getGoogleAuthUrl()}
-                className="sidebar-user-menu-item"
-                style={{ textDecoration: 'none' }}
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                  <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
-                  <polyline points="10 17 15 12 10 7" />
-                  <line x1="15" y1="12" x2="3" y2="12" />
-                </svg>
-                <span>Iniciar sesión con Google</span>
-              </a>
-            )}
-          </div>
+          {/* Menú emergente hacia arriba (fiel al menú legacy completo) */}
+          <UserMenu abierto={userMenuOpen} onCerrar={() => setUserMenuOpen(false)} />
         </div>
       </aside>
     </>

@@ -105,10 +105,10 @@ export default function MemoriasView() {
             <div className="memoria-list">
               {memorias.map((m) => (
                 <div key={m.id} className="memoria-item">
-                  <div className="memoria-texto">{m.texto}</div>
+                  <div className="memoria-texto">{m.memory_text}</div>
                   <div className="memoria-pie">
                     <span className="memoria-cat">
-                      {NOMBRES_CATEGORIAS[m.categoria] || m.categoria || 'Personal'}
+                      {NOMBRES_CATEGORIAS[m.category] || m.category || 'Personal'}
                     </span>
                     <button
                       type="button"

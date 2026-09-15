@@ -1,13 +1,20 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { apiGet, apiPost } from '@/lib/api';
 
 /**
- * Hook para gestionar el estado de autenticación del usuario.
- * Llama a GET /api/usuario-actual incluyendo la cookie de sesión.
+ * Contexto de autenticación compartido por toda la app.
+ *
+ * Antes este hook devolvía estado local por componente (useState dentro del
+ * hook), de modo que al hacer logout desde el menú de usuario, el Sidebar y
+ * el Topbar seguían mostrando el nombre de la cuenta anterior hasta recargar
+ * la página. Con un contexto compartido, un solo logout actualiza a todos
+ * los componentes al instante.
  */
-export function useAuth() {
+const AuthContext = createContext(null);
+
+export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(null);
   const [autenticado, setAutenticado] = useState(false);
   const [cargando, setCargando] = useState(true);
@@ -49,12 +56,26 @@ export function useAuth() {
     consultarUsuario();
   }, [consultarUsuario]);
 
-  return {
-    usuario,
-    autenticado,
-    cargando,
-    error,
-    refrescar: consultarUsuario,
-    logout,
-  };
+  return (
+    <AuthContext.Provider
+      value={{
+        usuario,
+        autenticado,
+        cargando,
+        error,
+        refrescar: consultarUsuario,
+        logout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth debe usarse dentro de un AuthProvider');
+  }
+  return context;
 }

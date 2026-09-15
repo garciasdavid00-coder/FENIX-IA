@@ -9,9 +9,9 @@ const pool = process.env.DATABASE_URL
     })
   : null;
 
-// Si la conexi├│n del pool falla sola (Neon reinicia, timeout de red...),
+// Si la conexión del pool falla sola (Neon reinicia, timeout de red...),
 // pg emite 'error' a nivel de pool. Sin listener, Node lo trata como
-// excepci├│n no capturada y tumba TODO el proceso. Con esto solo logueamos
+// excepción no capturada y tumba TODO el proceso. Con esto solo logueamos
 // y el pool sigue abriendo conexiones nuevas en las siguientes queries.
 if (pool) {
   pool.on('error', (err) => {
@@ -45,16 +45,22 @@ async function inicializar() {
       CREATE TABLE IF NOT EXISTS chats (
         id             SERIAL PRIMARY KEY,
         google_id      VARCHAR(100) NOT NULL,
-        cliente_id     BIGINT       NOT NULL,
+        cliente_id     BIGINT       NOT NULL,                    -- id que usa el navegador
         titulo         TEXT         NOT NULL,
-        mensajes       JSONB        NOT NULL DEFAULT '[]',
+        mensajes       JSONB        NOT NULL DEFAULT '[]',       -- [{tipo, texto}, ...]
         pinned         BOOLEAN      NOT NULL DEFAULT FALSE,
-        proyecto_id    BIGINT,
+        proyecto_id    BIGINT,                                   -- id de cliente del proyecto (opcional)
+        insult_count   INTEGER      NOT NULL DEFAULT 0,       -- contador de insultos en esta conversación
+        is_blocked     BOOLEAN      NOT NULL DEFAULT FALSE,     -- ¿está bloqueado este chat?
         creado_en      TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
         actualizado_en TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
         UNIQUE (google_id, cliente_id)
       )
     `);
+    // Migración idempotente: la tabla pudo crearse antes de agregar las
+    // columnas de moderación, así que nos aseguramos de que existan.
+    await pool.query(`ALTER TABLE chats ADD COLUMN IF NOT EXISTS insult_count INTEGER NOT NULL DEFAULT 0`);
+    await pool.query(`ALTER TABLE chats ADD COLUMN IF NOT EXISTS is_blocked BOOLEAN NOT NULL DEFAULT FALSE`);
     await pool.query(`
       CREATE TABLE IF NOT EXISTS proyectos (
         id         SERIAL PRIMARY KEY,
@@ -162,6 +168,38 @@ async function actualizarPlan(googleId, plan, duracionMeses = 1) {
   return rows[0] || null;
 }
 
+// Devuelve el estado de moderación (insult_count / is_blocked) de un chat
+// concreto de un usuario. null si el chat aún no existe en la BD.
+async function obtenerEstadoChat(googleId, clienteId) {
+  if (!pool || !googleId || clienteId == null) return null;
+  const { rows } = await pool.query(
+    `SELECT insult_count, is_blocked
+     FROM chats
+     WHERE google_id = $1 AND cliente_id = $2`,
+    [googleId, clienteId]
+  );
+  return rows[0] || null;
+}
+
+// Suma 1 insulto al chat. Si la fila aún no existe (el navegador no ha hecho
+// el snapshot de /api/sincronizar), la crea para que la moderación no dependa
+// de la sincronización. Al llegar a 5 insultos marca is_blocked = true.
+// Devuelve el estado nuevo ({ insult_count, is_blocked }) o null si no hay BD.
+async function registrarInsulto(googleId, clienteId, titulo = 'Nuevo chat') {
+  if (!pool || !googleId || clienteId == null) return null;
+  const { rows } = await pool.query(
+    `INSERT INTO chats (google_id, cliente_id, titulo, mensajes, insult_count)
+     VALUES ($1, $2, $3, '[]'::jsonb, 1)
+     ON CONFLICT (google_id, cliente_id) DO UPDATE SET
+       insult_count = chats.insult_count + 1,
+       is_blocked   = (chats.insult_count + 1) >= 5,
+       actualizado_en = NOW()
+     RETURNING insult_count, is_blocked`,
+    [googleId, clienteId, String(titulo || '').slice(0, 200) || 'Nuevo chat']
+  );
+  return rows[0] || null;
+}
+
 // Reemplaza por completo los chats y proyectos del usuario por el estado
 // que manda el navegador (sincronización por snapshot).
 async function sincronizarDatos(googleId, { chats, proyectos }) {
@@ -169,6 +207,17 @@ async function sincronizarDatos(googleId, { chats, proyectos }) {
   const cliente = await pool.connect();
   try {
     await cliente.query('BEGIN');
+
+    // Antes de sobrescribir, conservamos el estado de moderación de los chats
+    // (insult_count / is_blocked) para que un snapshot posterior al bloqueo
+    // no resucite un chat que ya fue bloqueado.
+    const { rows: chatsModerados } = await cliente.query(
+      `SELECT cliente_id, insult_count, is_blocked
+       FROM chats
+       WHERE google_id = $1 AND (is_blocked = TRUE OR insult_count > 0)`,
+      [googleId]
+    );
+
     await cliente.query('DELETE FROM chats WHERE google_id = $1', [googleId]);
     await cliente.query('DELETE FROM proyectos WHERE google_id = $1', [googleId]);
 
@@ -192,6 +241,16 @@ async function sincronizarDatos(googleId, { chats, proyectos }) {
          VALUES ($1, $2, $3)
          ON CONFLICT (google_id, cliente_id) DO UPDATE SET nombre = EXCLUDED.nombre`,
         [googleId, p.id, p.nombre || '']
+      );
+    }
+
+    // Re-aplicamos el estado de moderación conservado antes del snapshot.
+    for (const m of chatsModerados) {
+      await cliente.query(
+        `UPDATE chats
+         SET insult_count = $3, is_blocked = $4
+         WHERE google_id = $1 AND cliente_id = $2`,
+        [googleId, m.cliente_id, m.insult_count, m.is_blocked]
       );
     }
 
@@ -316,6 +375,8 @@ module.exports = {
   obtenerOCrearUsuario,
   obtenerUsuarioPorGoogleId,
   actualizarPlan,
+  obtenerEstadoChat,
+  registrarInsulto,
   sincronizarDatos,
   obtenerDatos,
   obtenerOCrearUsuarioPorTelefono,

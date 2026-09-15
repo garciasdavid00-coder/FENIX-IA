@@ -23,8 +23,27 @@ const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const SESSION_SECRET = process.env.SESSION_SECRET || 'cambia_esto_por_algo_secreto';
+const SESSION_SECRET = process.env.SESSION_SECRET;
+// Seguridad: sin SESSION_SECRET el servidor NO arranca. Usar un valor por
+// defecto permitiría forjar cookies de sesión. Si este error aparece, genera
+// una con: node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+if (!SESSION_SECRET) {
+  console.error('ERROR: No se encontró SESSION_SECRET en el archivo .env');
+  console.error('El servidor NO va a arrancar sin un secreto de sesión fuerte.');
+  console.error('Genera uno con: node -e "console.log(require(\'crypto\').randomBytes(48).toString(\'hex\'))"');
+  console.error('y agrégalo al .env como: SESSION_SECRET=<ese valor>');
+  process.exit(1);
+}
+if (SESSION_SECRET === 'cambia_esto_por_algo_secreto' || SESSION_SECRET === 'cambia_esto_por_algo_secreto_muy_largo') {
+  console.error('ERROR: SESSION_SECRET sigue usando el valor de ejemplo (público e inseguro).');
+  console.error('Genera uno nuevo: node -e "console.log(require(\'crypto\').randomBytes(48).toString(\'hex\'))"');
+  process.exit(1);
+}
 const enProduccion = process.env.NODE_ENV === 'production';
+// Hasta que exista un proveedor de pagos real (Stripe/PayPal), los planes de
+// pago permanecen deshabilitados: fail-closed por defecto (PAGOS_HABILITADOS=true
+// solo cuando el flujo de pago esté integrado).
+const PAGOS_HABILITADOS = process.env.PAGOS_HABILITADOS === 'true';
 
 if (!GROQ_API_KEY) {
   console.error('ERROR: No se encontró GROQ_API_KEY en el archivo .env');
@@ -53,11 +72,20 @@ app.set('trust proxy', 1);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
 // Lista de orígenes permitidos para peticiones con credenciales (cookies)
-const origenesPermitidos = [
+const ORIGENES_BASE = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:3001',
   process.env.FRONTEND_URL
-].filter(Boolean);
+].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
+
+// En local, el propio Express sirve la app en :3001 (mismo origen) y además
+// se permite el FRONTEND_URL definido en .env. En producción/desarrollo
+// remoto, FRONTEND_URL indica el origen del frontend real.
+const origenesPermitidos = enProduccion
+  ? ORIGENES_BASE
+  : [...ORIGENES_BASE, `http://localhost:${process.env.PORT || 3001}`, `http://127.0.0.1:${process.env.PORT || 3001}`];
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -212,6 +240,10 @@ app.post('/api/sincronizar', async (req, res) => {
 // Voz en tiempo real: token efímero para Gemini Live API.
 // (Va directo aquí para no depender de carpetas extra en el repo.)
 app.post('/api/voice-token', async (req, res) => {
+  // Igual que el resto de endpoints protegidos: requiere sesión iniciada.
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
+    return res.status(401).json({ error: 'Debes iniciar sesión para usar la voz en tiempo real.' });
+  }
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
   if (!GEMINI_API_KEY) {
@@ -454,11 +486,20 @@ app.get('/api/mi-plan', (req, res) => {
 
 // Cambia el plan del usuario (se llamará cuando exista el pago real).
 // Por ahora lo dejamos listo para conectar con Stripe/PayPal después.
+// Mientras PAGOS_HABILITADOS no sea "true", cualquier intento de cambiar a
+// un plan de pago (pro/ultra) se rechaza con 501 ANTES de autenticar y de
+// tocar la base de datos. Solo se permite volver a 'gratis' (downgrade).
 app.post('/api/cambiar-plan', async (req, res) => {
+  const { plan } = req.body || {};
+
+  // Sin proveedor de pagos integrado no existen planes de pago.
+  if (!PAGOS_HABILITADOS && (plan === 'pro' || plan === 'ultra')) {
+    return res.status(501).json({ error: 'El cambio a un plan de pago no está disponible todavía. Falta integrar el proveedor de pagos.' });
+  }
+
   if (!req.isAuthenticated || !req.isAuthenticated()) {
     return res.status(401).json({ error: 'Debes iniciar sesión para cambiar de plan.' });
   }
-  const { plan } = req.body || {};
   if (!['pro', 'ultra', 'gratis'].includes(plan)) {
     return res.status(400).json({ error: 'Plan no válido.' });
   }
@@ -725,7 +766,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     // MODERACIÓN: verifica bloqueo y prepara contexto de moderación
-    moderationMiddleware()(req, res, () => {});
+    await moderationMiddleware()(req, res, () => {});
 
     // Si el middleware ya envió una respuesta (chat bloqueado), short-circuit
     if (res.headersSent) return;
@@ -756,11 +797,15 @@ app.post('/api/chat', async (req, res) => {
     }
 
     // ==========================================================
-    // BÚSQUEDA WEB EN TIEMPO REAL — SOLO BAJO DEMANDA EXPLÍCITA
-    // (forzarWebSearch === true desde el frontend) O vía marcador
-    // [BUSCAR_WEB] que decide el modelo. Sin auto-detección.
+    // BÚSQUEDA WEB EN TIEMPO REAL — MODO EXPLÍCITO DEL USUARIO
+    //   'on'   → SIEMPRE busca web, sin pasar por el detector.
+    //   'off'  → NUNCA busca web, sin importar el mensaje.
+    //   'auto' → detecta automáticamente si hace falta buscar.
+    // El frontend envía webSearch como STRING ('auto'|'on'|'off');
+    // si el campo falta, el modo por defecto es 'auto'.
     // ==========================================================
-    const necesitaBusquedaAutomatica = forzarWebSearch === true || (forzarWebSearch !== false && webSearch.detectarNecesidadBusqueda(mensaje, historial));
+    const modoWeb = forzarWebSearch || 'auto';
+    const necesitaBusquedaAutomatica = modoWeb === 'on' || (modoWeb === 'auto' && webSearch.detectarNecesidadBusqueda(mensaje, historial));
 
     if (necesitaBusquedaAutomatica) {
       res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
@@ -782,11 +827,13 @@ app.post('/api/chat', async (req, res) => {
         });
 
         // Emisión en pequeños bloques fluidos (efecto máquina de escribir)
+        // Sin retardo artificial grande: 4ms por palabra es suficiente para el
+        // efecto visual sin alargar el tiempo de espera real del usuario.
         const palabras = resBusqueda.texto.split(/(\s+)/);
         for (const p of palabras) {
           if (!p) continue;
           res.write(`data: ${JSON.stringify({ texto: p })}\n\n`);
-          await new Promise(r => setTimeout(r, 12));
+          await new Promise(r => setTimeout(r, 4));
         }
 
         // Emite las fuentes citadas si existen
@@ -848,14 +895,46 @@ app.post('/api/chat', async (req, res) => {
 
     const bodyIA = chatEngine.crearCuerpoIA({ modeloIA, mensajes, stream: true, proveedor });
 
-    const respuestaIA = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify(bodyIA)
-    });
+    // Timeout para la llamada al modelo (bug #6). Mismo patrón que el flujo de
+    // WhatsApp en chatEngine.solicitarTextoCompleto(): AbortController + timer.
+    // WhatsApp espera la respuesta completa (timeoutMs=90000); aquí el fetch de
+    // streaming resuelve apenas llegan los headers (primer token), así que 60s
+    // cubre con margen la latencia sin cortar respuestas normales.
+    const TIMEOUT_IA_MS = 60000;
+    const MSG_TIMEOUT_IA = 'El modelo tardó demasiado en responder, intentá de nuevo.';
+
+    const controladorIA = new AbortController();
+    const temporizadorIA = setTimeout(() => controladorIA.abort(), TIMEOUT_IA_MS);
+    let respuestaIA;
+    try {
+      respuestaIA = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify(bodyIA),
+        signal: controladorIA.signal
+      });
+    } catch (e) {
+      if (e.name === 'AbortError') {
+        console.error(`[chat] Timeout de ${proveedor} (${TIMEOUT_IA_MS}ms)`);
+        if (res.headersSent) {
+          // Ya arrancó el SSE (caso fall-through de búsqueda web): cerramos con
+          // evento de error para que el frontend lo muestre y no quede colgado.
+          if (!res.writableEnded) {
+            res.write(`data: ${JSON.stringify({ error: MSG_TIMEOUT_IA })}\n\n`);
+            res.end();
+          }
+        } else {
+          res.status(504).json({ error: MSG_TIMEOUT_IA });
+        }
+        return;
+      }
+      throw e;
+    } finally {
+      clearTimeout(temporizadorIA);
+    }
 
     if (!respuestaIA.ok) {
       const errorData = await respuestaIA.text();
@@ -900,32 +979,92 @@ app.post('/api/chat', async (req, res) => {
       }
     });
 
-    async function procesarStreamConBusqueda(stream, mensajesOriginales, sistemaFinal) {
-      // Fase 1: leer stream completo y filtrar razonamiento
-      // El filtro devuelve texto acumulado; usamos el mismo patrón que el streaming original
-      // (trackear longitud emitida) para obtener solo el texto nuevo de cada chunk.
-      let respuestaCompleta = '';
-      let emitidoHasta = 0;
-      await leerStreamSSE(stream, delta => {
-        const filtrado = filtro.push(delta);
-        const nuevo = filtrado.slice(emitidoHasta);
-        emitidoHasta = filtrado.length;
-        if (nuevo) respuestaCompleta += nuevo;
-      }, { esActivo: () => !lectorAbortado, setLector: (r) => { lector = r; } });
-      const resto = filtro.final().slice(emitidoHasta);
-      if (resto) respuestaCompleta += resto;
+    async function procesarStreamConBusqueda(stream, mensajesOriginales, sistemaFinal, modoWeb) {
+      // Fase 1: STREAMING PROGRESIVO con detector de marcador en vivo.
+      // El texto confirmado por el filtro se envía al cliente apenas llega
+      // (efecto máquina de escribir en tiempo real); solo se retiene la cola
+      // que podría ser el inicio de "[BUSCAR_WEB]:" para no filtrar el marcador.
+      // Si el marcador aparece, se corta la lectura, se busca en la web y se
+      // responde con una segunda llamada al modelo.
+      const MARCADOR_RE = /\[BUSCAR_WEB\]\s*:\s*([^\n]+)/i;
+      const ANCLA_MARCADOR = '[BUSCAR_WEB]: ';
 
-      // Detectar marcador [BUSCAR_WEB]: consulta
-      const matchBuscar = respuestaCompleta.match(/\[BUSCAR_WEB\]\s*:\s*([^\n]+)/i);
-      if (!matchBuscar) {
-        // Sin marcador → emitir respuesta completa y terminar
-        enviarTexto(respuestaCompleta);
+      // ¿Cuántos caracteres del final podrían ser parte del marcador?
+      function pendienteMarcador(texto) {
+        const max = Math.min(texto.length, ANCLA_MARCADOR.length);
+        for (let n = max; n >= 1; n--) {
+          if (ANCLA_MARCADOR.startsWith(texto.slice(-n))) return n;
+        }
+        return 0;
+      }
+
+      let emitido = '';             // texto confirmado por el filtro (monótono)
+      let comprometido = 0;         // caracteres ya entregados al cliente
+      let buscarDetectado = false;
+      let buscarQuery = '';
+      let respuestaCompleta = '';
+
+      await leerStreamSSE(stream, delta => {
+        emitido = filtro.push(delta);
+        if (buscarDetectado) return;
+
+        // ¿El modelo decidió buscar en la web?
+        const coincidencia = MARCADOR_RE.exec(emitido);
+        if (coincidencia) {
+          buscarDetectado = true;
+          buscarQuery = coincidencia[1].trim();
+          respuestaCompleta = emitido;
+          enviarTexto(emitido.slice(0, coincidencia.index).trim());
+          // No seguimos leyendo: el marcador ya está detectado
+          if (lector && !lectorAbortado) {
+            lector.cancel().catch(() => {});
+          }
+          return;
+        }
+
+        // Emitir solo la parte segura (la cola podría iniciar el marcador)
+        const fiable = emitido.length - pendienteMarcador(emitido);
+        if (fiable > comprometido) {
+          enviarTexto(emitido.slice(0, fiable));
+          comprometido = fiable;
+        }
+      }, { esActivo: () => !lectorAbortado, setLector: (r) => { lector = r; } });
+
+      // Fin del stream sin marcador completo: entregar lo que quedó pendiente
+      if (!buscarDetectado) {
+        emitido = filtro.final();
+        const coincidencia = MARCADOR_RE.exec(emitido);
+        if (coincidencia) {
+          buscarDetectado = true;
+          buscarQuery = coincidencia[1].trim();
+          respuestaCompleta = emitido;
+          enviarTexto(emitido.slice(0, coincidencia.index).trim());
+        } else if (emitido.length > comprometido) {
+          enviarTexto(emitido);
+          comprometido = emitido.length;
+        }
+      }
+
+      // Sin marcador: la respuesta ya se transmitió en tiempo real
+      if (!buscarDetectado) {
         res.write('data: [DONE]\n\n');
         res.end();
         return;
       }
 
-      const query = matchBuscar[1].trim();
+      // En modo 'off' el usuario pidió NO buscar nunca: ignoramos el marcador
+      // (el modelo puede emitirlo por su instrucción general) y emitimos la
+      // respuesta tal cual, sin disparar ninguna búsqueda. Si el modelo solo
+      // emitió el marcador y nada más, avisamos en vez de responder vacío.
+      if (modoWeb === 'off') {
+        const limpio = respuestaCompleta.replace(/\[BUSCAR_WEB\][\s\S]*$/i, '').trim();
+        enviarTexto(limpio || 'No puedo buscar en internet porque tenés la búsqueda web desactivada.');
+        res.write('data: [DONE]\n\n');
+        res.end();
+        return;
+      }
+
+      const query = buscarQuery;
       console.log('[chat] [BUSCAR_WEB] detectado, consulta:', query);
 
       // Fase 2: búsqueda web con Gemini Grounding
@@ -955,11 +1094,31 @@ app.post('/api/chat', async (req, res) => {
       ];
 
       const bodyIA2 = chatEngine.crearCuerpoIA({ modeloIA, mensajes: mensajesConBusqueda, stream: true, proveedor });
-      const respuestaIA2 = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-        body: JSON.stringify(bodyIA2)
-      });
+
+      // Mismo timeout que la primera llamada (los headers SSE ya se enviaron).
+      const controladorIA2 = new AbortController();
+      const temporizadorIA2 = setTimeout(() => controladorIA2.abort(), TIMEOUT_IA_MS);
+      let respuestaIA2;
+      try {
+        respuestaIA2 = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+          body: JSON.stringify(bodyIA2),
+          signal: controladorIA2.signal
+        });
+      } catch (e) {
+        if (e.name === 'AbortError') {
+          console.error(`[chat] Timeout en 2ª llamada de ${proveedor} (${TIMEOUT_IA_MS}ms)`);
+          if (!res.writableEnded) {
+            res.write(`data: ${JSON.stringify({ error: MSG_TIMEOUT_IA })}\n\n`);
+            res.end();
+          }
+          return;
+        }
+        throw e;
+      } finally {
+        clearTimeout(temporizadorIA2);
+      }
 
       if (!respuestaIA2.ok) {
         const errorData = await respuestaIA2.text();
@@ -1007,7 +1166,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     try {
-      await procesarStreamConBusqueda(respuestaIA, mensajes, sistemaFinal);
+      await procesarStreamConBusqueda(respuestaIA, mensajes, sistemaFinal, modoWeb);
     } catch (e) {
       console.error('Error en streaming con búsqueda:', e.message);
       if (!res.writableEnded) {
@@ -1023,7 +1182,16 @@ app.post('/api/chat', async (req, res) => {
 
   } catch (error) {
     console.error('Error en /api/chat:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    if (res.headersSent) {
+      // Si ya arrancó el SSE no podemos mandar JSON: cerramos con un evento de
+      // error para que el frontend lo muestre en vez de dejar la conexión colgada.
+      if (!res.writableEnded) {
+        res.write(`data: ${JSON.stringify({ error: 'Error interno del servidor' })}\n\n`);
+        res.end();
+      }
+    } else {
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
   }
 });
 

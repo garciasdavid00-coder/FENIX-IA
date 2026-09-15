@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Topbar from '@/components/Topbar';
 import GreetingView from '@/components/GreetingView';
@@ -8,6 +8,7 @@ import ChatView from '@/components/ChatView';
 import ProjectsView from '@/components/ProjectsView';
 import BibliotecaView from '@/components/BibliotecaView';
 import SettingsView from '@/components/SettingsView';
+import IdiomaView from '@/components/IdiomaView';
 import MemoriasView from '@/components/MemoriasView';
 import ModalMemoria from '@/components/ModalMemoria';
 import ModalDocumento from '@/components/ModalDocumento';
@@ -58,7 +59,14 @@ export default function HomePage() {
   }, [chatActualId, chats, setMensajes]);
 
   // Al completar la generación o haber nuevos mensajes, los guardamos en el historial
+  // El ref evita que al crear un chat nuevo (chatActualId en null) se guarden como
+  // un chat nuevo los mensajes viejos del chat anterior en el mismo render.
+  const prevChatActualIdRef = useRef(chatActualId);
   useEffect(() => {
+    if (prevChatActualIdRef.current !== chatActualId) {
+      prevChatActualIdRef.current = chatActualId;
+      return;
+    }
     if (mensajes.length > 0 && !generando) {
       // El resultado del stream se guarda en el chat al que pertenecía al
       // enviarse (streamChatIdRef), aunque el usuario haya cambiado de chat
@@ -95,6 +103,7 @@ export default function HomePage() {
         {vistaActiva === 'proyectos' && <ProjectsView />}
         {vistaActiva === 'biblioteca' && <BibliotecaView />}
         {vistaActiva === 'configuracion' && <SettingsView />}
+        {vistaActiva === 'idioma' && <IdiomaView />}
         {vistaActiva === 'memoria' && <MemoriasView />}
 
         {vistaActiva === 'chat' && (

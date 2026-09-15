@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS chats (
   mensajes       JSONB        NOT NULL DEFAULT '[]',       -- [{tipo, texto}, ...]
   pinned         BOOLEAN      NOT NULL DEFAULT FALSE,
   proyecto_id    BIGINT,                                   -- id de cliente del proyecto (opcional)
+  insult_count   INTEGER      NOT NULL DEFAULT 0,       -- contador de insultos en esta conversación
+  is_blocked     BOOLEAN      NOT NULL DEFAULT FALSE,     -- ¿está bloqueado este chat?
   creado_en      TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
   actualizado_en TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
   UNIQUE (google_id, cliente_id)
