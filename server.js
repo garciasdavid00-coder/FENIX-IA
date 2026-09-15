@@ -572,10 +572,11 @@ async function leerStreamSSE(respuestaIA, onTexto, opciones){
 function crearFiltroRazonamiento(){
   const etiquetas = [
     { abre: '<think>', cierra: '</think>' },
+    { abre: '<thought>', cierra: '</thought>' },
     { abre: '<thinking>', cierra: '</thinking>' },
     { abre: '<reasoning>', cierra: '</reasoning>' }
   ];
-  const cierresSimples = [' response', ' response', '</think>', '</thinking>', '</reasoning>', ' response', '.'];
+  const cierresSimples = [' response', ' response', '</think>', '</thought>', '</thinking>', '</reasoning>', ' response', '.'];
 
   let emitido = '';        // texto confirmado (monótono creciente)
   let cola = '';           // caracteres en espera (lookahead para detectar aperturas)

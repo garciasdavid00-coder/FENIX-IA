@@ -197,6 +197,7 @@ function limpiarRazonamiento(texto) {
   return String(texto || '')
     .replace(/<think>[\s\S]*?<\/think>/gi, '')
     .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
+    .replace(/<thought>[\s\S]*?<\/thought>/gi, '')
     .replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, '')
     .replace(/^\s*thinking\b.*$/m, '')
     .replace(/^\s*$/gm, '')
