@@ -31,10 +31,22 @@ export default function HomePage() {
     generando,
     enviarMensaje: enviarAlStream,
     detener,
+    streamChatIdRef,
   } = useChatStream();
 
   // Si cambia el chat seleccionado en la barra lateral, cargamos sus mensajes
   useEffect(() => {
+    // Si hay un stream en curso que pertenece a OTRO chat (el usuario cambió de
+    // chat a mitad de generación), guardamos lo que ya llegó en el chat del
+    // stream antes de cargar el nuevo, para no perder la respuesta en curso.
+    const chatDelStream = streamChatIdRef.current;
+    if (generando && chatDelStream && chatDelStream !== chatActualId) {
+      if (mensajes.length > 0) {
+        guardarMensajesEnHistorial(chatDelStream, mensajes);
+      }
+      streamChatIdRef.current = null;
+      detener();
+    }
     if (chatActualId) {
       const chatEncontrado = chats.find((c) => c.id === chatActualId);
       if (chatEncontrado && Array.isArray(chatEncontrado.mensajes)) {
@@ -48,11 +60,15 @@ export default function HomePage() {
   // Al completar la generación o haber nuevos mensajes, los guardamos en el historial
   useEffect(() => {
     if (mensajes.length > 0 && !generando) {
-      const id = chatActualId || Date.now().toString();
+      // El resultado del stream se guarda en el chat al que pertenecía al
+      // enviarse (streamChatIdRef), aunque el usuario haya cambiado de chat
+      // mientras se generaba. Si no había chat stream, cae al chat actual.
+      const id = streamChatIdRef.current || chatActualId || Date.now().toString();
       if (!chatActualId) {
         setChatActualId(id);
       }
       guardarMensajesEnHistorial(id, mensajes);
+      streamChatIdRef.current = null;
     }
   }, [mensajes, generando, chatActualId, setChatActualId, guardarMensajesEnHistorial]);
 
@@ -60,6 +76,7 @@ export default function HomePage() {
     enviarAlStream(texto, {
       modelo: modeloSeleccionado,
       webSearch: busquedaWeb,
+      chatId: chatActualId,
     });
   };
 

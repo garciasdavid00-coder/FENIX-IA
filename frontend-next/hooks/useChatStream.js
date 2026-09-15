@@ -16,6 +16,10 @@ export function useChatStream() {
   const [generando, setGenerando] = useState(false);
   const [error, setError] = useState(null);
   const abortControllerRef = useRef(null);
+  // Chat al que pertenece el stream en curso (capturado al enviar). Sirve para
+  // que, si el usuario cambia de chat a mitad de generación, el resultado se
+  // guarde en el chat correcto y no se pierda ni corrompa.
+  const streamChatIdRef = useRef(null);
 
   const detener = useCallback(() => {
     if (abortControllerRef.current) {
@@ -27,6 +31,10 @@ export function useChatStream() {
 
   const enviarMensaje = useCallback(async (textoMensaje, opciones = {}) => {
     if (!textoMensaje || !textoMensaje.trim() || generando) return;
+
+    // Guardamos a qué chat le pertenece ESTE stream antes de que chatActualId
+    // pueda cambiar en el frontend mientras se genera la respuesta.
+    streamChatIdRef.current = opciones.chatId || null;
 
     setError(null);
     const mensajeUsuario = {
@@ -270,8 +278,13 @@ export function useChatStream() {
       await finalizarBurbuja(acumulado);
     } catch (err) {
       if (err.name === 'AbortError') {
-        // Cancelado por el usuario: conservar lo que ya llegó
-        await finalizarBurbuja(acumulado);
+        // Cancelado por el usuario: conservar lo que ya llegó.
+        // Si el stream pertenece a un chat que se abandonó (cambió de chat a
+        // mitad de generación), page.js ya guardó lo parcial antes de detener:
+        // no re-finalizar aquí para no disparar una generación descartada.
+        if (streamChatIdRef.current !== null) {
+          await finalizarBurbuja(acumulado);
+        }
       } else {
         console.error('[useChatStream] Error:', err);
         const mensajeError = err.message || 'Error al conectar con Fenix IA';
@@ -304,5 +317,6 @@ export function useChatStream() {
     detener,
     limpiarChat,
     setMensajes,
+    streamChatIdRef,
   };
 }
