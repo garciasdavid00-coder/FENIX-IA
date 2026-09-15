@@ -195,8 +195,9 @@ function mensajeErrorIA(proveedor, status, cuerpo) {
 // terminada (el equivalente no-streaming del filtro de server.js).
 function limpiarRazonamiento(texto) {
   return String(texto || '')
-    .replace(/<thinking>[\s\S]*?<\/thinking>/g, '')
-    .replace(/<reasoning>[\s\S]*?<\/reasoning>/g, '')
+    .replace(/<think>[\s\S]*?<\/think>/gi, '')
+    .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
+    .replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, '')
     .replace(/^\s*thinking\b.*$/m, '')
     .replace(/^\s*$/gm, '')
     .replace(/\n{3,}/g, '\n\n')

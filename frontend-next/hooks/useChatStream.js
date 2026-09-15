@@ -248,11 +248,19 @@ export function useChatStream() {
                 .replace(/\[GENERAR_(IMAGEN|DOC)\][\s\S]*$/i, '')
                 .replace(/\[BUSCAR_WEB\][\s\S]*$/i, '')
                 .replace(/^\[IMAGEN\]\s*:?.*$/gim, '');
-              const espera = /\[GENERAR_DOC\]/i.test(acumulado) ? 'Generando documento...' : 'Generando imagen...';
+              let espera = '';
+              if (/\[GENERAR_DOC\]/i.test(acumulado)) {
+                espera = 'Generando documento...';
+              } else if (/\[BUSCAR_WEB\]/i.test(acumulado)) {
+                espera = 'Buscando en la web...';
+              } else if (/\[GENERAR_IMAGEN\]/i.test(acumulado)) {
+                espera = 'Generando imagen...';
+              }
+
               setMensajes((prev) =>
                 prev.map((msg) =>
                   msg.id === idBot
-                    ? { ...msg, contenido: visible.trim() ? visible : espera, cargando: false }
+                    ? { ...msg, contenido: visible.trim() ? visible : espera, cargando: !visible.trim() && !espera }
                     : msg
                 )
               );

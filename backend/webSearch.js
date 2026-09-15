@@ -263,76 +263,70 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español' }) {
   }
 
   const key = apiKey || process.env.SEARLO_API_KEY;
-  if (!key) {
-    console.warn('[buscarEnWeb] falta la SEARLO_API_KEY en .env; devolviendo respuesta segura.');
-    return {
-      texto: 'La búsqueda en la web no está disponible porque falta la clave del servicio externo.',
-      fuentes: []
-    };
+
+  // Si hay clave de Searlo, intentamos primero con Searlo
+  if (key) {
+    try {
+      const urlApi = new URL('https://api.searlo.tech/api/v1/search/web');
+      urlApi.searchParams.set('q', query.slice(0, 500));
+      urlApi.searchParams.set('limit', '8');
+      urlApi.searchParams.set('gl', 'us');
+      urlApi.searchParams.set('hl', 'es');
+
+      console.log('[buscarEnWeb] Consultando Searlo para: ' + query.slice(0, 80));
+
+      const respuesta = await fetch(urlApi, {
+        headers: { 'x-api-key': key }
+      });
+
+      const data = await respuesta.json().catch(() => ({}));
+
+      if (respuesta.ok) {
+        const items = (data && (Array.isArray(data.organic) ? data.organic : (Array.isArray(data.items) ? data.items : [])))
+          .filter(it => it && it.title && it.link);
+
+        if (items.length) {
+          const fuentes = items.slice(0, 6).map(it => ({
+            titulo: String(it.title).trim(),
+            url: it.link
+          }));
+
+          const texto = items
+            .slice(0, 5)
+            .map((it, i) => {
+              const snippet = (it.snippet || '').trim();
+              return `${i + 1}. ${it.title}${snippet ? ' — ' + snippet : ''}`;
+            })
+            .join('\n');
+
+          console.log('[buscarEnWeb] Búsqueda Searlo lista (' + items.length + ' resultados, ' + fuentes.length + ' fuentes).');
+          return { texto, fuentes };
+        }
+      } else {
+        const detalle = (data && data.message) || (data && data.error) || String(respuesta.status);
+        console.warn('[buscarEnWeb] Searlo falló (' + respuesta.status + ': ' + detalle + '), recurriendo a buscador multi-fuente...');
+      }
+    } catch (e) {
+      console.warn('[buscarEnWeb] Excepción en Searlo (' + (e && e.message ? e.message : e) + '), recurriendo a buscador multi-fuente...');
+    }
   }
 
+  // Fallback universal multi-fuente (Google News RSS + Wikipedia)
+  console.log('[buscarEnWeb] Usando buscador multi-fuente gratuito para: ' + query.slice(0, 80));
   try {
-    const urlApi = new URL('https://api.searlo.tech/api/v1/search/web');
-    urlApi.searchParams.set('q', query.slice(0, 500));
-    urlApi.searchParams.set('limit', '8');
-    urlApi.searchParams.set('gl', 'us');
-    urlApi.searchParams.set('hl', 'es');
+    const resMulti = await buscarWebMultiFuente(query);
+    const hechos = Array.isArray(resMulti.hechos) ? resMulti.hechos : [];
+    const fuentes = Array.isArray(resMulti.fuentes) ? resMulti.fuentes : [];
 
-    console.log('[buscarEnWeb] Consultando Searlo para: ' + query.slice(0, 80));
+    const texto = hechos.length
+      ? hechos.join('\n')
+      : 'No se encontraron titulares directos para esta consulta.';
 
-    const respuesta = await fetch(urlApi, {
-      headers: { 'x-api-key': key }
-    });
-
-    const data = await respuesta.json().catch(() => ({}));
-
-    if (!respuesta.ok) {
-      const detalle =
-        (data && data.message) || (data && data.error) || String(respuesta.status);
-      console.error('[buscarEnWeb] Searlo respondió ' + respuesta.status + ': ' + detalle);
-      if (respuesta.status === 402) {
-        console.warn('[buscarEnWeb] CRÉDITOS DE SEARLO AGOTADOS (402). Revisa dashboard.searlo.tech');
-      }
-      if (respuesta.status === 429) {
-        console.warn('[buscarEnWeb] RATE LIMIT DE SEARLO (429). Espera un momento e intenta de nuevo.');
-      }
-      return {
-        texto: 'He intentado buscar información actualizada, pero el servicio de búsqueda web respondió con error temporal.',
-        fuentes: []
-      };
-    }
-
-    const items = (data && (Array.isArray(data.organic) ? data.organic : (Array.isArray(data.items) ? data.items : [])))
-      .filter(it => it && it.title && it.link);
-
-    if (!items.length) {
-      console.error('[buscarEnWeb] Searlo devolvió resultados vacíos.');
-      return {
-        texto: 'La búsqueda web respondió sin resultados útiles en este momento.',
-        fuentes: []
-      };
-    }
-
-    const fuentes = items.slice(0, 6).map(it => ({
-      titulo: String(it.title).trim(),
-      url: it.link
-    }));
-
-    const texto = items
-      .slice(0, 5)
-      .map((it, i) => {
-        const snippet = (it.snippet || '').trim();
-        return `${i + 1}. ${it.title}${snippet ? ' — ' + snippet : ''}`;
-      })
-      .join('\n');
-
-    console.log('[buscarEnWeb] Búsqueda lista (' + items.length + ' resultados, ' + fuentes.length + ' fuentes).');
-
-    return { texto, fuentes };
-  } catch (e) {
-    console.error('[buscarEnWeb] Error inesperado en la búsqueda web:', e && e.message ? e.message : e);
+    return { texto, fuentes: fuentes.slice(0, 6) };
+  } catch (eMulti) {
+    console.error('[buscarEnWeb] Error en fallback multi-fuente:', eMulti.message);
     return {
-      texto: 'La búsqueda web no pudo completarse por un error temporal del servicio externo.',
+      texto: 'No se pudieron recuperar resultados actualizados de la web en este momento.',
       fuentes: []
     };
   }
