@@ -12,7 +12,7 @@ export default function GreetingView({ onEnviarMensaje, generando, detener }) {
   const { usuario } = useAuth();
   const { busquedaWeb, cambiarBusquedaWeb } = useChat();
   const [textoInput, setTextoInput] = useState('');
-  const [saludo, setSaludo] = useState('Vamos con todo');
+  const [saludo, setSaludo] = useState('¡Qué gusto verte, Invitado!');
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [archivoAdjunto, setArchivoAdjunto] = useState(null);
   const [arrastrando, setArrastrando] = useState(false);
@@ -172,19 +172,18 @@ export default function GreetingView({ onEnviarMensaje, generando, detener }) {
               </svg>
             </button>
 
-            {/* Modo Conversación por Voz en Vivo (Llamada) */}
+            {/* Modo Conversación por Voz en Vivo (Voz) */}
             <button
               type="button"
-              className="voice-call-btn"
+              className="mic-btn voz-btn"
               onClick={() => setVoiceModalOpen(true)}
-              title="Modo Conversación de Voz en Vivo"
+              title="Voz en vivo (Modo conversación)"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="17" height="17">
-                <path d="M12 3v18" />
-                <path d="M8 7v10" />
-                <path d="M16 7v10" />
-                <path d="M4 11v2" />
-                <path d="M20 11v2" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="20" height="20">
+                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
+                <path d="M19 10v2a7 7 0 01-14 0v-2" />
+                <line x1="12" y1="19" x2="12" y2="23" />
+                <path d="M8 21h8" />
               </svg>
             </button>
 
@@ -275,6 +274,15 @@ export default function GreetingView({ onEnviarMensaje, generando, detener }) {
             <line x1="8" y1="17" x2="16" y2="17" />
           </svg>
           <span>Resumen</span>
+        </div>
+
+        <div className="pill" onClick={() => usarPill('Investiga y resume los mejores sitios web sobre: ')}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z" />
+          </svg>
+          <span>Sitios</span>
         </div>
       </div>
     </div>
