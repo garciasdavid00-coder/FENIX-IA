@@ -53,7 +53,7 @@ async function generarDocumentoConHechosReales({ tema, apiKey, modelo }) {
     throw new Error('generarDocumentoConHechosReales: falta la GEMINI_API_KEY.');
   }
 
-  const modeloIA = modelo || 'gemini-3.6-flash';
+  const modeloIA = modelo || process.env.GEMINI_MODEL || 'gemini-1.5-flash';
   const urlApi = 'https://generativelanguage.googleapis.com/v1beta/models/'
     + encodeURIComponent(modeloIA)
     + ':generateContent?key=' + encodeURIComponent(apiKey);

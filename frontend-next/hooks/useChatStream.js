@@ -247,6 +247,7 @@ export function useChatStream() {
               const visible = acumulado
                 .replace(/\[GENERAR_(IMAGEN|DOC)\][\s\S]*$/i, '')
                 .replace(/\[BUSCAR_WEB\][\s\S]*$/i, '')
+                .replace(/\[FENIX_CHART:[\s\S]*$/i, '')
                 .replace(/^\[IMAGEN\]\s*:?.*$/gim, '');
               let espera = '';
               if (/\[GENERAR_DOC\]/i.test(acumulado)) {
@@ -260,7 +261,14 @@ export function useChatStream() {
               setMensajes((prev) =>
                 prev.map((msg) =>
                   msg.id === idBot
-                    ? { ...msg, contenido: visible.trim() ? visible : espera, cargando: !visible.trim() && !espera }
+                    ? {
+                        ...msg,
+                        contenido: visible.trim() ? visible : espera,
+                        cargando: !visible.trim() && !espera,
+                        ...(msg.searchInfo?.estado === 'buscando'
+                          ? { searchInfo: { ...msg.searchInfo, estado: 'completado' } }
+                          : {})
+                      }
                     : msg
                 )
               );

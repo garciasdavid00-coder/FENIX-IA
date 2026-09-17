@@ -1,26 +1,58 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useChat } from '@/context/ChatContext';
 import { getGoogleAuthUrl } from '@/lib/api';
 import { descargarDocumento } from '@/lib/documentos';
+import MarkdownContent from '@/components/MarkdownContent';
+import TrendChart from '@/components/TrendChart';
+
+function formatearQueryBusqueda(q) {
+  if (!q) return '';
+  let limpia = String(q).trim().replace(/^['"“«]+|['"”»]+$/g, '').trim();
+  if (limpia.length > 3 && limpia === limpia.toUpperCase()) {
+    limpia = limpia.toLowerCase();
+  }
+  if (limpia.length > 40) {
+    limpia = limpia.slice(0, 38) + '…';
+  }
+  return limpia;
+}
 
 export default function MessageBubble({ mensaje }) {
   const { abrirModalMemoria, abrirDocModal } = useChat();
   const [copiado, setCopiado] = useState(false);
+  const [mostrarTodasFuentes, setMostrarTodasFuentes] = useState(false);
+
+  // Extraer datos de gráfico de tendencias de divisas si existen en el texto
+  const { textoLimpio, chartData } = useMemo(() => {
+    let raw = mensaje?.contenido || '';
+    let parsedChart = null;
+    const match = raw.match(/\[FENIX_CHART:([\s\S]*?)\]/);
+    if (match) {
+      try {
+        parsedChart = JSON.parse(match[1]);
+      } catch (e) {
+        // Fallback silencioso si no es JSON completo aún
+      }
+    }
+    // Ocultar siempre el marcador FENIX_CHART del texto visible
+    raw = raw.replace(/\[FENIX_CHART:[\s\S]*$/i, '').trimEnd();
+    return { textoLimpio: raw, chartData: parsedChart };
+  }, [mensaje?.contenido]);
 
   const copiarTexto = () => {
-    if (!mensaje.contenido) return;
-    navigator.clipboard.writeText(mensaje.contenido);
+    if (!textoLimpio) return;
+    navigator.clipboard.writeText(textoLimpio);
     setCopiado(true);
     setTimeout(() => setCopiado(false), 2000);
   };
 
   const hablarTexto = () => {
-    if (!mensaje.contenido || typeof window === 'undefined') return;
+    if (!textoLimpio || typeof window === 'undefined') return;
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(mensaje.contenido);
+      const utter = new SpeechSynthesisUtterance(textoLimpio);
       utter.lang = 'es-ES';
       window.speechSynthesis.speak(utter);
     }
@@ -30,27 +62,55 @@ export default function MessageBubble({ mensaje }) {
 
   return (
     <div className={`msg ${esUsuario ? 'msg-user' : 'msg-bot'}`}>
-      {/* Badge de búsqueda web en vivo */}
+      {/* Badge de búsqueda web en vivo ultra elegante */}
       {!esUsuario && mensaje.searchInfo && mensaje.searchInfo.estado && (
         <div
           className={`busqueda-web-badge ${
             mensaje.searchInfo.estado === 'buscando' ? 'anim-pulse' : 'completado'
           }`}
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="2" y1="12" x2="22" y2="12" />
-            <path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z" />
-          </svg>
-          <span>
-            {mensaje.searchInfo.estado === 'buscando' ? (
-              <>
-                Buscando en la web: <i>{mensaje.searchInfo.query}</i>
-              </>
-            ) : (
-              'Búsqueda web completada'
-            )}
-          </span>
+          {mensaje.searchInfo.estado === 'buscando' ? (
+            <>
+              <div className="busqueda-icon-wrap">
+                <svg className="busqueda-icon-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="2" y1="12" x2="22" y2="12" />
+                  <path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z" />
+                </svg>
+                <span className="busqueda-pulse-ring" />
+              </div>
+
+              <div className="busqueda-texto-wrap">
+                <span className="busqueda-label-animada">Buscando en la web</span>
+                {mensaje.searchInfo.query && (
+                  <>
+                    <span className="busqueda-sep">·</span>
+                    <span className="busqueda-query-token" title={mensaje.searchInfo.query}>
+                      “{formatearQueryBusqueda(mensaje.searchInfo.query)}”
+                    </span>
+                  </>
+                )}
+                <div className="busqueda-puntos">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="busqueda-icon-wrap">
+                <svg className="busqueda-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <span className="busqueda-texto-completado">
+                {mensaje.searchInfo.fuentes?.length
+                  ? `Consultadas ${mensaje.searchInfo.fuentes.length} fuentes en tiempo real`
+                  : 'Búsqueda web completada'}
+              </span>
+            </>
+          )}
         </div>
       )}
 
@@ -90,63 +150,82 @@ export default function MessageBubble({ mensaje }) {
               </div>
             </div>
           </div>
+        ) : esUsuario ? (
+          <div style={{ whiteSpace: 'pre-wrap' }}>
+            {textoLimpio}
+          </div>
         ) : (
           <>
-            {mensaje.cargando && !mensaje.contenido ? (
-              <span className="cursor-escribiendo" />
-            ) : (
-              <>
-                {mensaje.contenido}
-                {mensaje.cargando && <span className="cursor-escribiendo" />}
-              </>
-            )}
+            <MarkdownContent contenido={textoLimpio} cargando={mensaje.cargando} />
+            {chartData && <TrendChart datos={chartData} />}
           </>
         )}
       </div>
 
-      {/* Fuentes consultadas */}
-      {!esUsuario && mensaje.searchInfo?.fuentes?.length > 0 && (
-        <div className="fuentes-container">
-          <div className="fuentes-cabecera">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="2" y1="12" x2="22" y2="12" />
-              <path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z" />
-            </svg>
-            <span>Fuentes consultadas ({mensaje.searchInfo.fuentes.length})</span>
+      {/* Fuentes consultadas (reducidas a 2-3 por defecto con opción a expandir) */}
+      {!esUsuario && mensaje.searchInfo?.fuentes?.length > 0 && (() => {
+        const totalFuentes = mensaje.searchInfo.fuentes.length;
+        const limite = 3;
+        const fuentesMostradas = mostrarTodasFuentes
+          ? mensaje.searchInfo.fuentes
+          : mensaje.searchInfo.fuentes.slice(0, limite);
+        const hayMas = totalFuentes > limite;
+
+        return (
+          <div className="fuentes-container">
+            <div className="fuentes-cabecera">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z" />
+              </svg>
+              <span>Fuentes consultadas ({totalFuentes})</span>
+            </div>
+            <div className="fuentes-grid">
+              {fuentesMostradas.map((f, i) => {
+                let host = '';
+                try {
+                  host = new URL(f.url).hostname.replace(/^www\./, '');
+                } catch (e) {}
+                return (
+                  <a
+                    key={i}
+                    className="fuente-card"
+                    href={f.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img
+                      className="fuente-favicon"
+                      src={`https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=32`}
+                      alt=""
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                    <div className="fuente-info">
+                      <span className="fuente-host">{host}</span>
+                      <span className="fuente-titulo">{f.titulo || host}</span>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+
+            {hayMas && (
+              <button
+                type="button"
+                className="fuentes-toggle-btn"
+                onClick={() => setMostrarTodasFuentes(v => !v)}
+              >
+                {mostrarTodasFuentes
+                  ? '− Mostrar menos fuentes'
+                  : `+ Ver ${totalFuentes - limite} fuentes más`}
+              </button>
+            )}
           </div>
-          <div className="fuentes-grid">
-            {mensaje.searchInfo.fuentes.map((f, i) => {
-              let host = '';
-              try {
-                host = new URL(f.url).hostname.replace(/^www\./, '');
-              } catch (e) {}
-              return (
-                <a
-                  key={i}
-                  className="fuente-card"
-                  href={f.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <img
-                    className="fuente-favicon"
-                    src={`https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=32`}
-                    alt=""
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                  <div className="fuente-info">
-                    <span className="fuente-host">{host}</span>
-                    <span className="fuente-titulo">{f.titulo || host}</span>
-                  </div>
-                </a>
-              );
-            })}
-          </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Límite de mensajes sin sesión: invita a iniciar sesión */}
       {mensaje.limite && (

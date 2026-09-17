@@ -21,6 +21,7 @@ const PORT = process.env.PORT || 3001;
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const SESSION_SECRET = process.env.SESSION_SECRET;
@@ -244,8 +245,6 @@ app.post('/api/voice-token', async (req, res) => {
   if (!req.isAuthenticated || !req.isAuthenticated()) {
     return res.status(401).json({ error: 'Debes iniciar sesión para usar la voz en tiempo real.' });
   }
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
   if (!GEMINI_API_KEY) {
     return res.status(500).json({ error: 'Gemini no está configurado en el servidor.' });
   }
@@ -864,9 +863,15 @@ app.post('/api/chat', async (req, res) => {
     // Si el usuario eligió un modelo en el dropdown (groq/gemini/deepseek),
     // respetamos su elección. Si mandó "auto" o no mandó nada, el router decide.
     const MODELOS_MANUALES = ['groq', 'gemini', 'deepseek'];
-    const proveedor = MODELOS_MANUALES.includes(modelo)
+    let proveedor = MODELOS_MANUALES.includes(modelo)
       ? modelo
       : selectModel(mensaje, historial);
+
+    // Si el modo es automático y el proveedor elegido no tiene clave, usar groq
+    if (!MODELOS_MANUALES.includes(modelo)) {
+      if (proveedor === 'deepseek' && !DEEPSEEK_API_KEY) proveedor = 'groq';
+      if (proveedor === 'gemini' && !GEMINI_API_KEY) proveedor = 'groq';
+    }
 
     // Prompt de sistema, historial de mensajes y copia para extraer memorias
     // (compartidos con el bot de WhatsApp en backend/chatEngine.js).
@@ -1069,13 +1074,12 @@ app.post('/api/chat', async (req, res) => {
       const query = buscarQuery;
       console.log('[chat] [BUSCAR_WEB] detectado, consulta:', query);
 
-      // Fase 2: búsqueda web con Gemini Grounding
+      // Fase 2: búsqueda web en tiempo real
       let resultadoBusqueda = { texto: '', fuentes: [] };
       try {
         resultadoBusqueda = await webSearch.buscarEnWeb({
           consulta: query,
-          apiKey: process.env.GEMINI_API_KEY,
-          modelo: 'gemini-3.6-flash',
+          apiKey: process.env.SEARLO_API_KEY,
           lang
         });
       } catch (e) {

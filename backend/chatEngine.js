@@ -116,7 +116,7 @@ function configurarProveedor(proveedor) {
     return {
       url: 'https://api.deepseek.com/chat/completions',
       apiKey: process.env.DEEPSEEK_API_KEY,
-      modeloIA: 'deepseek-v4-flash' // el nombre viejo "deepseek-chat" se retiró el 24 de julio de 2026
+      modeloIA: process.env.DEEPSEEK_MODEL || 'deepseek-chat'
     };
   }
 
@@ -129,14 +129,14 @@ function configurarProveedor(proveedor) {
     return {
       url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
       apiKey: process.env.GEMINI_API_KEY,
-      modeloIA: 'gemini-3.6-flash'
+      modeloIA: process.env.GEMINI_MODEL || 'gemini-3.6-flash'
     };
   }
 
   return {
     url: 'https://api.groq.com/openai/v1/chat/completions',
     apiKey: process.env.GROQ_API_KEY,
-    modeloIA: 'qwen/qwen3.6-27b'
+    modeloIA: process.env.GROQ_MODEL || 'groq/compound'
   };
 }
 
@@ -150,12 +150,6 @@ function crearCuerpoIA({ modeloIA, mensajes, stream, proveedor, maxTokens = 1024
     max_tokens: maxTokens,
     stream: !!stream
   };
-  // Groq y DeepSeek soportan desactivar el razonamiento para responder más
-  // rápido; Gemini no acepta este parámetro, así que solo se manda a los que
-  // lo soportan.
-  if (proveedor && proveedor !== 'gemini') {
-    cuerpo.reasoning_effort = 'none';
-  }
   return cuerpo;
 }
 

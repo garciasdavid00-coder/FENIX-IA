@@ -200,28 +200,49 @@ async function registrarInsulto(googleId, clienteId, titulo = 'Nuevo chat') {
   return rows[0] || null;
 }
 
-// Reemplaza por completo los chats y proyectos del usuario por el estado
-// que manda el navegador (sincronización por snapshot).
+// Función auxiliar para asegurar que los IDs de cliente sean compatibles con BIGINT
+function parsearClienteId(id) {
+  if (id == null) return null;
+  const num = typeof id === 'number' ? id : parseInt(String(id).replace(/\D/g, '').slice(0, 18), 10);
+  return Number.isFinite(num) && num > 0 ? num : null;
+}
+
+// Sincroniza los chats y proyectos del usuario de forma segura (Upsert + reconciliación).
+// Protege el historial contra sobreescrituras vacías accidentales si el cliente
+// aún no había cargado su localStorage.
 async function sincronizarDatos(googleId, { chats, proyectos }) {
-  if (!pool) return null;
+  if (!pool || !googleId) return null;
   const cliente = await pool.connect();
   try {
     await cliente.query('BEGIN');
 
-    // Antes de sobrescribir, conservamos el estado de moderación de los chats
-    // (insult_count / is_blocked) para que un snapshot posterior al bloqueo
-    // no resucite un chat que ya fue bloqueado.
-    const { rows: chatsModerados } = await cliente.query(
-      `SELECT cliente_id, insult_count, is_blocked
-       FROM chats
-       WHERE google_id = $1 AND (is_blocked = TRUE OR insult_count > 0)`,
+    const listaChats = Array.isArray(chats) ? chats : [];
+    const listaProyectos = Array.isArray(proyectos) ? proyectos : [];
+
+    // Verificamos si el usuario ya tenía datos en la base de datos
+    const { rows: conteoActual } = await cliente.query(
+      'SELECT COUNT(*) AS total FROM chats WHERE google_id = $1',
       [googleId]
     );
+    const totalExistente = parseInt(conteoActual[0]?.total || '0', 10);
 
-    await cliente.query('DELETE FROM chats WHERE google_id = $1', [googleId]);
-    await cliente.query('DELETE FROM proyectos WHERE google_id = $1', [googleId]);
+    // PROTECCIÓN ANTI-PÉRDIDA: Si el cliente envía 0 chats pero la BD ya tiene
+    // chats guardados, no ejecutamos borrado masivo (evita que una pestaña nueva
+    // o un fallo de lectura local borre el historial de la cuenta en Neon).
+    if (listaChats.length === 0 && totalExistente > 0) {
+      console.warn(`[sincronizarDatos] Petición vacía ignorada para google_id ${googleId} para evitar pérdida de ${totalExistente} chats.`);
+      await cliente.query('COMMIT');
+      return { ok: true, omitidoPorProteccion: true };
+    }
 
-    for (const c of Array.isArray(chats) ? chats : []) {
+    // 1) Upsert de chats válidos enviados por el cliente
+    const idsChatsEnviados = [];
+    for (const c of listaChats) {
+      const cid = parsearClienteId(c.id);
+      if (!cid) continue;
+      idsChatsEnviados.push(cid);
+
+      const pid = parsearClienteId(c.proyectoId);
       await cliente.query(
         `INSERT INTO chats (google_id, cliente_id, titulo, mensajes, pinned, proyecto_id)
          VALUES ($1, $2, $3, $4, $5, $6)
@@ -231,27 +252,45 @@ async function sincronizarDatos(googleId, { chats, proyectos }) {
            pinned = EXCLUDED.pinned,
            proyecto_id = EXCLUDED.proyecto_id,
            actualizado_en = NOW()`,
-        [googleId, c.id, c.titulo || '', JSON.stringify(c.mensajes || []), !!c.pinned, c.proyectoId ?? null]
+        [googleId, cid, String(c.titulo || '').slice(0, 300), JSON.stringify(c.mensajes || []), !!c.pinned, pid]
       );
     }
 
-    for (const p of Array.isArray(proyectos) ? proyectos : []) {
+    // 2) Eliminación deliberada: si se enviaron chats, solo eliminamos los que
+    // el usuario explícitamente borró (no están en idsChatsEnviados)
+    if (idsChatsEnviados.length > 0) {
+      await cliente.query(
+        `DELETE FROM chats
+         WHERE google_id = $1 AND cliente_id != ALL($2::bigint[])`,
+        [googleId, idsChatsEnviados]
+      );
+    }
+
+    // 3) Reconciliación de proyectos
+    const idsProyectosEnviados = [];
+    for (const p of listaProyectos) {
+      const pid = parsearClienteId(p.id);
+      if (!pid) continue;
+      idsProyectosEnviados.push(pid);
+
       await cliente.query(
         `INSERT INTO proyectos (google_id, cliente_id, nombre)
          VALUES ($1, $2, $3)
-         ON CONFLICT (google_id, cliente_id) DO UPDATE SET nombre = EXCLUDED.nombre`,
-        [googleId, p.id, p.nombre || '']
+         ON CONFLICT (google_id, cliente_id) DO UPDATE SET
+           nombre = EXCLUDED.nombre`,
+        [googleId, pid, String(p.nombre || '').slice(0, 300)]
       );
     }
 
-    // Re-aplicamos el estado de moderación conservado antes del snapshot.
-    for (const m of chatsModerados) {
+    if (idsProyectosEnviados.length > 0) {
       await cliente.query(
-        `UPDATE chats
-         SET insult_count = $3, is_blocked = $4
-         WHERE google_id = $1 AND cliente_id = $2`,
-        [googleId, m.cliente_id, m.insult_count, m.is_blocked]
+        `DELETE FROM proyectos
+         WHERE google_id = $1 AND cliente_id != ALL($2::bigint[])`,
+        [googleId, idsProyectosEnviados]
       );
+    } else if (listaProyectos.length === 0 && listaChats.length > 0) {
+      // Si el cliente envió chats pero explícitamente vació sus proyectos
+      await cliente.query('DELETE FROM proyectos WHERE google_id = $1', [googleId]);
     }
 
     await cliente.query('COMMIT');

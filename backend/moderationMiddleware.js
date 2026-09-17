@@ -5,13 +5,9 @@
 const db = require('../db');
 
 const insultosBase = [
-  'puta', 'hijo', 'perra', 'mierda', 'cabrón', 'pendejo', 'estúpido', 'idiota',
-  'tonto', 'imbécil', 'groso', 'boludo', 'pelotudo', 'cobarde', 'miedoso',
-  'gil', 'gilipollas', 'retardado', 'nazi', 'fascista',
-  'racista', 'sexista', 'homofóbico', 'homofobo', 'discriminatorio',
-  'agresivo', 'agresión', 'amenaza', 'golpe', 'lastimar', 'daño', 'malo',
-  'malvado', 'satanás', 'diablo', 'infiel', 'traidor', 'vergüenza',
-  'lástima', 'pena', 'daño', 'dañar', 'malo', 'malvado', 'satanás',
+  'puta', 'perra', 'mierda', 'cabron', 'pendejo', 'estupido', 'idiota',
+  'imbecil', 'boludo', 'pelotudo', 'gilipollas', 'retardado',
+  'maricon', 'hdp'
 ];
 
 const MENSAJE_BLOQUEADO =

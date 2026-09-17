@@ -8,7 +8,7 @@ import { getGoogleAuthUrl } from '@/lib/api';
 const NOMBRES_MODELOS = {
   auto: 'Fenix 2.0 (Auto)',
   groq: 'Groq (Llama 3.3)',
-  gemini: 'Gemini 2.5 Flash',
+  gemini: 'Gemini 1.5 Flash',
   deepseek: 'DeepSeek V3',
 };
 

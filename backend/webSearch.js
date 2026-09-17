@@ -52,7 +52,8 @@ function detectarNecesidadBusqueda(mensaje, historial = []) {
  */
 function extraerQueryBusqueda(mensaje) {
   let q = String(mensaje || '').trim();
-  q = q.replace(/^(por\s+favor\s+)?(busca|investiga|googlea|averigua|dime|cu[aá]l\s+es|qu[eé]\s+es)(\s+en\s+(internet|la\s+web|google))?(\s+sobre|\s+acerca\s+de)?\s+/i, '');
+  q = q.replace(/^(por\s+favor\s+)?(busca(r)?|investiga(r)?|googlea(r)?|averigua(r)?|dime|cu[aá]l\s+es|caul\s+es|qu[eé]\s+es)(\s+en\s+(internet|la\s+web|google))?(\s+sobre|\s+acerca\s+de)?\s+/i, '');
+  q = q.replace(/^[¿?¡!'"“«\s]+|[¿?¡!'"”»\s]+$/g, '').trim();
   return q.slice(0, 150) || mensaje;
 }
 
@@ -109,6 +110,84 @@ async function buscarWebMultiFuente(query) {
  * Si Gemini Grounding no está disponible (ej. 429 quota), usa el motor de búsqueda
  * multi-fuente con Groq / DeepSeek garantizando que SIEMPRE responda con datos reales.
  */
+/**
+ * Determina si el mensaje del usuario pregunta sobre tipo de cambio o divisas.
+ */
+function detectarConsultaTipoCambio(mensaje) {
+  if (!mensaje || typeof mensaje !== 'string') return false;
+  return /\b(d[oó]lar|dolares|peso(s)?|usd|mxn|tipo\s+de\s+cambio|cotizaci[oó]n|cu[aá]nto\s+est[aá]\s+el\s+d[oó]lar|precio\s+del\s+d[oó]lar|cambio\s+de\s+d[oó]lar|d[oó]lar\s+hoy|euro(s)?|eur)\b/i.test(mensaje);
+}
+
+/**
+ * Consulta la API oficial de Frankfurter para obtener la serie de 30 días y calcular tendencia.
+ */
+async function obtenerHistoricoDivisas(from = 'USD', to = 'MXN', dias = 30) {
+  try {
+    const hoy = new Date();
+    const haceDias = new Date(Date.now() - dias * 24 * 3600 * 1000);
+    const fFin = hoy.toISOString().slice(0, 10);
+    const fInicio = haceDias.toISOString().slice(0, 10);
+
+    const res = await fetch(`https://api.frankfurter.dev/v1/${fInicio}..${fFin}?from=${from}&to=${to}`, {
+      headers: { 'User-Agent': 'FenixIA/1.0' }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const rates = data.rates || {};
+    const fechas = Object.keys(rates).sort();
+    if (fechas.length < 2) return null;
+
+    const puntos = fechas.map(f => ({
+      fecha: f,
+      valor: Number(rates[f][to])
+    })).filter(p => typeof p.valor === 'number' && !Number.isNaN(p.valor));
+
+    if (puntos.length < 2) return null;
+
+    const inicial = puntos[0].valor;
+    const final = puntos[puntos.length - 1].valor;
+    const valores = puntos.map(p => p.valor);
+    const minimo = Math.min(...valores);
+    const maximo = Math.max(...valores);
+    const diff = final - inicial;
+    const porcentajeNum = (diff / inicial) * 100;
+    const porcentaje = porcentajeNum.toFixed(2);
+    const subio = porcentajeNum > 0.05;
+    const bajo = porcentajeNum < -0.05;
+
+    let tendenciaTexto = '';
+    if (subio) {
+      tendenciaTexto = `↑ El dólar ha subido un ${porcentaje}% este mes (el peso se depreció un ${porcentaje}%)`;
+    } else if (bajo) {
+      const absPct = Math.abs(porcentajeNum).toFixed(2);
+      tendenciaTexto = `↓ El dólar ha bajado un ${absPct}% este mes (el peso se apreció un ${absPct}%)`;
+    } else {
+      tendenciaTexto = `→ El tipo de cambio se ha mantenido prácticamente estable este mes (${porcentaje}%)`;
+    }
+
+    return {
+      from,
+      to,
+      puntos,
+      inicial: inicial.toFixed(4),
+      final: final.toFixed(4),
+      minimo: minimo.toFixed(4),
+      maximo: maximo.toFixed(4),
+      porcentaje,
+      subio,
+      bajo,
+      tendenciaTexto
+    };
+  } catch (e) {
+    console.warn('[obtenerHistoricoDivisas] Excepción consultando Frankfurter:', e.message);
+    return null;
+  }
+}
+
+/**
+ * Ejecuta la búsqueda web y redacta la respuesta usando el modelo configurado.
+ * Con soporte especializado para tipo de cambio (Timestamp exacto, tendencia 30 días, mini gráfico y fuentes reducidas).
+ */
 async function ejecutarBusquedaWebCompleta({
   mensaje,
   historial = [],
@@ -125,80 +204,66 @@ async function ejecutarBusquedaWebCompleta({
     };
   }
 
-  // 1) Intentar Gemini Grounding si hay API Key disponible
-  if (apiKey) {
-    try {
-      const urlApi = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=' + encodeURIComponent(apiKey);
-      const promptSistema = `Eres Fenix IA, un asistente útil y actualizado. Responde siempre en ${lang}. Tu creador es Joshua Blandon Gonzales.
-Tienes acceso a Google Search Grounding.
-1) Basa tu respuesta en la información más reciente de la búsqueda.
-2) Cita hechos, precios, fechas y nombres comprobables.
-3) Sé conciso y directo.${memoriaContexto ? '\n\n' + memoriaContexto : ''}${instruccionExtra ? '\n\n' + instruccionExtra : ''}`;
+  // ¿Es una consulta sobre divisas / tipo de cambio?
+  const esTipoCambio = detectarConsultaTipoCambio(mensaje);
 
-      const contents = [];
-      const ultimosMensajes = (Array.isArray(historial) ? historial : []).slice(-6);
-      for (const m of ultimosMensajes) {
-        const role = m.role === 'assistant' ? 'model' : 'user';
-        const text = typeof m.content === 'string' ? m.content : '';
-        if (text.trim()) contents.push({ role, parts: [{ text }] });
-      }
-      contents.push({ role: 'user', parts: [{ text: mensaje }] });
-
-      const resp = await fetch(urlApi, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: promptSistema }] },
-          contents,
-          tools: [{ google_search: {} }],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 2048 }
-        })
-      });
-
-      if (resp.ok) {
-        const data = await resp.json();
-        const candidato = data && data.candidates && data.candidates[0];
-        const partes = (candidato && candidato.content && candidato.content.parts) || [];
-        const texto = partes.filter(p => typeof p.text === 'string').map(p => p.text).join('').trim();
-        const chunks = (candidato && candidato.groundingMetadata && candidato.groundingMetadata.groundingChunks) || [];
-        const fuentes = chunks
-          .map(c => ({ titulo: (c.web && c.web.title) || '', url: (c.web && c.web.uri) || '' }))
-          .filter(f => f.url && f.url.startsWith('http'));
-
-        if (texto) {
-          return { texto, fuentes: fuentes.slice(0, 6) };
-        }
-      } else {
-        console.warn('[WebSearch] Gemini falló (código ' + resp.status + '), usando buscador web multi-fuente...');
-      }
-    } catch (e) {
-      console.warn('[WebSearch] Error con Gemini Grounding, usando buscador multi-fuente:', e.message);
-    }
-  }
-
-  // 2) Fallback Universal Multi-Fuente con Groq / DeepSeek
-  let hechos = [];
-  let fuentes = [];
+  // 1) Búsqueda Web Elegante vía Searlo (Google Search real y limpio)
+  let busqueda = { texto: '', fuentes: [] };
   try {
-    const resultado = await buscarWebMultiFuente(query);
-    hechos = Array.isArray(resultado.hechos) ? resultado.hechos : [];
-    fuentes = Array.isArray(resultado.fuentes) ? resultado.fuentes : [];
+    busqueda = await buscarEnWeb({ consulta: query });
   } catch (e) {
-    console.error('[WebSearch] Error al ejecutar la búsqueda multi-fuente:', e.message);
+    console.error('[WebSearch] Error al buscar en Searlo:', e.message);
   }
 
-  const fechaHoy = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  // Para consultas de divisas limitamos las fuentes a 2-3 para no saturar
+  const fuentesFinales = esTipoCambio
+    ? (busqueda.fuentes || []).slice(0, 3)
+    : (busqueda.fuentes || []).slice(0, 6);
 
-  const sistemaConHechos = `Eres Fenix IA, un asistente útil, veraz y actualizado. Responde siempre en ${lang}. Tu creador es Joshua Blandon Gonzales.
+  // 2) Si es tipo de cambio, consultamos histórico de 30 días para calcular tendencia exacta y gráfico
+  let historico = null;
+  if (esTipoCambio) {
+    historico = await obtenerHistoricoDivisas('USD', 'MXN', 30);
+  }
 
-INFORMACIÓN EN TIEMPO REAL EXTRAÍDA DE LA WEB (Fecha actual: ${fechaHoy}):
-${hechos.length ? hechos.join('\n') : 'No se encontraron titulares directos.'}
+  // 3) TIMESTAMP: hora y fecha exactas del servidor (hora de México)
+  const ahora = new Date();
+  const horaExacta = ahora.toLocaleTimeString('es-MX', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'America/Mexico_City'
+  });
+  const fechaHoy = ahora.toLocaleDateString('es-ES', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'America/Mexico_City'
+  });
 
-INSTRUCCIONES:
-1) Basa tu respuesta en los datos, cotizaciones, noticias y hechos reales mostrados arriba.
-2) Menciona los datos y precios específicos disponibles. Si varían por país (ej. México, Colombia, Argentina) o por mercado (oficial, paralelo, etc.), indícalo con claridad.
-3) NUNCA digas "no tengo acceso a datos en tiempo real" ya que se te acaban de proporcionar los datos de la web en vivo arriba.
-4) Responde de forma concisa y estructurada.${memoriaContexto ? '\n\n' + memoriaContexto : ''}${instruccionExtra ? '\n\n' + instruccionExtra : ''}`;
+  let instruccionesEspeciales = '';
+  if (esTipoCambio) {
+    instruccionesEspeciales = `
+
+INSTRUCCIONES CLAVE PARA TIPO DE CAMBIO (RESPUESTA SIMPLE, ELEGANTE Y DIRECTA):
+- SÉ BREVE Y DIRECTO: Responde en 2 o 3 oraciones concisas y fluidas. NO uses títulos ni encabezados largos (prohibido "Variación según la fuente", "Tendencia en los últimos 30 días", etc.) ni listas de viñetas.
+- Da el valor actual de inmediato en la primera frase indicando la hora (ej: "El dólar cotiza actualmente en torno a los **$17.14 MXN** (a las ${horaExacta} de hoy).").
+- Explica brevemente en una sola frase si varía en bancos (ej: "En ventanillas bancarias se ubica cerca de **$17.50 MXN** por el diferencial comercial.").
+- Menciona la tendencia mensual en una frase corta (ej: "${historico ? historico.tendenciaTexto : 'ha mostrado estabilidad este mes'}").
+- La aplicación dibuja automáticamente el gráfico interactivo con el rango mensual, por lo que NO debes listar mínimos ni máximos en texto.`;
+  }
+
+  const sistemaConHechos = `Eres Fenix IA, un asistente financiero y de información útil, veraz y actualizado. Responde siempre en ${lang}. Tu creador es Joshua Blandon Gonzales.
+
+INFORMACIÓN EN TIEMPO REAL EXTRAÍDA DE LA WEB (Google Search - ${fechaHoy} a las ${horaExacta}):
+${busqueda.texto || 'No se encontraron resultados directos.'}
+${historico ? `\nDATOS HISTÓRICOS OFICIALES (Últimos 30 días):\n- Cotización hace 30 días: $${historico.inicial} MXN\n- Cotización reciente: $${historico.final} MXN\n- Mínimo del mes: $${historico.minimo} MXN\n- Máximo del mes: $${historico.maximo} MXN\n- Variación: ${historico.tendenciaTexto}` : ''}
+
+INSTRUCCIONES GENERALES:
+1) Basa tu respuesta en los datos reales mostrados arriba. Usa negritas en las cifras clave y formato limpio.
+2) Cita los hechos concretos, precios y nombres de fuentes reales (ej. Banxico, DOF, Investing, Wise).
+3) NUNCA digas "no tengo acceso a internet" ya que se te proporcionan los datos en vivo arriba.${instruccionesEspeciales}${memoriaContexto ? '\n\n' + memoriaContexto : ''}${instruccionExtra ? '\n\n' + instruccionExtra : ''}`;
 
   const mensajes = [
     { role: 'system', content: sistemaConHechos },
@@ -206,42 +271,75 @@ INSTRUCCIONES:
     { role: 'user', content: mensaje }
   ];
 
-  const proveedor = process.env.GROQ_API_KEY ? 'groq' : (process.env.DEEPSEEK_API_KEY ? 'deepseek' : 'groq');
-  const { url: urlIA, apiKey: keyIA, modeloIA } = chatEngine.configurarProveedor(proveedor);
-  const cuerpoIA = chatEngine.crearCuerpoIA({ modeloIA, mensajes, stream: false, proveedor });
-
-  let rawText = 'No se pudo generar la respuesta con la búsqueda.';
-  try {
-    const resIA = await fetch(urlIA, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${keyIA}` },
-      body: JSON.stringify(cuerpoIA)
-    });
-
-    if (!resIA.ok) {
-      const detalle = await resIA.text().catch(() => '');
-      console.warn('[WebSearch] El proveedor de respaldo devolvió error:', resIA.status, detalle.slice(0, 200));
-      return {
-        texto: 'He intentado buscar información actualizada, pero el proveedor de respuesta no está disponible en este momento.',
-        fuentes: fuentes.slice(0, 6)
-      };
+  // 4) Redacción elegante con Gemini o Groq
+  let rawText = '';
+  const geminiKey = apiKey || process.env.GEMINI_API_KEY;
+  if (geminiKey) {
+    try {
+      const resp = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${geminiKey}`
+        },
+        body: JSON.stringify({
+          model: process.env.GEMINI_MODEL || 'gemini-3.6-flash',
+          messages: mensajes,
+          temperature: 0.3,
+          max_tokens: 2048
+        })
+      });
+      if (resp.ok) {
+        const d = await resp.json();
+        rawText = d.choices?.[0]?.message?.content || '';
+      }
+    } catch (eGem) {
+      console.warn('[WebSearch] Falló redacción con Gemini:', eGem.message);
     }
-
-    const dataIA = await resIA.json();
-    rawText = dataIA.choices?.[0]?.message?.content || rawText;
-  } catch (e) {
-    console.error('[WebSearch] Error al pedir respuesta al proveedor de respaldo:', e.message);
-    return {
-      texto: 'He intentado buscar información actualizada, pero la respuesta final no pudo generarse por un error temporal del servicio.',
-      fuentes: fuentes.slice(0, 6)
-    };
   }
 
-  const textoLimpio = chatEngine.limpiarRazonamiento(rawText);
+  // Fallback a Groq si Gemini no respondió
+  if (!rawText && process.env.GROQ_API_KEY) {
+    try {
+      const config = chatEngine.configurarProveedor('groq');
+      const cuerpo = chatEngine.crearCuerpoIA({ modeloIA: config.modeloIA, mensajes, stream: false, proveedor: 'groq' });
+      const respGroq = await fetch(config.url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.apiKey}` },
+        body: JSON.stringify(cuerpo)
+      });
+      if (respGroq.ok) {
+        const dGroq = await respGroq.json();
+        rawText = dGroq.choices?.[0]?.message?.content || '';
+      }
+    } catch (eGroq) {
+      console.error('[WebSearch] Falló redacción con Groq:', eGroq.message);
+    }
+  }
+
+  let textoLimpio = chatEngine.limpiarRazonamiento(rawText) || 'No se pudo generar la información del tipo de cambio.';
+
+  // Garantizar que el marcador [FENIX_CHART:...] esté presente si hay datos históricos disponibles
+  if (esTipoCambio && historico && Array.isArray(historico.puntos) && historico.puntos.length >= 2) {
+    if (!textoLimpio.includes('[FENIX_CHART:')) {
+      const chartPayload = {
+        titulo: `Evolución ${historico.from}/${historico.to} (Últimos 30 días)`,
+        from: historico.from,
+        to: historico.to,
+        puntos: historico.puntos,
+        minimo: historico.minimo,
+        maximo: historico.maximo,
+        porcentaje: historico.porcentaje,
+        subio: historico.subio,
+        bajo: historico.bajo
+      };
+      textoLimpio = textoLimpio.trimEnd() + `\n\n[FENIX_CHART:${JSON.stringify(chartPayload)}]`;
+    }
+  }
 
   return {
-    texto: textoLimpio || 'No se pudo generar la respuesta con la búsqueda.',
-    fuentes: fuentes.slice(0, 6)
+    texto: textoLimpio,
+    fuentes: fuentesFinales
   };
 }
 
