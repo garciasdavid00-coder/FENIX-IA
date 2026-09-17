@@ -41,6 +41,7 @@ export function useChatStream() {
       id: Date.now().toString(),
       rol: 'user',
       contenido: textoMensaje.trim(),
+      archivo: opciones.archivo || null,
       fecha: new Date().toISOString(),
     };
 
@@ -120,7 +121,7 @@ export function useChatStream() {
     };
 
     // El usuario pide explícitamente una imagen: va directo por /api/imagen
-    if (esPeticionImagen(textoMensaje)) {
+    if (esPeticionImagen(textoMensaje) && !opciones.archivo) {
       try {
         const urlImagen = await generarImagen(textoMensaje.trim());
         setMensajes((prev) =>
@@ -162,8 +163,14 @@ export function useChatStream() {
         idiomaLocal = localStorage.getItem('fenixIdioma') || 'es';
       } catch (e) {}
 
+      // Si se adjuntó un archivo de texto/código, inyectar su contenido en el prompt
+      let mensajeParaIA = textoMensaje.trim();
+      if (opciones.archivo && opciones.archivo.contenidoTexto) {
+        mensajeParaIA = `[DOCUMENTO/ARCHIVO ADJUNTO: "${opciones.archivo.nombre}" (${opciones.archivo.tamano})]\n\`\`\`\n${opciones.archivo.contenidoTexto}\n\`\`\`\n\n[INSTRUCCIÓN/PREGUNTA DEL USUARIO]:\n${textoMensaje.trim()}`;
+      }
+
       const payload = {
-        mensaje: textoMensaje.trim(),
+        mensaje: mensajeParaIA,
         historial,
         modelo: opciones.modelo || 'auto',
         idioma: opciones.idioma || idiomaLocal,

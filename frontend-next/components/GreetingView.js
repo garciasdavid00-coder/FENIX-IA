@@ -1,14 +1,61 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useChat } from '@/context/ChatContext';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
+import VoiceModal from '@/components/VoiceModal';
+import FileAttachmentChip from '@/components/FileAttachmentChip';
+import { procesarArchivo } from '@/lib/fileParser';
 
 export default function GreetingView({ onEnviarMensaje, generando, detener }) {
   const { usuario } = useAuth();
   const { busquedaWeb, cambiarBusquedaWeb } = useChat();
   const [textoInput, setTextoInput] = useState('');
   const [saludo, setSaludo] = useState('Vamos con todo');
+  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
+  const [archivoAdjunto, setArchivoAdjunto] = useState(null);
+  const [arrastrando, setArrastrando] = useState(false);
+  const textoBaseRef = useRef('');
+  const fileInputRef = useRef(null);
+
+  // Dictado por voz en tiempo real
+  const { escuchando, toggle: toggleDictado } = useSpeechRecognition({
+    onResult: (texto) => {
+      const base = textoBaseRef.current.trim();
+      setTextoInput(base ? `${base} ${texto}` : texto);
+    }
+  });
+
+  const manejarClickMic = () => {
+    textoBaseRef.current = textoInput;
+    toggleDictado();
+  };
+
+  const manejarSeleccionArchivo = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const proc = await procesarArchivo(file);
+      setArchivoAdjunto(proc);
+    } catch (err) {
+      alert(err.message || 'No se pudo procesar el archivo');
+    }
+    e.target.value = '';
+  };
+
+  const manejarDrop = async (e) => {
+    e.preventDefault();
+    setArrastrando(false);
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    try {
+      const proc = await procesarArchivo(file);
+      setArchivoAdjunto(proc);
+    } catch (err) {
+      alert(err.message || 'No se pudo procesar el archivo');
+    }
+  };
 
   useEffect(() => {
     const hora = new Date().getHours();
@@ -21,9 +68,13 @@ export default function GreetingView({ onEnviarMensaje, generando, detener }) {
   }, [usuario]);
 
   const manejarEnvio = () => {
-    if (!textoInput.trim() || generando) return;
-    onEnviarMensaje(textoInput);
+    const texto = textoInput.trim();
+    if ((!texto && !archivoAdjunto) || generando) return;
+
+    const textoFinal = texto || (archivoAdjunto ? `Analiza este archivo adjunto: ${archivoAdjunto.nombre}` : '');
+    onEnviarMensaje(textoFinal, { archivo: archivoAdjunto });
     setTextoInput('');
+    setArchivoAdjunto(null);
   };
 
   const manejarKeyDown = (e) => {
@@ -43,22 +94,47 @@ export default function GreetingView({ onEnviarMensaje, generando, detener }) {
         {saludo}
       </h1>
 
-      <div className="chat-box">
+      <div
+        className={`chat-box ${arrastrando ? 'drag-over' : ''}`}
+        onDragOver={(e) => { e.preventDefault(); setArrastrando(true); }}
+        onDragLeave={() => setArrastrando(false)}
+        onDrop={manejarDrop}
+      >
+        {/* Chip de archivo adjunto si el usuario cargó uno */}
+        {archivoAdjunto && (
+          <div className="attached-file-preview-area">
+            <FileAttachmentChip
+              archivo={archivoAdjunto}
+              onRemover={() => setArchivoAdjunto(null)}
+            />
+          </div>
+        )}
+
         <textarea
           className="chat-input"
-          placeholder="Cuando quieras..."
+          placeholder={escuchando ? 'Escuchando tu voz...' : (archivoAdjunto ? `Escribe una pregunta sobre "${archivoAdjunto.nombre}" o presiona Enviar...` : 'Cuando quieras...')}
           rows={1}
           value={textoInput}
           onChange={(e) => setTextoInput(e.target.value)}
           onKeyDown={manejarKeyDown}
           autoFocus
         />
+
+        {/* Input de archivo oculto */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={manejarSeleccionArchivo}
+          style={{ display: 'none' }}
+          accept=".txt,.md,.pdf,.doc,.docx,.csv,.json,.js,.jsx,.ts,.tsx,.py,.html,.css,.sql,image/*"
+        />
+
         <div className="chat-actions">
           <button
             type="button"
             className="plus-btn"
-            onClick={() => alert('Selecciona un archivo para adjuntar a la conversación.')}
-            title="Adjuntar archivo"
+            onClick={() => fileInputRef.current?.click()}
+            title="Adjuntar archivo, documento o imagen"
           >
             +
           </button>
@@ -82,16 +158,33 @@ export default function GreetingView({ onEnviarMensaje, generando, detener }) {
               </svg>
             </button>
 
+            {/* Dictado por voz directo en caja de texto */}
             <button
               type="button"
-              className="mic-btn"
-              onClick={() => alert('Funcionalidad de dictado')}
-              title="Dictado por voz"
+              className={`mic-btn ${escuchando ? 'grabando activo' : ''}`}
+              onClick={manejarClickMic}
+              title={escuchando ? 'Detener dictado (escuchando...)' : 'Dictar por voz'}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="20" height="20">
                 <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
                 <path d="M19 10v2a7 7 0 01-14 0v-2" />
                 <line x1="12" y1="19" x2="12" y2="23" />
+              </svg>
+            </button>
+
+            {/* Modo Conversación por Voz en Vivo (Llamada) */}
+            <button
+              type="button"
+              className="voice-call-btn"
+              onClick={() => setVoiceModalOpen(true)}
+              title="Modo Conversación de Voz en Vivo"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="17" height="17">
+                <path d="M12 3v18" />
+                <path d="M8 7v10" />
+                <path d="M16 7v10" />
+                <path d="M4 11v2" />
+                <path d="M20 11v2" />
               </svg>
             </button>
 
@@ -111,7 +204,7 @@ export default function GreetingView({ onEnviarMensaje, generando, detener }) {
                 type="button"
                 className="send-btn"
                 onClick={manejarEnvio}
-                disabled={!textoInput.trim()}
+                disabled={!textoInput.trim() && !archivoAdjunto}
                 title="Enviar mensaje"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
@@ -123,6 +216,13 @@ export default function GreetingView({ onEnviarMensaje, generando, detener }) {
           </div>
         </div>
       </div>
+
+      {/* Modal de Conversación por Voz en Vivo */}
+      <VoiceModal
+        isOpen={voiceModalOpen}
+        onClose={() => setVoiceModalOpen(false)}
+        onEnviarMensaje={onEnviarMensaje}
+      />
 
       {/* Pills de sugerencias */}
       <div className="pills">

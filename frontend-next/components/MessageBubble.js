@@ -7,6 +7,7 @@ import { descargarDocumento } from '@/lib/documentos';
 import MarkdownContent from '@/components/MarkdownContent';
 import TrendChart from '@/components/TrendChart';
 import WebSearchIndicator from '@/components/WebSearchIndicator';
+import FileAttachmentChip from '@/components/FileAttachmentChip';
 
 export default function MessageBubble({ mensaje }) {
   const { abrirModalMemoria, abrirDocModal } = useChat();
@@ -58,6 +59,13 @@ export default function MessageBubble({ mensaje }) {
           sourceCount={mensaje.searchInfo.fuentes?.length || 0}
           fuentes={mensaje.searchInfo.fuentes || []}
         />
+      )}
+
+      {/* Archivo adjunto del usuario si existe */}
+      {esUsuario && mensaje.archivo && (
+        <div style={{ marginBottom: textoLimpio ? '8px' : '0' }}>
+          <FileAttachmentChip archivo={mensaje.archivo} compacto={true} />
+        </div>
       )}
 
       {/* Contenido del mensaje */}
