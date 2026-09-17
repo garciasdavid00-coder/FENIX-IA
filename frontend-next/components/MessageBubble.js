@@ -22,7 +22,6 @@ function formatearQueryBusqueda(q) {
 export default function MessageBubble({ mensaje }) {
   const { abrirModalMemoria, abrirDocModal } = useChat();
   const [copiado, setCopiado] = useState(false);
-  const [mostrarTodasFuentes, setMostrarTodasFuentes] = useState(false);
 
   // Extraer datos de gráfico de tendencias de divisas si existen en el texto
   const { textoLimpio, chartData } = useMemo(() => {
@@ -105,9 +104,7 @@ export default function MessageBubble({ mensaje }) {
                 </svg>
               </div>
               <span className="busqueda-texto-completado">
-                {mensaje.searchInfo.fuentes?.length
-                  ? `Consultadas ${mensaje.searchInfo.fuentes.length} fuentes en tiempo real`
-                  : 'Búsqueda web completada'}
+                Búsqueda web completada
               </span>
             </>
           )}
@@ -162,70 +159,7 @@ export default function MessageBubble({ mensaje }) {
         )}
       </div>
 
-      {/* Fuentes consultadas (reducidas a 2-3 por defecto con opción a expandir) */}
-      {!esUsuario && mensaje.searchInfo?.fuentes?.length > 0 && (() => {
-        const totalFuentes = mensaje.searchInfo.fuentes.length;
-        const limite = 3;
-        const fuentesMostradas = mostrarTodasFuentes
-          ? mensaje.searchInfo.fuentes
-          : mensaje.searchInfo.fuentes.slice(0, limite);
-        const hayMas = totalFuentes > limite;
 
-        return (
-          <div className="fuentes-container">
-            <div className="fuentes-cabecera">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="2" y1="12" x2="22" y2="12" />
-                <path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z" />
-              </svg>
-              <span>Fuentes consultadas ({totalFuentes})</span>
-            </div>
-            <div className="fuentes-grid">
-              {fuentesMostradas.map((f, i) => {
-                let host = '';
-                try {
-                  host = new URL(f.url).hostname.replace(/^www\./, '');
-                } catch (e) {}
-                return (
-                  <a
-                    key={i}
-                    className="fuente-card"
-                    href={f.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <img
-                      className="fuente-favicon"
-                      src={`https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=32`}
-                      alt=""
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                    <div className="fuente-info">
-                      <span className="fuente-host">{host}</span>
-                      <span className="fuente-titulo">{f.titulo || host}</span>
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
-
-            {hayMas && (
-              <button
-                type="button"
-                className="fuentes-toggle-btn"
-                onClick={() => setMostrarTodasFuentes(v => !v)}
-              >
-                {mostrarTodasFuentes
-                  ? '− Mostrar menos fuentes'
-                  : `+ Ver ${totalFuentes - limite} fuentes más`}
-              </button>
-            )}
-          </div>
-        );
-      })()}
 
       {/* Límite de mensajes sin sesión: invita a iniciar sesión */}
       {mensaje.limite && (

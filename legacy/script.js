@@ -1912,41 +1912,7 @@ function actualizarBotonesBusquedaWeb(){
 }
 
 function renderizarFuentes(burbujaBot, fuentes){
-  if(!burbujaBot || !Array.isArray(fuentes) || !fuentes.length) return;
-  if(burbujaBot.querySelector('.fuentes-container')) return;
-
-  const cont = document.createElement('div');
-  cont.className = 'fuentes-container';
-
-  const cabecera = document.createElement('div');
-  cabecera.className = 'fuentes-cabecera';
-  cabecera.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z"/></svg> <span>Fuentes consultadas (' + fuentes.length + ')</span>';
-  cont.appendChild(cabecera);
-
-  const grid = document.createElement('div');
-  grid.className = 'fuentes-grid';
-
-  fuentes.forEach(function(f){
-    try {
-      const u = new URL(f.url);
-      const host = u.hostname.replace(/^www\./, '');
-      const a = document.createElement('a');
-      a.className = 'fuente-card';
-      a.href = f.url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.innerHTML =
-        '<img src="https://www.google.com/s2/favicons?domain=' + encodeURIComponent(host) + '&sz=32" class="fuente-favicon" alt="" onerror="this.style.display=\'none\'">' +
-        '<div class="fuente-info">' +
-          '<span class="fuente-host">' + escaparHTML(host) + '</span>' +
-          '<span class="fuente-titulo">' + escaparHTML(f.titulo || host) + '</span>' +
-        '</div>';
-      grid.appendChild(a);
-    } catch(e) {}
-  });
-
-  cont.appendChild(grid);
-  burbujaBot.appendChild(cont);
+  // Desactivado: solo se muestra la respuesta limpia de la IA sin tarjetas de fuentes
 }
 
   let historialParaAPI = [];
@@ -2086,9 +2052,6 @@ function renderizarFuentes(burbujaBot, fuentes){
             if(limpio){
               burbujaBot.textContent = limpio;
               guardarMensajeEnHistorial('bot', limpio);
-              if(fuentesRecibidas && fuentesRecibidas.length){
-                renderizarFuentes(burbujaBot, fuentesRecibidas);
-              }
               agregarMenuMensaje(burbujaBot, limpio, null);
             } else {
               burbujaBot.remove();
