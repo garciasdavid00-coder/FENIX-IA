@@ -170,18 +170,19 @@ export default function ChatView({ mensajes, generando, onEnviarMensaje, detener
               </svg>
             </button>
 
-            {/* Modo Conversación por Voz en Vivo (Voz) */}
+            {/* Modo Conversación por Voz en Vivo */}
             <button
               type="button"
-              className="mic-btn voz-btn"
+              className="voice-call-btn"
               onClick={() => setVoiceModalOpen(true)}
               title="Voz en vivo (Modo conversación)"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="20" height="20">
-                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
-                <path d="M19 10v2a7 7 0 01-14 0v-2" />
-                <line x1="12" y1="19" x2="12" y2="23" />
-                <path d="M8 21h8" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+                <path d="M12 3v18" />
+                <path d="M8 7v10" />
+                <path d="M16 7v10" />
+                <path d="M4 11v2" />
+                <path d="M20 11v2" />
               </svg>
             </button>
 

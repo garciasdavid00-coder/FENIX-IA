@@ -384,6 +384,22 @@ body{
   color:var(--accent);
   filter:drop-shadow(0 0 4px var(--accent));
 }
+.voice-call-btn{
+  background:none;
+  border:none;
+  cursor:pointer;
+  color:var(--mic-color);
+  padding:6px;
+  border-radius:8px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transition:all 150ms ease;
+}
+.voice-call-btn:hover{
+  background:rgba(91, 79, 214, 0.1);
+  color:var(--accent);
+}
 
 .send-btn{
   background:var(--send-btn-bg);
