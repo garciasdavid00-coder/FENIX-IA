@@ -90,12 +90,21 @@ const origenesPermitidos = enProduccion
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Permitir peticiones sin cabecera origin (ej: curl, scripts internos) o si coincide con la lista blanca
-    if (!origin || origenesPermitidos.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('No permitido por CORS'));
-    }
+    // Permitir peticiones sin cabecera origin (curl, scripts internos, servidor)
+    if (!origin) return callback(null, true);
+
+    // Orígenes permitidos explícitos
+    if (origenesPermitidos.includes(origin)) return callback(null, true);
+
+    // Permitir cualquier dominio o subdominio alojado en Render (*.onrender.com)
+    if (/^https?:\/\/.*\.onrender\.com$/i.test(origin)) return callback(null, true);
+
+    // Permitir localhost o 127.0.0.1 en cualquier puerto
+    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin)) return callback(null, true);
+
+    console.warn('[CORS] Origen no permitido:', origin);
+    // callback(null, false) rechaza CORS de forma limpia sin generar Error 500
+    callback(null, false);
   },
   credentials: true
 }));
@@ -854,8 +863,12 @@ app.post('/api/chat', async (req, res) => {
         }
         return;
       } catch (errWeb) {
-        console.error('[WebSearch] Error en búsqueda web; continuando con modelo estándar:', errWeb.message);
-        // Si falla la búsqueda, el flujo continúa hacia el modelo de chat normal
+        console.error('[WebSearch] Error en búsqueda web:', errWeb.message);
+        if (!res.writableEnded) {
+          res.write(`data: ${JSON.stringify({ error: 'No se pudo completar la búsqueda en tiempo real. Por favor, intenta de nuevo.' })}\n\n`);
+          res.end();
+        }
+        return;
       }
     }
 
@@ -946,16 +959,26 @@ app.post('/api/chat', async (req, res) => {
     if (!respuestaIA.ok) {
       const errorData = await respuestaIA.text();
       console.error(`Error de ${proveedor}:`, errorData);
-      return res.status(respuestaIA.status).json({ error: chatEngine.mensajeErrorIA(proveedor, respuestaIA.status, errorData) });
+      const msgErr = chatEngine.mensajeErrorIA(proveedor, respuestaIA.status, errorData);
+      if (res.headersSent) {
+        if (!res.writableEnded) {
+          res.write(`data: ${JSON.stringify({ error: msgErr })}\n\n`);
+          res.end();
+        }
+        return;
+      }
+      return res.status(respuestaIA.status).json({ error: msgErr });
     }
 
     // ============================================================
     // STREAMING EN DOS FASES: detecta [BUSCAR_WEB] y reinyecta búsqueda
     // ============================================================
-    res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-    res.setHeader('X-Accel-Buffering', 'no');
+    if (!res.headersSent) {
+      res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no');
+    }
 
     const filtro = crearFiltroRazonamiento();
     let bufferRespuesta = '';
@@ -1263,6 +1286,19 @@ if (servirNext) {
     res.sendFile(path.join(LEGACY_RAIZ, 'index.html'));
   });
 }
+
+// Manejador global de errores de Express para responder siempre con JSON y no con HTML 500
+app.use((err, req, res, next) => {
+  console.error('[Error Global Servidor]:', err);
+  if (res.headersSent) {
+    if (!res.writableEnded) {
+      res.write(`data: ${JSON.stringify({ error: err.message || 'Error interno del servidor' })}\n\n`);
+      res.end();
+    }
+    return;
+  }
+  res.status(err.status || 500).json({ error: err.message || 'Error interno del servidor' });
+});
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);

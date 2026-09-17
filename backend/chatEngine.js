@@ -129,14 +129,18 @@ function configurarProveedor(proveedor) {
     return {
       url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
       apiKey: process.env.GEMINI_API_KEY,
-      modeloIA: process.env.GEMINI_MODEL || 'gemini-3.6-flash'
+      modeloIA: process.env.GEMINI_MODEL || 'gemini-1.5-flash'
     };
+  }
+
+  if (!process.env.GROQ_API_KEY) {
+    throw Object.assign(new Error('Groq no está configurado en el servidor (falta GROQ_API_KEY en variables de entorno).'), { claveError: true, status: 400 });
   }
 
   return {
     url: 'https://api.groq.com/openai/v1/chat/completions',
     apiKey: process.env.GROQ_API_KEY,
-    modeloIA: process.env.GROQ_MODEL || 'groq/compound'
+    modeloIA: process.env.GROQ_MODEL || 'openai/gpt-oss-120b'
   };
 }
 

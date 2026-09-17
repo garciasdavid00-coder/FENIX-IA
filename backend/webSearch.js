@@ -283,7 +283,7 @@ INSTRUCCIONES GENERALES:
           'Authorization': `Bearer ${geminiKey}`
         },
         body: JSON.stringify({
-          model: process.env.GEMINI_MODEL || 'gemini-3.6-flash',
+          model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
           messages: mensajes,
           temperature: 0.3,
           max_tokens: 2048
