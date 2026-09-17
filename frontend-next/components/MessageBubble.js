@@ -6,18 +6,7 @@ import { getGoogleAuthUrl } from '@/lib/api';
 import { descargarDocumento } from '@/lib/documentos';
 import MarkdownContent from '@/components/MarkdownContent';
 import TrendChart from '@/components/TrendChart';
-
-function formatearQueryBusqueda(q) {
-  if (!q) return '';
-  let limpia = String(q).trim().replace(/^['"“«]+|['"”»]+$/g, '').trim();
-  if (limpia.length > 3 && limpia === limpia.toUpperCase()) {
-    limpia = limpia.toLowerCase();
-  }
-  if (limpia.length > 40) {
-    limpia = limpia.slice(0, 38) + '…';
-  }
-  return limpia;
-}
+import WebSearchIndicator from '@/components/WebSearchIndicator';
 
 export default function MessageBubble({ mensaje }) {
   const { abrirModalMemoria, abrirDocModal } = useChat();
@@ -61,54 +50,14 @@ export default function MessageBubble({ mensaje }) {
 
   return (
     <div className={`msg ${esUsuario ? 'msg-user' : 'msg-bot'}`}>
-      {/* Badge de búsqueda web en vivo ultra elegante */}
+      {/* Indicador de Búsqueda Web (estados Buscando y Completado) */}
       {!esUsuario && mensaje.searchInfo && mensaje.searchInfo.estado && (
-        <div
-          className={`busqueda-web-badge ${
-            mensaje.searchInfo.estado === 'buscando' ? 'anim-pulse' : 'completado'
-          }`}
-        >
-          {mensaje.searchInfo.estado === 'buscando' ? (
-            <>
-              <div className="busqueda-icon-wrap">
-                <svg className="busqueda-icon-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="2" y1="12" x2="22" y2="12" />
-                  <path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z" />
-                </svg>
-                <span className="busqueda-pulse-ring" />
-              </div>
-
-              <div className="busqueda-texto-wrap">
-                <span className="busqueda-label-animada">Buscando en la web</span>
-                {mensaje.searchInfo.query && (
-                  <>
-                    <span className="busqueda-sep">·</span>
-                    <span className="busqueda-query-token" title={mensaje.searchInfo.query}>
-                      “{formatearQueryBusqueda(mensaje.searchInfo.query)}”
-                    </span>
-                  </>
-                )}
-                <div className="busqueda-puntos">
-                  <span />
-                  <span />
-                  <span />
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="busqueda-icon-wrap">
-                <svg className="busqueda-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </div>
-              <span className="busqueda-texto-completado">
-                Búsqueda web completada
-              </span>
-            </>
-          )}
-        </div>
+        <WebSearchIndicator
+          status={mensaje.searchInfo.estado === 'buscando' ? 'searching' : 'done'}
+          query={mensaje.searchInfo.query || ''}
+          sourceCount={mensaje.searchInfo.fuentes?.length || 0}
+          fuentes={mensaje.searchInfo.fuentes || []}
+        />
       )}
 
       {/* Contenido del mensaje */}
