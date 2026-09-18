@@ -35,11 +35,16 @@ export default function HomePage() {
     streamChatIdRef,
   } = useChatStream();
 
-  // Si cambia el chat seleccionado en la barra lateral, cargamos sus mensajes
+  // Control de cambio explícito de chat en barra lateral (evita parpadeos en blanco al enviar mensaje)
+  const chatSeleccionadoAnteriorRef = useRef(chatActualId);
   useEffect(() => {
-    // Si hay un stream en curso que pertenece a OTRO chat (el usuario cambió de
-    // chat a mitad de generación), guardamos lo que ya llegó en el chat del
-    // stream antes de cargar el nuevo, para no perder la respuesta en curso.
+    // Solo actuar si el usuario hizo clic en otro chat de la barra lateral
+    if (chatSeleccionadoAnteriorRef.current === chatActualId) {
+      return;
+    }
+    chatSeleccionadoAnteriorRef.current = chatActualId;
+
+    // Si hay un stream en curso que pertenece a OTRO chat, resguardarlo antes de cambiar
     const chatDelStream = streamChatIdRef.current;
     if (generando && chatDelStream && chatDelStream !== chatActualId) {
       if (mensajes.length > 0) {
@@ -54,6 +59,7 @@ export default function HomePage() {
         setMensajes(chatEncontrado.mensajes);
       }
     } else {
+      // El usuario hizo clic explícitamente en "+ Nuevo chat": resetear mensajes
       setMensajes([]);
     }
   }, [chatActualId, chats, setMensajes]);

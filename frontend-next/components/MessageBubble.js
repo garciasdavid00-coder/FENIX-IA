@@ -110,6 +110,13 @@ export default function MessageBubble({ mensaje }) {
           </div>
         ) : (
           <>
+            {mensaje.cargando && !textoLimpio && (
+              <div className="pensando-bubble" title="Fenix está pensando...">
+                <span className="pensando-dot" />
+                <span className="pensando-dot" />
+                <span className="pensando-dot" />
+              </div>
+            )}
             <MarkdownContent contenido={textoLimpio} cargando={mensaje.cargando} />
             {chartData && <TrendChart datos={chartData} />}
           </>
