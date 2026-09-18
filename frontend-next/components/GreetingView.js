@@ -18,6 +18,7 @@ export default function GreetingView({ onEnviarMensaje, generando, detener }) {
   const [arrastrando, setArrastrando] = useState(false);
   const textoBaseRef = useRef('');
   const fileInputRef = useRef(null);
+  const textareaRef = useRef(null);
 
   // Dictado por voz en tiempo real
   const { escuchando, toggle: toggleDictado } = useSpeechRecognition({
@@ -67,6 +68,14 @@ export default function GreetingView({ onEnviarMensaje, generando, detener }) {
     setSaludo(nombre ? `${frase}, ${nombre}` : 'Vamos con todo');
   }, [usuario]);
 
+  const manejarCambioInput = (e) => {
+    setTextoInput(e.target.value);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 140)}px`;
+    }
+  };
+
   const manejarEnvio = () => {
     const texto = textoInput.trim();
     if ((!texto && !archivoAdjunto) || generando) return;
@@ -75,6 +84,9 @@ export default function GreetingView({ onEnviarMensaje, generando, detener }) {
     onEnviarMensaje(textoFinal, { archivo: archivoAdjunto });
     setTextoInput('');
     setArchivoAdjunto(null);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
   };
 
   const manejarKeyDown = (e) => {
@@ -111,13 +123,13 @@ export default function GreetingView({ onEnviarMensaje, generando, detener }) {
         )}
 
         <textarea
+          ref={textareaRef}
           className="chat-input"
           placeholder={escuchando ? 'Escuchando tu voz...' : (archivoAdjunto ? `Escribe una pregunta sobre "${archivoAdjunto.nombre}" o presiona Enviar...` : 'Cuando quieras...')}
           rows={1}
           value={textoInput}
-          onChange={(e) => setTextoInput(e.target.value)}
+          onChange={manejarCambioInput}
           onKeyDown={manejarKeyDown}
-          autoFocus
         />
 
         {/* Input de archivo oculto */}

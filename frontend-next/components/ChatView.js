@@ -57,12 +57,46 @@ export default function ChatView({ mensajes, generando, onEnviarMensaje, detener
     }
   };
 
-  // Auto-scroll al final del chat al recibir nuevos tokens
+  // Control inteligente de scroll sin vibraciones en móvil
+  const autoScrollHabilitadoRef = useRef(true);
+  const ultimosMensajesLongitudRef = useRef(mensajes.length);
+  const textareaRef = useRef(null);
+
+  const manejarScrollMensajes = () => {
+    const el = containerRef.current;
+    if (!el) return;
+    const distAlFondo = el.scrollHeight - el.scrollTop - el.clientHeight;
+    // Si está a menos de 100px del fondo, mantener auto-scroll pegado
+    autoScrollHabilitadoRef.current = distAlFondo < 100;
+  };
+
+  // Scroll directo en el contenedor sin mover la ventana ni el viewport móvil
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    const el = containerRef.current;
+    if (!el) return;
+
+    const esNuevoMensaje = mensajes.length !== ultimosMensajesLongitudRef.current;
+    ultimosMensajesLongitudRef.current = mensajes.length;
+
+    if (esNuevoMensaje) {
+      autoScrollHabilitadoRef.current = true;
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+      return;
+    }
+
+    if (autoScrollHabilitadoRef.current) {
+      el.scrollTop = el.scrollHeight;
     }
   }, [mensajes]);
+
+  // Auto-ajustar altura del textarea al escribir
+  const manejarCambioInput = (e) => {
+    setTextoInput(e.target.value);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 140)}px`;
+    }
+  };
 
   const manejarEnvio = () => {
     const texto = textoInput.trim();
@@ -72,6 +106,9 @@ export default function ChatView({ mensajes, generando, onEnviarMensaje, detener
     onEnviarMensaje(textoFinal, { archivo: archivoAdjunto });
     setTextoInput('');
     setArchivoAdjunto(null);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
   };
 
   const manejarKeyDown = (e) => {
@@ -84,7 +121,7 @@ export default function ChatView({ mensajes, generando, onEnviarMensaje, detener
   return (
     <div className="chat-view" id="vistaChat">
       {/* Contenedor de burbujas de mensajes */}
-      <div className="messages" id="messages" ref={containerRef}>
+      <div className="messages" id="messages" ref={containerRef} onScroll={manejarScrollMensajes}>
         {mensajes.map((msg) => (
           <MessageBubble key={msg.id} mensaje={msg} />
         ))}
@@ -109,13 +146,13 @@ export default function ChatView({ mensajes, generando, onEnviarMensaje, detener
         )}
 
         <textarea
+          ref={textareaRef}
           className="chat-input"
           placeholder={escuchando ? 'Escuchando tu voz...' : (archivoAdjunto ? `Escribe una pregunta sobre "${archivoAdjunto.nombre}" o presiona Enviar...` : 'Cuando quieras...')}
           rows={1}
           value={textoInput}
-          onChange={(e) => setTextoInput(e.target.value)}
+          onChange={manejarCambioInput}
           onKeyDown={manejarKeyDown}
-          autoFocus
         />
 
         {/* Input de archivo oculto */}
