@@ -137,4 +137,19 @@ router.get('/api/imagen-real', async (req, res) => {
   }
 });
 
+// Endpoint directo que redirige a la URL real de la imagen para etiquetas <img> y PDFs
+router.get('/api/foto-directa', async (req, res) => {
+  const q = ((req.query.q != null) ? String(req.query.q) : '').trim().slice(0, 150);
+  if (!q) return res.status(400).end();
+  try {
+    const encontradas = await buscarImagenReal(q);
+    if (encontradas && encontradas[0] && encontradas[0].url) {
+      return res.redirect(encontradas[0].url);
+    }
+    return res.status(404).end();
+  } catch (e) {
+    return res.status(502).end();
+  }
+});
+
 module.exports = { router, buscarImagenReal };

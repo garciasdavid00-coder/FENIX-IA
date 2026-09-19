@@ -35,9 +35,16 @@ export function convertirMarkdownAHtml(contenido) {
     const l = linea.trim();
     if (!l) { cerrarLista(); continue; }
     let m;
-    if ((m = l.match(/^\[FENIX_IMG:([^\]]+)\]$/))) {
+    if ((m = l.match(/^\[FOTO_REAL:\s*([^\]]+)\]$/i))) {
+      cerrarLista();
+      const q = m[1].trim();
+      html += `<div class="doc-img-container"><img class="doc-imagen" src="/api/foto-directa?q=${encodeURIComponent(q)}" alt="${escapar(q)}" loading="lazy" /><div class="doc-img-caption">📷 ${escapar(q)}</div></div>`;
+    } else if ((m = l.match(/^\[FENIX_IMG:([^\]]+)\]$/i))) {
       cerrarLista();
       html += `<div class="doc-img-container"><img class="doc-imagen" src="${escapar(m[1])}" alt="Imagen del documento" loading="lazy" /></div>`;
+    } else if ((m = l.match(/^!\[([^\]]*)\]\(([^)]+)\)$/))) {
+      cerrarLista();
+      html += `<div class="doc-img-container"><img class="doc-imagen" src="${escapar(m[2])}" alt="${escapar(m[1])}" loading="lazy" />${m[1] ? `<div class="doc-img-caption">📷 ${escapar(m[1])}</div>` : ''}</div>`;
     } else if ((m = l.match(/^###\s+(.+)/))) {
       cerrarLista();
       html += `<h3 class="doc-h3">${enLinea(m[1])}</h3>`;

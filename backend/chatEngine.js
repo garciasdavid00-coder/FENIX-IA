@@ -69,7 +69,12 @@ No uses ese formato si solo preguntan sobre imágenes existentes o teoría; en e
 
 11) Puedes buscar información en tiempo real en la web. Cuando el usuario pregunte por hechos actuales, noticias recientes, precios, cotizaciones, clima, resultados deportivos, estrenos, cifras de 2024/2025, o cualquier dato que requiera información actualizada, responde ÚNICAMENTE con una sola línea en este formato exacto y nada más:
 [BUSCAR_WEB]: <consulta breve y específica para el buscador, en español>
-No uses ese formato para preguntas de conocimiento general, teoría, historia antigua, definiciones o tareas creativas; en esos casos responde normalmente con lo que sabes.`;
+No uses ese formato para preguntas de conocimiento general, teoría, historia antigua, definiciones o tareas creativas; en esos casos responde normalmente con lo que sabes.
+
+12) Fotos reales de personajes y hechos históricos:
+Cuando redactes biografías, historia, documentos o información sobre personajes históricos, celebridades, monumentos, lugares o eventos relevantes, puedes ilustrar el texto insertando en una línea separada el marcador:
+[FOTO_REAL: Nombre del personaje o evento histórico]
+Ejemplos válidos: [FOTO_REAL: Pablo Escobar], [FOTO_REAL: Albert Einstein], [FOTO_REAL: Torre Eiffel].`;
 
   const instruccionExtra = instruccionUsuarioDe(instruccion);
   const sistemaFinal = instruccionExtra
@@ -142,7 +147,7 @@ function configurarProveedor(proveedor) {
 
 // Cuerpo de la petición al proveedor. stream=true para el navegador
 // (con respuestas parciales) y stream=false para WhatsApp (texto completo).
-function crearCuerpoIA({ modeloIA, mensajes, stream, proveedor, maxTokens = 1024 }) {
+function crearCuerpoIA({ modeloIA, mensajes, stream, proveedor, maxTokens = 4096 }) {
   const cuerpo = {
     model: modeloIA,
     messages: mensajes,

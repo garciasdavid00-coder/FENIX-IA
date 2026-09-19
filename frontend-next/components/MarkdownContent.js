@@ -1,6 +1,60 @@
-﻿'use client';
+'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+function RealImage({ query, fallbackUrl = null }) {
+  const [data, setData] = useState(fallbackUrl ? { url: fallbackUrl, consulta: query } : null);
+  const [loading, setLoading] = useState(!fallbackUrl);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (fallbackUrl || !query) return;
+    let cancel = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/imagen-real?q=${encodeURIComponent(query)}`);
+        if (!res.ok) throw new Error('Not found');
+        const json = await res.json();
+        if (!cancel && json?.url) {
+          setData(json);
+        }
+      } catch (e) {
+        if (!cancel) setError(true);
+      } finally {
+        if (!cancel) setLoading(false);
+      }
+    })();
+    return () => { cancel = true; };
+  }, [query, fallbackUrl]);
+
+  if (error || (!loading && !data?.url)) return null;
+
+  if (loading) {
+    return (
+      <div className="foto-real-cargando">
+        <span className="foto-real-spinner" />
+        <span>Buscando fotografía histórica de &ldquo;{query}&rdquo;...</span>
+      </div>
+    );
+  }
+
+  return (
+    <figure className="foto-real-card">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={data.url}
+        alt={data.consulta || query || 'Fotografía histórica'}
+        className="foto-real-img"
+        loading="lazy"
+      />
+      <figcaption className="foto-real-caption">
+        <span className="foto-real-icon">📷</span>
+        <span className="foto-real-text">{data.consulta || query}</span>
+        {data.licencia && <span className="foto-real-badge">{data.licencia}</span>}
+      </figcaption>
+    </figure>
+  );
+}
 
 function CodeBlock({ language, code }) {
   const [copied, setCopied] = useState(false);
@@ -162,6 +216,33 @@ export default function MarkdownContent({ contenido, cargando = false }) {
       const trimmed = linea.trim();
       if (!trimmed) {
         vaciarLista(lIdx);
+        return;
+      }
+
+      const fotoRealMatch = trimmed.match(/^\[FOTO_REAL:\s*([^\]]+)\]$/i);
+      if (fotoRealMatch) {
+        vaciarLista(lIdx);
+        elements.push(
+          <RealImage key={`foto-real-${bIdx}-${lIdx}`} query={fotoRealMatch[1].trim()} />
+        );
+        return;
+      }
+
+      const fenixImgMatch = trimmed.match(/^\[FENIX_IMG:\s*([^\]]+)\]$/i);
+      if (fenixImgMatch) {
+        vaciarLista(lIdx);
+        elements.push(
+          <RealImage key={`fenix-img-${bIdx}-${lIdx}`} query="Imagen" fallbackUrl={fenixImgMatch[1].trim()} />
+        );
+        return;
+      }
+
+      const mdImgMatch = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+      if (mdImgMatch) {
+        vaciarLista(lIdx);
+        elements.push(
+          <RealImage key={`md-img-${bIdx}-${lIdx}`} query={mdImgMatch[1] || 'Imagen'} fallbackUrl={mdImgMatch[2]} />
+        );
         return;
       }
 
