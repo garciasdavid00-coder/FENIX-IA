@@ -921,14 +921,84 @@ app.post('/api/chat', async (req, res) => {
       }
     });
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // GENERACIÓN DE DOCUMENTO DIRECTO (fallback cuando el modelo emite [GENERAR_DOC])
+    // Si el modelo antiguo aún emite [GENERAR_DOC]: tema, hacemos una 2ª llamada
+    // para que la IA escriba el documento completo directamente.
+    // ─────────────────────────────────────────────────────────────────────────
+    async function generarDocumentoDirecto(tema, mensajesOriginales, sistemaFinal) {
+      const promptDoc = `Escribe un documento completo y detallado sobre: "${tema}".
+
+Formato obligatorio:
+- Empieza con "# ${tema}" como título principal
+- Usa ## para al menos 5 secciones temáticas
+- Párrafos informativos y ricos en contenido
+- Listas con viñetas donde sea adecuado
+- **Negritas** para datos clave
+- Inserta 3-5 marcadores [FOTO_REAL: nombre] en líneas separadas para ilustrar con fotos reales
+- Mínimo 700 palabras en español
+
+Escribe SOLO el documento completo. Comienza directamente con el título.`;
+
+      const mensajesDoc = [
+        { role: 'system', content: sistemaFinal },
+        ...mensajesOriginales.slice(1),
+        { role: 'user', content: promptDoc }
+      ];
+
+      const bodyDoc = chatEngine.crearCuerpoIA({ modeloIA, mensajes: mensajesDoc, stream: true, proveedor, maxTokens: 4096 });
+      const ctrlDoc = new AbortController();
+      const timerDoc = setTimeout(() => ctrlDoc.abort(), TIMEOUT_IA_MS);
+      let respDoc;
+      try {
+        respDoc = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+          body: JSON.stringify(bodyDoc),
+          signal: ctrlDoc.signal
+        });
+      } catch (e) {
+        if (!res.writableEnded) { res.write(`data: ${JSON.stringify({ error: 'No se pudo generar el documento. Intenta de nuevo.' })}\n\n`); res.end(); }
+        return;
+      } finally { clearTimeout(timerDoc); }
+
+      if (!respDoc.ok) {
+        if (!res.writableEnded) { res.write(`data: ${JSON.stringify({ error: 'Error al generar el documento' })}\n\n`); res.end(); }
+        return;
+      }
+
+      const filtroDoc = crearFiltroRazonamiento();
+      let bufDoc = '';
+      let primeraEmisionDoc = true;
+
+      function enviarDoc(texto) {
+        if (!texto) return;
+        let nuevo = texto.slice(bufDoc.length);
+        bufDoc = texto;
+        if (!nuevo) return;
+        if (primeraEmisionDoc) {
+          primeraEmisionDoc = false;
+          const limpio = nuevo.replace(/^\s+/, '');
+          if (!limpio) return;
+          nuevo = limpio;
+        }
+        try { res.write(`data: ${JSON.stringify({ texto: nuevo })}\n\n`); } catch (e) {}
+      }
+
+      await leerStreamSSE(respDoc, delta => enviarDoc(filtroDoc.push(delta)), {
+        esActivo: () => !lectorAbortado,
+        setLector: (r) => { lector = r; }
+      });
+      enviarDoc(filtroDoc.final());
+      res.write('data: [DONE]\n\n');
+      res.end();
+    }
+
     async function procesarStreamConBusqueda(stream, mensajesOriginales, sistemaFinal, modoWeb) {
-      // Fase 1: STREAMING PROGRESIVO con detector de marcador en vivo.
-      // El texto confirmado por el filtro se envía al cliente apenas llega
-      // (efecto máquina de escribir en tiempo real); solo se retiene la cola
-      // que podría ser el inicio de "[BUSCAR_WEB]:" para no filtrar el marcador.
-      // Si el marcador aparece, se corta la lectura, se busca en la web y se
-      // responde con una segunda llamada al modelo.
+      // Fase 1: STREAMING PROGRESIVO con detector de marcadores en vivo.
+      // Detecta [BUSCAR_WEB] y [GENERAR_DOC] durante el stream.
       const MARCADOR_RE = /\[BUSCAR_WEB\]\s*:\s*([^\n]+)/i;
+      const MARCADOR_DOC_RE = /\[GENERAR_DOC\]\s*:?\s*([^\n]+)/i;
       const ANCLA_MARCADOR = '[BUSCAR_WEB]: ';
 
       // ¿Cuántos caracteres del final podrían ser parte del marcador?
@@ -940,15 +1010,27 @@ app.post('/api/chat', async (req, res) => {
         return 0;
       }
 
-      let emitido = '';             // texto confirmado por el filtro (monótono)
-      let comprometido = 0;         // caracteres ya entregados al cliente
+      let emitido = '';
+      let comprometido = 0;
       let buscarDetectado = false;
+      let genDocDetectado = false;
       let buscarQuery = '';
+      let temaDocumento = '';
       let respuestaCompleta = '';
 
       await leerStreamSSE(stream, delta => {
         emitido = filtro.push(delta);
-        if (buscarDetectado) return;
+        if (buscarDetectado || genDocDetectado) return;
+
+        // ¿El modelo emitió [GENERAR_DOC]?
+        const coincidenciaDoc = MARCADOR_DOC_RE.exec(emitido);
+        if (coincidenciaDoc) {
+          genDocDetectado = true;
+          temaDocumento = coincidenciaDoc[1].trim();
+          respuestaCompleta = emitido;
+          if (lector && !lectorAbortado) { lector.cancel().catch(() => {}); }
+          return;
+        }
 
         // ¿El modelo decidió buscar en la web?
         const coincidencia = MARCADOR_RE.exec(emitido);
@@ -957,7 +1039,6 @@ app.post('/api/chat', async (req, res) => {
           buscarQuery = coincidencia[1].trim();
           respuestaCompleta = emitido;
           enviarTexto(emitido.slice(0, coincidencia.index).trim());
-          // No seguimos leyendo: el marcador ya está detectado
           if (lector && !lectorAbortado) {
             lector.cancel().catch(() => {});
           }
@@ -972,19 +1053,32 @@ app.post('/api/chat', async (req, res) => {
         }
       }, { esActivo: () => !lectorAbortado, setLector: (r) => { lector = r; } });
 
-      // Fin del stream sin marcador completo: entregar lo que quedó pendiente
-      if (!buscarDetectado) {
+      // Fin del stream: entregar lo que quedó pendiente
+      if (!buscarDetectado && !genDocDetectado) {
         emitido = filtro.final();
-        const coincidencia = MARCADOR_RE.exec(emitido);
-        if (coincidencia) {
-          buscarDetectado = true;
-          buscarQuery = coincidencia[1].trim();
-          respuestaCompleta = emitido;
-          enviarTexto(emitido.slice(0, coincidencia.index).trim());
-        } else if (emitido.length > comprometido) {
-          enviarTexto(emitido);
-          comprometido = emitido.length;
+        const coincidenciaDocFinal = MARCADOR_DOC_RE.exec(emitido);
+        if (coincidenciaDocFinal) {
+          genDocDetectado = true;
+          temaDocumento = coincidenciaDocFinal[1].trim();
+        } else {
+          const coincidencia = MARCADOR_RE.exec(emitido);
+          if (coincidencia) {
+            buscarDetectado = true;
+            buscarQuery = coincidencia[1].trim();
+            respuestaCompleta = emitido;
+            enviarTexto(emitido.slice(0, coincidencia.index).trim());
+          } else if (emitido.length > comprometido) {
+            enviarTexto(emitido);
+            comprometido = emitido.length;
+          }
         }
+      }
+
+      // Si se detectó [GENERAR_DOC], generar el documento directamente
+      if (genDocDetectado) {
+        console.log('[chat] [GENERAR_DOC] interceptado — generando documento sobre:', temaDocumento);
+        await generarDocumentoDirecto(temaDocumento, mensajesOriginales, sistemaFinal);
+        return;
       }
 
       // Sin marcador: la respuesta ya se transmitió en tiempo real
