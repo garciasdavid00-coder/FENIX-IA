@@ -7,6 +7,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const path = require('path');
 const fs = require('fs');
 const db = require('./db');
+const { selectModel } = require('./modelRouter');
 const { router: imagenesRealesRouter, buscarImagenReal } = require('./routes/imagenesReales');
 const documentosRouter = require('./routes/documentos');
 const memory = require('./backend/memoryManager');
@@ -1003,16 +1004,22 @@ Escribe SOLO el documento completo. Comienza directamente con el título.`;
       // Fase 1: STREAMING PROGRESIVO con detector de marcadores en vivo.
       // Detecta [BUSCAR_WEB] y [GENERAR_DOC] durante el stream.
       const MARCADOR_RE = /\[BUSCAR_WEB\]\s*:\s*([^\n]+)/i;
-      const MARCADOR_DOC_RE = /\[GENERAR_DOC\]\s*:?\s*([^\n]+)/i;
+      const MARCADOR_DOC_RE = /\[GENERAR_DOC\](?:\s*:?\s*([^\n]*))?/i;
       const ANCLA_MARCADOR = '[BUSCAR_WEB]: ';
+      const ANCLA_DOC = '[GENERAR_DOC]';
 
-      // ¿Cuántos caracteres del final podrían ser parte del marcador?
+      // ¿Cuántos caracteres del final podrían ser parte de un marcador?
       function pendienteMarcador(texto) {
-        const max = Math.min(texto.length, ANCLA_MARCADOR.length);
-        for (let n = max; n >= 1; n--) {
-          if (ANCLA_MARCADOR.startsWith(texto.slice(-n))) return n;
+        let nWeb = 0, nDoc = 0;
+        const maxWeb = Math.min(texto.length, ANCLA_MARCADOR.length);
+        for (let n = maxWeb; n >= 1; n--) {
+          if (ANCLA_MARCADOR.startsWith(texto.slice(-n))) { nWeb = n; break; }
         }
-        return 0;
+        const maxDoc = Math.min(texto.length, ANCLA_DOC.length);
+        for (let n = maxDoc; n >= 1; n--) {
+          if (ANCLA_DOC.startsWith(texto.slice(-n))) { nDoc = n; break; }
+        }
+        return Math.max(nWeb, nDoc);
       }
 
       let emitido = '';
@@ -1029,28 +1036,27 @@ Escribe SOLO el documento completo. Comienza directamente con el título.`;
 
         // ¿El modelo emitió [GENERAR_DOC]?
         const coincidenciaDoc = MARCADOR_DOC_RE.exec(emitido);
-        if (coincidenciaDoc) {
+        if (coincidenciaDoc && coincidenciaDoc[0].length >= ANCLA_DOC.length) {
           genDocDetectado = true;
-          temaDocumento = coincidenciaDoc[1].trim();
+          temaDocumento = (coincidenciaDoc[1] || '').trim();
           respuestaCompleta = emitido;
+          enviarTexto(emitido.slice(0, coincidenciaDoc.index).trim());
           if (lector && !lectorAbortado) { lector.cancel().catch(() => {}); }
           return;
         }
 
         // ¿El modelo decidió buscar en la web?
         const coincidencia = MARCADOR_RE.exec(emitido);
-        if (coincidencia) {
+        if (coincidencia && coincidencia[0].length >= ANCLA_MARCADOR.length) {
           buscarDetectado = true;
           buscarQuery = coincidencia[1].trim();
           respuestaCompleta = emitido;
           enviarTexto(emitido.slice(0, coincidencia.index).trim());
-          if (lector && !lectorAbortado) {
-            lector.cancel().catch(() => {});
-          }
+          if (lector && !lectorAbortado) { lector.cancel().catch(() => {}); }
           return;
         }
 
-        // Emitir solo la parte segura (la cola podría iniciar el marcador)
+      // Emitir solo la parte segura (la cola podría iniciar el marcador)
         const fiable = emitido.length - pendienteMarcador(emitido);
         if (fiable > comprometido) {
           enviarTexto(emitido.slice(0, fiable));
@@ -1064,7 +1070,8 @@ Escribe SOLO el documento completo. Comienza directamente con el título.`;
         const coincidenciaDocFinal = MARCADOR_DOC_RE.exec(emitido);
         if (coincidenciaDocFinal) {
           genDocDetectado = true;
-          temaDocumento = coincidenciaDocFinal[1].trim();
+          temaDocumento = (coincidenciaDocFinal[1] || '').trim();
+          enviarTexto(emitido.slice(0, coincidenciaDocFinal.index).trim());
         } else {
           const coincidencia = MARCADOR_RE.exec(emitido);
           if (coincidencia) {
@@ -1082,7 +1089,7 @@ Escribe SOLO el documento completo. Comienza directamente con el título.`;
       // Si se detectó [GENERAR_DOC], generar el documento directamente
       if (genDocDetectado) {
         console.log('[chat] [GENERAR_DOC] interceptado — generando documento sobre:', temaDocumento);
-        await generarDocumentoDirecto(temaDocumento, mensajesOriginales, sistemaFinal);
+        await generarDocumentoDirecto(temaDocumento || 'el tema solicitado', mensajesOriginales, sistemaFinal);
         return;
       }
 
