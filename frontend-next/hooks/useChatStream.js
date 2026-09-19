@@ -89,6 +89,7 @@ export function useChatStream() {
         const limpio = final
           .replace(/^\[BUSCAR_WEB\][^\n]*\n?/gim, '')
           .replace(/^\[GENERAR_IMAGEN\][^\n]*\n?/gim, '')
+          .replace(/^\[GENERAR_DOC\][^\n]*\n?/gim, '')
           .replace(/^\[IMAGEN\]\s*:?.*$/gim, '')
           .trim();
         setMensajes((prev) =>
@@ -231,6 +232,7 @@ export function useChatStream() {
               const visible = acumulado
                 .replace(/^\[BUSCAR_WEB\][^\n]*\n?/gim, '')
                 .replace(/^\[GENERAR_IMAGEN\][^\n]*\n?/gim, '')
+                .replace(/^\[GENERAR_DOC\][^\n]*\n?/gim, '')
                 .replace(/\[FENIX_CHART:[\s\S]*$/i, '')
                 .replace(/^\[IMAGEN\]\s*:?.*$/gim, '');
               let espera = '';

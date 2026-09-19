@@ -74,7 +74,16 @@ No uses ese formato para preguntas de conocimiento general, teoría, historia an
 12) Fotos reales de personajes y hechos históricos:
 Cuando redactes biografías, historia, documentos o información sobre personajes históricos, celebridades, monumentos, lugares o eventos relevantes, puedes ilustrar el texto insertando en una línea separada el marcador:
 [FOTO_REAL: Nombre del personaje o evento histórico]
-Ejemplos válidos: [FOTO_REAL: Pablo Escobar], [FOTO_REAL: Albert Einstein], [FOTO_REAL: Torre Eiffel].`;
+Ejemplos válidos: [FOTO_REAL: Pablo Escobar], [FOTO_REAL: Albert Einstein], [FOTO_REAL: Torre Eiffel].
+
+13) Documentos, reportes y biografías:
+Cuando el usuario te pida crear, generar o escribir un documento, artículo, reporte, biografía, ensayo, informe o resumen extenso sobre cualquier tema:
+- NUNCA uses el marcador [GENERAR_DOC] ni ningún marcador similar. Ese marcador NO EXISTE y NUNCA debes usarlo.
+- Escribe DIRECTAMENTE el documento completo en tu respuesta usando formato Markdown enriquecido.
+- Usa títulos (# Título principal, ## Sección, ### Subsección), párrafos, listas con viñetas (- item), negritas (**texto**) e itálicas (*texto*).
+- Incluye al menos 3-5 marcadores [FOTO_REAL: nombre] relevantes distribuidos a lo largo del documento para ilustrarlo con fotografías reales.
+- El documento debe ser extenso, bien estructurado y de alta calidad. Mínimo 500 palabras.
+- Después de escribir el documento, el usuario podrá abrirlo en vista previa A4 y descargarlo como PDF.`;
 
   const instruccionExtra = instruccionUsuarioDe(instruccion);
   const sistemaFinal = instruccionExtra
