@@ -59,6 +59,22 @@ export default function MessageBubble({ mensaje }) {
   };
 
   const esUsuario = mensaje.rol === 'user';
+  
+  // Detectar si el texto es un documento explícito y extraer el título
+  const esDocumento = textoLimpio && textoLimpio.includes('[ES_DOCUMENTO]');
+  let tituloDocumento = 'Documento generado';
+  let contenidoDocumentoFinal = textoLimpio;
+  
+  if (esDocumento) {
+    const match = textoLimpio.match(/#\s+(.+)/);
+    if (match) tituloDocumento = match[1].trim();
+    contenidoDocumentoFinal = textoLimpio.replace(/\[ES_DOCUMENTO\]/g, '').trim();
+  }
+
+  // Modificar abrirVistaPreviaPDF para que use el contenido sin el marcador
+  const abrirVistaPreviaPDFLocal = () => {
+    abrirPanelDoc(tituloDocumento, contenidoDocumentoFinal);
+  };
 
   return (
     <div className={`msg ${esUsuario ? 'msg-user' : 'msg-bot'}`}>
@@ -105,16 +121,29 @@ export default function MessageBubble({ mensaje }) {
                 <span className="pensando-dot" />
               </div>
             )}
-            <MarkdownContent contenido={textoLimpio} cargando={mensaje.cargando} />
+            
+            {esDocumento && !mensaje.cargando ? (
+              <div className="doc-card" onClick={abrirVistaPreviaPDFLocal}>
+                <div className="doc-card-icon">📕</div>
+                <div className="doc-card-info">
+                  <h4>{tituloDocumento}</h4>
+                  <span>Documento listo para visualizar o descargar</span>
+                </div>
+                <div className="doc-card-action">Abrir</div>
+              </div>
+            ) : (
+              <MarkdownContent contenido={esDocumento ? contenidoDocumentoFinal : textoLimpio} cargando={mensaje.cargando} />
+            )}
+
             {chartData && <TrendChart datos={chartData} />}
 
             {/* Acceso rápido a Vista Previa PDF para respuestas detalladas */}
-            {!mensaje.cargando && textoLimpio && textoLimpio.length > 200 && !mensaje.error && (
+            {!mensaje.cargando && textoLimpio && textoLimpio.length > 200 && !mensaje.error && !esDocumento && (
               <div className="msg-doc-shortcut">
                 <button
                   type="button"
                   className="btn-doc-shortcut"
-                  onClick={abrirVistaPreviaPDF}
+                  onClick={abrirVistaPreviaPDFLocal}
                   title="Abrir vista previa en hoja A4 y descargar PDF"
                 >
                   <span className="btn-doc-icon">📕</span>

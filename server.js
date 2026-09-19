@@ -936,7 +936,8 @@ app.post('/api/chat', async (req, res) => {
       const promptDoc = `Escribe un documento completo y detallado sobre: "${tema}".
 
 Formato obligatorio:
-- Empieza con "# ${tema}" como título principal
+- Tu primera línea DEBE SER EXACTAMENTE: [ES_DOCUMENTO]
+- Luego de eso, empieza con "# ${tema}" como título principal
 - Usa ## para al menos 5 secciones temáticas
 - Párrafos informativos y ricos en contenido
 - Listas con viñetas donde sea adecuado
@@ -944,7 +945,7 @@ Formato obligatorio:
 - Inserta 3-5 marcadores [FOTO_REAL: nombre] en líneas separadas para ilustrar con fotos reales
 - Mínimo 700 palabras en español
 
-Escribe SOLO el documento completo. Comienza directamente con el título.`;
+Escribe SOLO el documento completo comenzando con el marcador.`;
 
       const mensajesDoc = [
         { role: 'system', content: sistemaFinal },
