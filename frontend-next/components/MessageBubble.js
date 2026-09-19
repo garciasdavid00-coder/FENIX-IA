@@ -10,7 +10,7 @@ import WebSearchIndicator from '@/components/WebSearchIndicator';
 import FileAttachmentChip from '@/components/FileAttachmentChip';
 
 export default function MessageBubble({ mensaje }) {
-  const { abrirModalMemoria, abrirDocModal } = useChat();
+  const { abrirModalMemoria, abrirDocModal, abrirPanelDoc } = useChat();
   const [copiado, setCopiado] = useState(false);
 
   // Extraer datos de gráfico de tendencias de divisas si existen en el texto
@@ -51,7 +51,11 @@ export default function MessageBubble({ mensaje }) {
     if (!textoLimpio) return;
     const matchTitulo = textoLimpio.match(/^#+\s+(.+)$/m);
     const tituloDoc = matchTitulo ? matchTitulo[1].replace(/[*_`]/g, '').trim() : 'Documento Fenix IA';
-    abrirDocModal(tituloDoc, textoLimpio);
+    if (abrirPanelDoc) {
+      abrirPanelDoc(tituloDoc, textoLimpio);
+    } else {
+      abrirDocModal(tituloDoc, textoLimpio);
+    }
   };
 
   const esUsuario = mensaje.rol === 'user';

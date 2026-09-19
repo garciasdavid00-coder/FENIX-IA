@@ -13,7 +13,15 @@ const NOMBRES_MODELOS = {
 };
 
 export default function Topbar() {
-  const { toggleSidebar, modeloSeleccionado, cambiarModelo, tema, toggleTema } = useChat();
+  const {
+    toggleSidebar,
+    modeloSeleccionado,
+    cambiarModelo,
+    tema,
+    toggleTema,
+    panelDoc,
+    togglePanelDoc,
+  } = useChat();
   const { usuario, autenticado } = useAuth();
   const [menuModeloAbierto, setMenuModeloAbierto] = useState(false);
   const dropdownRef = useRef(null);
@@ -94,6 +102,18 @@ export default function Topbar() {
       </div>
 
       <div className="topbar-right">
+        {/* Toggle de panel de documento */}
+        {panelDoc?.contenido && (
+          <button
+            type="button"
+            className={`toggle-btn ${panelDoc.abierto ? 'active-doc-toggle' : ''}`}
+            onClick={togglePanelDoc}
+            title={panelDoc.abierto ? 'Ocultar panel de vista previa' : 'Abrir panel de vista previa A4'}
+          >
+            📕
+          </button>
+        )}
+
         {/* Toggle de tema claro / oscuro */}
         <button
           type="button"

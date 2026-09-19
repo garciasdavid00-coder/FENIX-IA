@@ -12,6 +12,7 @@ import IdiomaView from '@/components/IdiomaView';
 import MemoriasView from '@/components/MemoriasView';
 import ModalMemoria from '@/components/ModalMemoria';
 import ModalDocumento from '@/components/ModalDocumento';
+import PanelDocumento from '@/components/PanelDocumento';
 import { useChat } from '@/context/ChatContext';
 import { useChatStream } from '@/hooks/useChatStream';
 
@@ -24,6 +25,7 @@ export default function HomePage() {
     guardarMensajesEnHistorial,
     modeloSeleccionado,
     busquedaWeb,
+    panelDoc,
   } = useChat();
 
   const {
@@ -101,35 +103,40 @@ export default function HomePage() {
       {/* Barra lateral */}
       <Sidebar />
 
-      {/* Área principal */}
-      <div className="main">
-        <Topbar />
+      {/* Área principal dividida */}
+      <div className="main" style={{ display: 'flex', flexDirection: 'row', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+        <div className="main-chat-column" style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, height: '100%', overflow: 'hidden' }}>
+          <Topbar />
 
-        {/* Vistas dinámicas */}
-        {vistaActiva === 'proyectos' && <ProjectsView />}
-        {vistaActiva === 'biblioteca' && <BibliotecaView />}
-        {vistaActiva === 'configuracion' && <SettingsView />}
-        {vistaActiva === 'idioma' && <IdiomaView />}
-        {vistaActiva === 'memoria' && <MemoriasView />}
+          {/* Vistas dinámicas */}
+          {vistaActiva === 'proyectos' && <ProjectsView />}
+          {vistaActiva === 'biblioteca' && <BibliotecaView />}
+          {vistaActiva === 'configuracion' && <SettingsView />}
+          {vistaActiva === 'idioma' && <IdiomaView />}
+          {vistaActiva === 'memoria' && <MemoriasView />}
 
-        {vistaActiva === 'chat' && (
-          <>
-            {!mostrarChat ? (
-              <GreetingView
-                onEnviarMensaje={manejarEnvio}
-                generando={generando}
-                detener={detener}
-              />
-            ) : (
-              <ChatView
-                mensajes={mensajes}
-                generando={generando}
-                onEnviarMensaje={manejarEnvio}
-                detener={detener}
-              />
-            )}
-          </>
-        )}
+          {vistaActiva === 'chat' && (
+            <>
+              {!mostrarChat ? (
+                <GreetingView
+                  onEnviarMensaje={manejarEnvio}
+                  generando={generando}
+                  detener={detener}
+                />
+              ) : (
+                <ChatView
+                  mensajes={mensajes}
+                  generando={generando}
+                  onEnviarMensaje={manejarEnvio}
+                  detener={detener}
+                />
+              )}
+            </>
+          )}
+        </div>
+
+        {/* Panel lateral derecho: Vista Previa de Documento A4 */}
+        {panelDoc?.abierto && <PanelDocumento />}
       </div>
 
       {/* Modal global de memoria (botón "Recordar") */}

@@ -48,11 +48,12 @@ export function ChatProvider({ children }) {
   const [chatActualId, setChatActualId] = useState(null);
   const [proyectos, setProyectos] = useState([]);
   const [proyectoActualId, setProyectoActualId] = useState(null);
-  const [archivosBiblioteca, setArchivosBiblioteca] = useState([]); // [{id, nombre, tipo, tamanoKB, url}] efímeros (blobs)
+  const [archivosBiblioteca, setArchivosBiblioteca] = useState([]);
   const [filtroBuscar, setFiltroBuscar] = useState('');
   const [busquedaVisible, setBusquedaVisible] = useState(false);
   const [memoriaModal, setMemoriaModal] = useState(null); // null | { texto }
   const [docModal, setDocModal] = useState(null); // null | { titulo, contenido }
+  const [panelDoc, setPanelDoc] = useState({ abierto: false, titulo: '', contenido: '' });
 
   // Cargar tema guardado en localStorage + históricos locales
   useEffect(() => {
@@ -339,6 +340,22 @@ export function ChatProvider({ children }) {
     setDocModal(null);
   }, []);
 
+  const abrirPanelDoc = useCallback((titulo, contenido) => {
+    setPanelDoc({
+      abierto: true,
+      titulo: String(titulo || 'Documento Fenix IA'),
+      contenido: String(contenido || ''),
+    });
+  }, []);
+
+  const cerrarPanelDoc = useCallback(() => {
+    setPanelDoc((prev) => ({ ...prev, abierto: false }));
+  }, []);
+
+  const togglePanelDoc = useCallback(() => {
+    setPanelDoc((prev) => ({ ...prev, abierto: !prev.abierto }));
+  }, []);
+
   return (
     <ChatContext.Provider
       value={{
@@ -382,6 +399,10 @@ export function ChatProvider({ children }) {
         docModal,
         abrirDocModal,
         cerrarDocModal,
+        panelDoc,
+        abrirPanelDoc,
+        cerrarPanelDoc,
+        togglePanelDoc,
       }}
     >
       {children}
