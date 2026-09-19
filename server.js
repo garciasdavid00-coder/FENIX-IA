@@ -8,6 +8,7 @@ const path = require('path');
 const fs = require('fs');
 const db = require('./db');
 const { router: imagenesRealesRouter, buscarImagenReal } = require('./routes/imagenesReales');
+const documentosRouter = require('./routes/documentos');
 const memory = require('./backend/memoryManager');
 const chatEngine = require('./backend/chatEngine');
 const webSearch = require('./backend/webSearch');
@@ -212,6 +213,10 @@ app.post('/api/logout', (req, res) => {
 // Endpoint GET /api/imagen-real (fotos reales de Wikimedia Commons).
 // Ver routes/imagenesReales.js.
 app.use(imagenesRealesRouter);
+
+// Endpoint POST /api/documentos/generar (PDF con Puppeteer).
+// Ver routes/documentos.js.
+app.use(documentosRouter);
 
 // Historial en la nube: devuelve los chats y proyectos de la cuenta logueada.
 app.get('/api/sincronizar', async (req, res) => {

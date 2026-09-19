@@ -3,6 +3,36 @@
  * de documentos generados por Fenix IA.
  */
 
+/**
+ * Genera un PDF de alta calidad en el servidor (Puppeteer) y devuelve
+ * una Blob URL apta para mostrar en <iframe> y para descarga directa.
+ *
+ * @param {string} titulo             - Título del documento
+ * @param {string} contenidoMarkdown  - Contenido en markdown (con [FOTO_REAL:] etc.)
+ * @param {Array}  imagenes           - Imágenes adicionales [{ url, caption }]
+ * @returns {Promise<string>}         - Blob URL (revócala con URL.revokeObjectURL cuando ya no la necesites)
+ * @throws {Error}                    - Si el servidor responde con error o la red falla
+ */
+export async function generarPDFServidor(titulo, contenidoMarkdown, imagenes = []) {
+  const res = await fetch('/api/documentos/generar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ titulo, contenido: contenidoMarkdown, imagenes }),
+  });
+
+  if (!res.ok) {
+    let msg = `Error del servidor (${res.status})`;
+    try {
+      const json = await res.json();
+      msg = json.error || msg;
+    } catch { /* res no era JSON */ }
+    throw new Error(msg);
+  }
+
+  const blob = await res.blob();
+  return URL.createObjectURL(blob);
+}
+
 
 const escapar = (s) => String(s || '')
   .replace(/&/g, '&amp;')

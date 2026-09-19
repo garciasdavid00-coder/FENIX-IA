@@ -3420,3 +3420,99 @@ body{
   background: rgba(239, 68, 68, 0.15);
   color: #ef4444;
 }
+
+/* ═══════════════════════════════════════════════════════
+   PANEL PDF — iframe de vista previa con Puppeteer
+   ═══════════════════════════════════════════════════════ */
+
+/* Sección que contiene el iframe o el estado de carga/error */
+.panel-pdf-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--surface-alt, #f0eee9);
+}
+
+/* iframe que muestra el PDF inline */
+.panel-pdf-iframe {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  border: none;
+  display: block;
+  background: #fff;
+}
+
+/* Spinner de carga mientras Puppeteer genera el PDF */
+.panel-pdf-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  flex: 1;
+  color: var(--text-muted);
+  font-size: 13.5px;
+}
+.panel-pdf-loading small {
+  font-size: 12px;
+  opacity: 0.7;
+}
+.panel-pdf-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border, #d8d8d8);
+  border-top-color: var(--accent, #000);
+  border-radius: 50%;
+  animation: spin-pdf 0.75s linear infinite;
+}
+@keyframes spin-pdf {
+  to { transform: rotate(360deg); }
+}
+
+/* Estado de error */
+.panel-pdf-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 36px 24px;
+  text-align: center;
+  color: var(--danger, #c0392b);
+  font-size: 13px;
+  flex: 1;
+}
+
+/* CTA para generar PDF (cuando se muestra la hoja HTML) */
+.panel-pdf-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px 0 10px;
+  border-top: 1px dashed var(--border, #d8d8d8);
+  margin-top: 24px;
+}
+.panel-pdf-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--accent, #000);
+  color: var(--text-invert, #fff);
+  border: none;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 120ms ease;
+}
+.panel-pdf-cta-btn:hover { opacity: 0.85; }
+.panel-pdf-cta-hint {
+  font-size: 11.5px;
+  color: var(--text-muted, #4a4a4a);
+}
