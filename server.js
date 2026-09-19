@@ -1176,10 +1176,14 @@ Escribe SOLO el documento completo. Comienza directamente con el título.`;
         return;
       }
 
-      // Stream de la respuesta final
+      // Stream de la respuesta final con detección de [GENERAR_DOC]
       const filtro2 = crearFiltroRazonamiento();
       let bufferFinal = '';
       let primeraEmision2 = true;
+      let emitido2 = '';
+      let comprometido2 = 0;
+      let genDocDetectado2 = false;
+      let temaDocumento2 = '';
 
       function enviarTextoFinal(texto) {
         if (!texto) return;
@@ -1197,11 +1201,48 @@ Escribe SOLO el documento completo. Comienza directamente con el título.`;
         } catch (e) { /* cliente cerró */ }
       }
 
-      await leerStreamSSE(respuestaIA2, delta => enviarTextoFinal(filtro2.push(delta)), {
+      await leerStreamSSE(respuestaIA2, delta => {
+        emitido2 = filtro2.push(delta);
+        if (genDocDetectado2) return;
+
+        const coincidenciaDoc = MARCADOR_DOC_RE.exec(emitido2);
+        if (coincidenciaDoc && coincidenciaDoc[0].length >= ANCLA_DOC.length) {
+          genDocDetectado2 = true;
+          temaDocumento2 = (coincidenciaDoc[1] || '').trim();
+          enviarTextoFinal(emitido2.slice(0, coincidenciaDoc.index).trim());
+          if (lector && !lectorAbortado) { lector.cancel().catch(() => {}); }
+          return;
+        }
+
+        const fiable = emitido2.length - pendienteMarcador(emitido2);
+        if (fiable > comprometido2) {
+          enviarTextoFinal(emitido2.slice(0, fiable));
+          comprometido2 = fiable;
+        }
+      }, {
         esActivo: () => !lectorAbortado,
         setLector: (r) => { lector = r; }
       });
-      enviarTextoFinal(filtro2.final());
+
+      if (!genDocDetectado2) {
+        emitido2 = filtro2.final();
+        const coincidenciaDocFinal = MARCADOR_DOC_RE.exec(emitido2);
+        if (coincidenciaDocFinal) {
+          genDocDetectado2 = true;
+          temaDocumento2 = (coincidenciaDocFinal[1] || '').trim();
+          enviarTextoFinal(emitido2.slice(0, coincidenciaDocFinal.index).trim());
+        } else if (emitido2.length > comprometido2) {
+          enviarTextoFinal(emitido2);
+          comprometido2 = emitido2.length;
+        }
+      }
+
+      if (genDocDetectado2) {
+        console.log('[chat] [GENERAR_DOC] interceptado en 2da llamada — generando documento sobre:', temaDocumento2);
+        // Generar documento usando los mensajes que YA incluyen los resultados de búsqueda
+        await generarDocumentoDirecto(temaDocumento2 || 'el tema solicitado', mensajesConBusqueda, sistemaFinal);
+        return;
+      }
 
       // Emitir fuentes al final si las hay
       if (resultadoBusqueda.fuentes && resultadoBusqueda.fuentes.length) {
