@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useChat } from '@/context/ChatContext';
 import { getGoogleAuthUrl } from '@/lib/api';
-import { descargarDocumento } from '@/lib/documentos';
+import { descargarPDF } from '@/lib/documentos';
 import MarkdownContent from '@/components/MarkdownContent';
 import TrendChart from '@/components/TrendChart';
 import WebSearchIndicator from '@/components/WebSearchIndicator';
@@ -83,23 +83,26 @@ export default function MessageBubble({ mensaje }) {
           </>
         ) : mensaje.documento ? (
           <div className="tarjeta-doc">
-            <div className="tarjeta-doc-icono">📄</div>
+            <div className="tarjeta-doc-icono">📕</div>
             <div className="tarjeta-doc-info">
               <div className="tarjeta-doc-nombre">{mensaje.documento.titulo}</div>
+              <div className="tarjeta-doc-sub">Documento PDF generado</div>
               <div className="tarjeta-doc-botones">
                 <button
                   type="button"
                   className="tarjeta-doc-btn tarjeta-doc-btn-sec"
                   onClick={() => abrirDocModal(mensaje.documento.titulo, mensaje.documento.contenido)}
+                  title="Abrir vista previa del documento"
                 >
-                  👁️ Ver
+                  👁️ Ver vista previa
                 </button>
                 <button
                   type="button"
-                  className="tarjeta-doc-btn"
-                  onClick={() => descargarDocumento(mensaje.documento.titulo, mensaje.documento.contenido)}
+                  className="tarjeta-doc-btn tarjeta-doc-btn-prim"
+                  onClick={() => descargarPDF(mensaje.documento.titulo, mensaje.documento.contenido)}
+                  title="Descargar documento en PDF"
                 >
-                  ⬇️ Descargar
+                  ⬇️ Descargar PDF
                 </button>
               </div>
             </div>

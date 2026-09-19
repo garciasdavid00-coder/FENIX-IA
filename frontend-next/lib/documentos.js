@@ -18,7 +18,7 @@ export async function generarDocumentoReal(tema) {
   return String(data.contenido).replace(/\n{3,}/g, '\n\n').trim();
 }
 
-const escapar = (s) => s
+const escapar = (s) => String(s || '')
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;')
   .replace(/>/g, '&gt;')
@@ -27,11 +27,12 @@ const escapar = (s) => s
 
 const enLinea = (s) => escapar(s)
   .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-  .replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+  .replace(/\*([^*\n]+)\*/g, '<em>$1</em>')
+  .replace(/`([^`]+)`/g, '<code>$1</code>');
 
 /**
  * Convierte el formato simple que usa el modelo (# títulos, - viñetas, **negritas**)
- * a HTML para la vista previa y el archivo Word.
+ * a HTML estructurado y elegante para la vista previa y el archivo PDF/Word.
  */
 export function convertirMarkdownAHtml(contenido) {
   const lineas = String(contenido || '').replace(/```[\s\S]*?```/g, (m) => m).split('\n');
@@ -43,26 +44,169 @@ export function convertirMarkdownAHtml(contenido) {
       listaAbierta = null;
     }
   };
+
   for (const linea of lineas) {
     const l = linea.trim();
     if (!l) { cerrarLista(); continue; }
     let m;
     if ((m = l.match(/^\[FENIX_IMG:([^\]]+)\]$/))) {
       cerrarLista();
-      html += `<img class="doc-imagen" src="${escapar(m[1])}" alt="">`;
-    } else if ((m = l.match(/^###\s+(.+)/))) { cerrarLista(); html += `<h3>${enLinea(m[1])}</h3>`; }
-    else if ((m = l.match(/^##\s+(.+)/))) { cerrarLista(); html += `<h2>${enLinea(m[1])}</h2>`; }
-    else if ((m = l.match(/^#\s+(.+)/))) { cerrarLista(); html += `<h1>${enLinea(m[1])}</h1>`; }
-    else if ((m = l.match(/^[-*]\s+(.+)/))) {
-      if (listaAbierta !== 'ul') { cerrarLista(); html += '<ul>'; listaAbierta = 'ul'; }
-      html += `<li>${enLinea(m[1])}</li>`;
+      html += `<div class="doc-img-container"><img class="doc-imagen" src="${escapar(m[1])}" alt="Imagen del documento" loading="lazy" /></div>`;
+    } else if ((m = l.match(/^###\s+(.+)/))) {
+      cerrarLista();
+      html += `<h3 class="doc-h3">${enLinea(m[1])}</h3>`;
+    } else if ((m = l.match(/^##\s+(.+)/))) {
+      cerrarLista();
+      html += `<h2 class="doc-h2">${enLinea(m[1])}</h2>`;
+    } else if ((m = l.match(/^#\s+(.+)/))) {
+      cerrarLista();
+      html += `<h1 class="doc-h1">${enLinea(m[1])}</h1>`;
+    } else if ((m = l.match(/^[-*]\s+(.+)/))) {
+      if (listaAbierta !== 'ul') { cerrarLista(); html += '<ul class="doc-ul">'; listaAbierta = 'ul'; }
+      html += `<li class="doc-li">${enLinea(m[1])}</li>`;
     } else if ((m = l.match(/^\d+[.)]\s+(.+)/))) {
-      if (listaAbierta !== 'ol') { cerrarLista(); html += '<ol>'; listaAbierta = 'ol'; }
-      html += `<li>${enLinea(m[1])}</li>`;
-    } else { cerrarLista(); html += `<p>${enLinea(l)}</p>`; }
+      if (listaAbierta !== 'ol') { cerrarLista(); html += '<ol class="doc-ol">'; listaAbierta = 'ol'; }
+      html += `<li class="doc-li">${enLinea(m[1])}</li>`;
+    } else {
+      cerrarLista();
+      html += `<p class="doc-p">${enLinea(l)}</p>`;
+    }
   }
   cerrarLista();
   return html;
+}
+
+/**
+ * Genera y descarga un archivo PDF profesional y limpio con jsPDF y html2canvas.
+ * @param {string} titulo - Título del documento
+ * @param {string} contenidoMarkdown - Contenido en formato Markdown
+ * @param {HTMLElement} [elementoExistente=null] - Elemento DOM de la vista previa si está disponible
+ */
+export async function descargarPDF(titulo, contenidoMarkdown, elementoExistente = null) {
+  const nombreSeguro = String(titulo || 'documento')
+    .replace(/[^\w\s\u00C0-\uFFFF-]/g, '')
+    .trim()
+    .slice(0, 80) || 'documento';
+
+  // Importación dinámica de librerías para compatibilidad con SSR / Next.js
+  const { jsPDF } = await import('jspdf');
+  const html2canvas = (await import('html2canvas')).default;
+
+  // Creamos un contenedor temporal optimizado para formato A4 si no se pasa elemento
+  let contenedor = elementoExistente;
+  let esTemporal = false;
+
+  if (!contenedor) {
+    esTemporal = true;
+    contenedor = document.createElement('div');
+    contenedor.className = 'pdf-render-sheet';
+    contenedor.innerHTML = `
+      <div class="pdf-document-paper">
+        <div class="pdf-header">
+          <div class="pdf-brand">FENIX IA · DOCUMENTO VERIFICADO</div>
+          <div class="pdf-date">${new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+        </div>
+        <h1 class="pdf-title">${escapar(titulo || 'Documento')}</h1>
+        <div class="pdf-body">
+          ${convertirMarkdownAHtml(contenidoMarkdown)}
+        </div>
+        <div class="pdf-footer">
+          <span>Generado por Fenix IA</span>
+          <span>Página 1</span>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(contenedor);
+  }
+
+  try {
+    const canvas = await html2canvas(contenedor, {
+      scale: 2, // Calidad HD (alta resolución)
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+    });
+
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+      compress: true,
+    });
+
+    const pageWidth = 210; // A4 mm
+    const pageHeight = 297; // A4 mm
+    const imgWidth = pageWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    // Primera página
+    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+    heightLeft -= pageHeight;
+
+    // Páginas subsiguientes si el documento es largo
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save(`${nombreSeguro}.pdf`);
+  } catch (err) {
+    console.error('[descargarPDF] Error al generar PDF con html2canvas, usando fallback de impresión:', err);
+    imprimirDocumento(titulo, contenidoMarkdown);
+  } finally {
+    if (esTemporal && contenedor?.parentNode) {
+      contenedor.parentNode.removeChild(contenedor);
+    }
+  }
+}
+
+/**
+ * Imprime o guarda como PDF nativo mediante el diálogo de impresión del navegador.
+ */
+export function imprimirDocumento(titulo, contenidoMarkdown) {
+  const html = convertirMarkdownAHtml(contenidoMarkdown);
+  const ventana = window.open('', '_blank');
+  if (!ventana) return;
+
+  ventana.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <title>${escapar(titulo)}</title>
+        <style>
+          @page { size: A4; margin: 20mm; }
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georgia, serif; font-size: 11pt; line-height: 1.6; color: #1a1a1a; max-width: 800px; margin: 0 auto; padding: 20px; }
+          h1 { font-size: 20pt; border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 20px; color: #0f172a; }
+          h2 { font-size: 14pt; margin-top: 24px; color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+          h3 { font-size: 12pt; margin-top: 18px; color: #334155; }
+          p { margin: 12px 0; }
+          ul, ol { padding-left: 24px; margin: 12px 0; }
+          li { margin: 6px 0; }
+          img { max-width: 100%; height: auto; border-radius: 8px; margin: 16px 0; }
+          .header { font-size: 9pt; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; border-bottom: 1px solid #cbd5e1; padding-bottom: 6px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">Fenix IA · Documento Verificado</div>
+        <h1>${escapar(titulo)}</h1>
+        ${html}
+      </body>
+    </html>
+  `);
+  ventana.document.close();
+  ventana.focus();
+  setTimeout(() => {
+    ventana.print();
+    ventana.close();
+  }, 350);
 }
 
 const utf8ABase64 = (str) => {
@@ -84,7 +228,6 @@ const envolver76 = (s) => s.replace(/(.{76})/g, '$1\n');
 
 /**
  * Descarga un documento como .doc legible por Word/LibreOffice/Google Docs.
- * Si el contenido trae fotos ([FENIX_IMG:url]) se incrustan en formato MHTML.
  */
 export async function descargarDocumento(titulo, contenidoMarkdown) {
   const cuerpoHtml = convertirMarkdownAHtml(contenidoMarkdown);
