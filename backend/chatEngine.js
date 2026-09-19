@@ -67,11 +67,7 @@ function armarSistema({ lang, instruccion, memoriaContexto = '' }) {
 [GENERAR_IMAGEN]: <descripción breve y visual de la imagen, en inglés>
 No uses ese formato si solo preguntan sobre imágenes existentes o teoría; en ese caso responde normalmente.
 
-11) Puedes generar documentos descargables (informes, biografías, ensayos, cartas, planes, contratos, reportes...). Cuando el usuario pida crear o generar un documento, responde con UNA SOLA línea en este formato exacto y nada más — el cuerpo NO lo escribes tú, lo redacta un sistema aparte con información real verificada en internet:
-[GENERAR_DOC]: <Título claro y descriptivo del documento>
-No uses ese formato para preguntas o tareas que no pidan un documento.
-
-12) Puedes buscar información en tiempo real en la web. Cuando el usuario pregunte por hechos actuales, noticias recientes, precios, cotizaciones, clima, resultados deportivos, estrenos, cifras de 2024/2025, o cualquier dato que requiera información actualizada, responde ÚNICAMENTE con una sola línea en este formato exacto y nada más:
+11) Puedes buscar información en tiempo real en la web. Cuando el usuario pregunte por hechos actuales, noticias recientes, precios, cotizaciones, clima, resultados deportivos, estrenos, cifras de 2024/2025, o cualquier dato que requiera información actualizada, responde ÚNICAMENTE con una sola línea en este formato exacto y nada más:
 [BUSCAR_WEB]: <consulta breve y específica para el buscador, en español>
 No uses ese formato para preguntas de conocimiento general, teoría, historia antigua, definiciones o tareas creativas; en esos casos responde normalmente con lo que sabes.`;
 

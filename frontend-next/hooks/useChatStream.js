@@ -3,7 +3,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { apiFetch } from '@/lib/api';
 import { generarImagen, esPeticionImagen } from '@/lib/imagenes';
-import { generarDocumentoReal } from '@/lib/documentos';
 
 /**
  * Hook reactivo para enviar mensajes al chat y consumir el streaming Server-Sent Events (SSE)
@@ -62,35 +61,9 @@ export function useChatStream() {
 
     const finalizarBurbuja = async (acumulado) => {
       const final = acumulado;
-      const coincidenciaDoc = final.match(/\[GENERAR_DOC\]\s*:?\s*([^\n]*)\n?([\s\S]*)/i);
       const coincidenciaImg = final.match(/\[GENERAR_IMAGEN\]\s*:?\s*([\s\S]+)/i);
 
-      if (coincidenciaDoc && coincidenciaDoc[1].trim()) {
-        const titulo = coincidenciaDoc[1].trim();
-        setMensajes((prev) =>
-          prev.map((m) => (m.id === idBot ? { ...m, contenido: 'Generando documento...', cargando: true } : m))
-        );
-        try {
-          const tema = textoMensaje.trim() || titulo;
-          const contenidoReal = await generarDocumentoReal(tema);
-          setMensajes((prev) =>
-            prev.map((m) =>
-              m.id === idBot
-                ? { ...m, contenido: '', cargando: false, documento: { titulo: titulo || 'Documento', contenido: contenidoReal } }
-                : m
-            )
-          );
-        } catch (e) {
-          console.error('[useChatStream] documento:', e);
-          setMensajes((prev) =>
-            prev.map((m) =>
-              m.id === idBot
-                ? { ...m, contenido: `⚠️ ${e.message || 'No se pudo generar el documento'}`, error: true, cargando: false }
-                : m
-            )
-          );
-        }
-      } else if (coincidenciaImg && coincidenciaImg[1].trim()) {
+      if (coincidenciaImg && coincidenciaImg[1].trim()) {
         const descripcion = coincidenciaImg[1].trim();
         setMensajes((prev) =>
           prev.map((m) => (m.id === idBot ? { ...m, contenido: 'Generando imagen...', cargando: true } : m))
@@ -252,14 +225,12 @@ export function useChatStream() {
               acumulado += dataObj.texto;
               // Oculta los marcadores crudos mientras llega el resto de la respuesta
               const visible = acumulado
-                .replace(/\[GENERAR_(IMAGEN|DOC)\][\s\S]*$/i, '')
+                .replace(/\[GENERAR_IMAGEN\][\s\S]*$/i, '')
                 .replace(/\[BUSCAR_WEB\][\s\S]*$/i, '')
                 .replace(/\[FENIX_CHART:[\s\S]*$/i, '')
                 .replace(/^\[IMAGEN\]\s*:?.*$/gim, '');
               let espera = '';
-              if (/\[GENERAR_DOC\]/i.test(acumulado)) {
-                espera = 'Generando documento...';
-              } else if (/\[BUSCAR_WEB\]/i.test(acumulado)) {
+              if (/\[BUSCAR_WEB\]/i.test(acumulado)) {
                 espera = 'Buscando en la web...';
               } else if (/\[GENERAR_IMAGEN\]/i.test(acumulado)) {
                 espera = 'Generando imagen...';

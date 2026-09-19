@@ -7,8 +7,6 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const path = require('path');
 const fs = require('fs');
 const db = require('./db');
-const { selectModel } = require('./modelRouter');
-const { generarDocumentoConHechosReales } = require('./services/promptDocumentos');
 const { router: imagenesRealesRouter, buscarImagenReal } = require('./routes/imagenesReales');
 const memory = require('./backend/memoryManager');
 const chatEngine = require('./backend/chatEngine');
@@ -392,92 +390,6 @@ app.get('/api/imagen-archivo', async (req, res) => {
   }
 });
 ============================================================ */
-
-// POST /api/documento-real
-// Genera un documento con HECHOS REALES: el modelo usa el grounding de
-// Google Search (no inventa fechas/nombres/cifras) y las ilustraciones
-// son FOTOS REALES de Wikimedia Commons, nunca imágenes generadas por IA.
-// Cada llamada tiene costo real (Gemini con grounding + Wikimedia), así que
-// además de exigir sesión se limita a N documentos por usuario y por hora.
-const LIMITE_DOCUMENTOS_POR_HORA = 5;
-const CONTADOR_DOCUMENTOS = new Map(); // rate limiting por usuario (ventana de 1 hora)
-
-function permiteGenerarDocumento(userId) {
-  if (!userId) return false;
-  const clave = String(userId) + ':' + Math.floor(Date.now() / 3600000);
-  const usos = CONTADOR_DOCUMENTOS.get(clave) || 0;
-  if (usos >= LIMITE_DOCUMENTOS_POR_HORA) return false;
-  CONTADOR_DOCUMENTOS.set(clave, usos + 1);
-  return true;
-}
-
-app.post('/api/documento-real', async (req, res) => {
-  if (!req.isAuthenticated || !req.isAuthenticated()) {
-    return res.status(401).json({ error: 'Debes iniciar sesión para generar documentos con hechos reales.' });
-  }
-  if (!permiteGenerarDocumento(req.user && req.user.id)) {
-    return res.status(429).json({ error: 'Alcanzaste el límite de ' + LIMITE_DOCUMENTOS_POR_HORA + ' documentos con hechos reales por hora. Vuelve a intentar en un rato.' });
-  }
-  try {
-    const tema = ((req.body && req.body.tema) || '').toString().trim().slice(0, 1000);
-    if (!tema) {
-      return res.status(400).json({ error: 'Falta el campo "tema".' });
-    }
-    if (!GEMINI_API_KEY) {
-      return res.status(400).json({ error: 'GEMINI_API_KEY no está configurado en el servidor.' });
-    }
-
-    // 1) El modelo redacta basándose en búsquedas reales (grounding) y, en
-    //    vez de imágenes, emite marcadores [IMG_QUERY: consulta corta].
-    const { contenido, fuentes } = await generarDocumentoConHechosReales({
-      tema,
-      apiKey: GEMINI_API_KEY,
-      modelo: GEMINI_MODEL
-    });
-
-    // 2) Resolvemos cada [IMG_QUERY: ...] contra una foto real de Commons
-    //    (llamada interna, sin pasar por HTTP). Si no hay foto, el marcador
-    //    desaparece en vez de dejar una imagen rota.
-    const MAX_IMAGENES = 4;
-    let imagenesColocadas = 0;
-    const marcadores = Array.from(contenido.matchAll(/\[IMG_QUERY:\s*([^\]]+)\]/gi));
-    let documentoFinal = contenido;
-
-    for (const m of marcadores) {
-      const consultaImg = m[1].trim().slice(0, 120);
-      let reemplazo = '';
-      if (imagenesColocadas < MAX_IMAGENES) {
-        try {
-          const fotos = await buscarImagenReal(consultaImg);
-          const urlFoto = fotos[0] && fotos[0].url;
-          if (urlFoto) {
-            reemplazo = '[FENIX_IMG:' + urlFoto + ']';
-            imagenesColocadas++;
-          } else {
-            console.warn('[documento-real] Sin foto real para:', consultaImg, '— marcador eliminado.');
-          }
-        } catch (e) {
-          console.error('[documento-real] Error buscando foto real para "' + consultaImg + '":', e.message);
-        }
-      }
-      // reemplaza la primera aparición exacta de este marcador
-      documentoFinal = documentoFinal.replace(m[0], reemplazo);
-    }
-
-    // 3) Al final, sección "Fuentes" con las URLs REALES que usó Gemini.
-    if (fuentes.length) {
-      const enlaces = fuentes.map(f => '- ' + f.url).join('\n');
-      documentoFinal = documentoFinal.trim() + '\n\n## Fuentes\n\n' + enlaces;
-    }
-
-    // Formato compatible con el renderizador del front (clases .doc-imagen).
-    const contenidoLimpio = documentoFinal.replace(/\n{3,}/g, '\n\n').trim();
-    res.json({ contenido: contenidoLimpio, fuentes });
-  } catch (e) {
-    console.error('Error en /api/documento-real:', e);
-    res.status(502).json({ error: 'No se pudo generar el documento con hechos reales. Intenta de nuevo.' });
-  }
-});
 
 // Plan del usuario conectado
 app.get('/api/mi-plan', (req, res) => {

@@ -1,22 +1,8 @@
-import { apiFetch } from './api';
-
 /**
- * Pide al servidor /api/documento-real (Gemini con grounding) un contenido real
- * sobre un tema, con fotos de Wikimedia, y devuelve el markdown simple de la app.
- * @param {string} tema - Consulta completa del usuario
- * @returns {Promise<string>} Contenido en formato simple ([FENIX_IMG:url], #,##, -)
+ * Utilidades para vista previa, exportación a PDF, Word e impresión
+ * de documentos generados por Fenix IA.
  */
-export async function generarDocumentoReal(tema) {
-  const res = await apiFetch('/api/documento-real', {
-    method: 'POST',
-    body: JSON.stringify({ tema }),
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok || !data.contenido) {
-    throw new Error(data.error || 'No se pudo generar el documento');
-  }
-  return String(data.contenido).replace(/\n{3,}/g, '\n\n').trim();
-}
+
 
 const escapar = (s) => String(s || '')
   .replace(/&/g, '&amp;')

@@ -47,6 +47,13 @@ export default function MessageBubble({ mensaje }) {
     }
   };
 
+  const abrirVistaPreviaPDF = () => {
+    if (!textoLimpio) return;
+    const matchTitulo = textoLimpio.match(/^#+\s+(.+)$/m);
+    const tituloDoc = matchTitulo ? matchTitulo[1].replace(/[*_`]/g, '').trim() : 'Documento Fenix IA';
+    abrirDocModal(tituloDoc, textoLimpio);
+  };
+
   const esUsuario = mensaje.rol === 'user';
 
   return (
@@ -81,32 +88,6 @@ export default function MessageBubble({ mensaje }) {
             />
             {mensaje.contenido && <div className="msg-pie">{mensaje.contenido}</div>}
           </>
-        ) : mensaje.documento ? (
-          <div className="tarjeta-doc">
-            <div className="tarjeta-doc-icono">📕</div>
-            <div className="tarjeta-doc-info">
-              <div className="tarjeta-doc-nombre">{mensaje.documento.titulo}</div>
-              <div className="tarjeta-doc-sub">Documento PDF generado</div>
-              <div className="tarjeta-doc-botones">
-                <button
-                  type="button"
-                  className="tarjeta-doc-btn tarjeta-doc-btn-sec"
-                  onClick={() => abrirDocModal(mensaje.documento.titulo, mensaje.documento.contenido)}
-                  title="Abrir vista previa del documento"
-                >
-                  👁️ Ver vista previa
-                </button>
-                <button
-                  type="button"
-                  className="tarjeta-doc-btn tarjeta-doc-btn-prim"
-                  onClick={() => descargarPDF(mensaje.documento.titulo, mensaje.documento.contenido)}
-                  title="Descargar documento en PDF"
-                >
-                  ⬇️ Descargar PDF
-                </button>
-              </div>
-            </div>
-          </div>
         ) : esUsuario ? (
           <div style={{ whiteSpace: 'pre-wrap' }}>
             {textoLimpio}
@@ -122,11 +103,24 @@ export default function MessageBubble({ mensaje }) {
             )}
             <MarkdownContent contenido={textoLimpio} cargando={mensaje.cargando} />
             {chartData && <TrendChart datos={chartData} />}
+
+            {/* Acceso rápido a Vista Previa PDF para respuestas detalladas */}
+            {!mensaje.cargando && textoLimpio && textoLimpio.length > 200 && !mensaje.error && (
+              <div className="msg-doc-shortcut">
+                <button
+                  type="button"
+                  className="btn-doc-shortcut"
+                  onClick={abrirVistaPreviaPDF}
+                  title="Abrir vista previa en hoja A4 y descargar PDF"
+                >
+                  <span className="btn-doc-icon">📕</span>
+                  <span>Vista previa / PDF</span>
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>
-
-
 
       {/* Límite de mensajes sin sesión: invita a iniciar sesión */}
       {mensaje.limite && (
@@ -158,6 +152,23 @@ export default function MessageBubble({ mensaje }) {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <rect x="4" y="2" width="16" height="20" rx="2" />
                 <path d="M12 18h.01" />
+              </svg>
+            </button>
+          )}
+
+          {/* Botón Vista Previa / Exportar PDF */}
+          {!esUsuario && (
+            <button
+              type="button"
+              className="msg-accion"
+              title="Vista previa en hoja A4 y descargar PDF"
+              onClick={abrirVistaPreviaPDF}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
               </svg>
             </button>
           )}
