@@ -86,7 +86,11 @@ export function useChatStream() {
           );
         }
       } else {
-        const limpio = final.replace(/\[(GENERAR_\w*|BUSCAR_WEB)[\s\S]*$/i, '').trim();
+        const limpio = final
+          .replace(/^\[BUSCAR_WEB\][^\n]*\n?/gim, '')
+          .replace(/^\[GENERAR_IMAGEN\][^\n]*\n?/gim, '')
+          .replace(/^\[IMAGEN\]\s*:?.*$/gim, '')
+          .trim();
         setMensajes((prev) =>
           prev.map((m) => (m.id === idBot ? { ...m, contenido: limpio, cargando: false } : m))
         );
@@ -225,14 +229,14 @@ export function useChatStream() {
               acumulado += dataObj.texto;
               // Oculta los marcadores crudos mientras llega el resto de la respuesta
               const visible = acumulado
-                .replace(/\[GENERAR_IMAGEN\][\s\S]*$/i, '')
-                .replace(/\[BUSCAR_WEB\][\s\S]*$/i, '')
+                .replace(/^\[BUSCAR_WEB\][^\n]*\n?/gim, '')
+                .replace(/^\[GENERAR_IMAGEN\][^\n]*\n?/gim, '')
                 .replace(/\[FENIX_CHART:[\s\S]*$/i, '')
                 .replace(/^\[IMAGEN\]\s*:?.*$/gim, '');
               let espera = '';
-              if (/\[BUSCAR_WEB\]/i.test(acumulado)) {
+              if (/^\[BUSCAR_WEB\]/im.test(acumulado) && !visible.trim()) {
                 espera = 'Buscando en la web...';
-              } else if (/\[GENERAR_IMAGEN\]/i.test(acumulado)) {
+              } else if (/^\[GENERAR_IMAGEN\]/im.test(acumulado) && !visible.trim()) {
                 espera = 'Generando imagen...';
               }
 
