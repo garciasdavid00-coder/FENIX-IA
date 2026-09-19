@@ -150,7 +150,7 @@ function configurarProveedor(proveedor) {
   return {
     url: 'https://api.groq.com/openai/v1/chat/completions',
     apiKey: process.env.GROQ_API_KEY,
-    modeloIA: process.env.GROQ_MODEL || 'openai/gpt-oss-120b'
+    modeloIA: process.env.GROQ_MODEL || 'qwen/qwen3.8-27b'
   };
 }
 
