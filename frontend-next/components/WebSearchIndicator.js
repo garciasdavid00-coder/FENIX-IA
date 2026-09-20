@@ -81,7 +81,7 @@ export default function WebSearchIndicator({ status = 'searching', query = '', s
             type="button"
             className={`web-search-sources-btn ${expandido ? 'is-active' : ''}`}
             onClick={() => setExpandido((prev) => !prev)}
-            title="Ver fuentes consultadas"
+            title={expandido ? 'Ocultar fuentes' : 'Mostrar fuentes consultadas'}
           >
             <span>{totalFuentes} {totalFuentes === 1 ? 'fuente' : 'fuentes'}</span>
             <svg
@@ -99,9 +99,9 @@ export default function WebSearchIndicator({ status = 'searching', query = '', s
         )}
       </div>
 
-      {/* Desplegable sutil de fuentes consultadas */}
+      {/* Grid de tarjetas de fuentes consultadas (estilo Perplexity / Modern AI) */}
       {!esBuscando && expandido && fuentes?.length > 0 && (
-        <div className="web-search-sources-dropdown">
+        <div className="web-search-cards-grid">
           {fuentes.map((f, i) => {
             let host = '';
             try {
@@ -113,19 +113,22 @@ export default function WebSearchIndicator({ status = 'searching', query = '', s
                 href={f.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="web-search-source-item"
+                className="web-search-card"
+                title={f.titulo || host}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  className="web-search-source-favicon"
-                  src={`https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=32`}
-                  alt=""
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-                <span className="web-search-source-title">{f.titulo || host}</span>
-                <span className="web-search-source-host">{host}</span>
+                <div className="web-search-card-top">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    className="web-search-source-favicon"
+                    src={`https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=32`}
+                    alt=""
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                  <span className="web-search-card-domain">{host}</span>
+                </div>
+                <div className="web-search-card-title">{f.titulo || host}</div>
               </a>
             );
           })}

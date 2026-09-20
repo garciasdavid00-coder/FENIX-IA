@@ -360,10 +360,12 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español' }) {
     };
   }
 
-  const key = apiKey || process.env.SEARLO_API_KEY;
+  const keySearlo = apiKey || process.env.SEARLO_API_KEY;
+  const keyTavily = process.env.TAVILY_API_KEY;
+  const keySerper = process.env.SERPER_API_KEY;
 
-  // Si hay clave de Searlo, intentamos primero con Searlo
-  if (key) {
+  // 1) Intentar con Searlo API
+  if (keySearlo) {
     try {
       const urlApi = new URL('https://api.searlo.tech/api/v1/search/web');
       urlApi.searchParams.set('q', query.slice(0, 500));
@@ -371,41 +373,100 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español' }) {
       urlApi.searchParams.set('gl', 'us');
       urlApi.searchParams.set('hl', 'es');
 
-      console.log('[buscarEnWeb] Consultando Searlo para: ' + query.slice(0, 80));
+      console.log('[buscarEnWeb] Consultando Searlo API para: ' + query.slice(0, 80));
 
       const respuesta = await fetch(urlApi, {
-        headers: { 'x-api-key': key }
+        headers: { 'x-api-key': keySearlo }
       });
 
       const data = await respuesta.json().catch(() => ({}));
 
       if (respuesta.ok) {
-        const items = (data && (Array.isArray(data.organic) ? data.organic : (Array.isArray(data.items) ? data.items : [])))
-          .filter(it => it && it.title && it.link);
+        const items = (data && (Array.isArray(data.organic) ? data.organic : (Array.isArray(data.items) ? data.items : (Array.isArray(data.results) ? data.results : []))))
+          .filter(it => it && (it.title || it.name) && (it.link || it.url));
 
         if (items.length) {
           const fuentes = items.slice(0, 6).map(it => ({
-            titulo: String(it.title).trim(),
-            url: it.link
+            titulo: String(it.title || it.name).trim(),
+            url: it.link || it.url
           }));
 
           const texto = items
             .slice(0, 5)
             .map((it, i) => {
-              const snippet = (it.snippet || '').trim();
-              return `${i + 1}. ${it.title}${snippet ? ' — ' + snippet : ''}`;
+              const titulo = String(it.title || it.name).trim();
+              const snippet = String(it.snippet || it.content || it.description || '').trim();
+              return `${i + 1}. ${titulo}${snippet ? ' — ' + snippet : ''}`;
             })
             .join('\n');
 
-          console.log('[buscarEnWeb] Búsqueda Searlo lista (' + items.length + ' resultados, ' + fuentes.length + ' fuentes).');
+          console.log('[buscarEnWeb] Búsqueda Searlo exitosa (' + items.length + ' resultados).');
           return { texto, fuentes };
         }
       } else {
         const detalle = (data && data.message) || (data && data.error) || String(respuesta.status);
-        console.warn('[buscarEnWeb] Searlo falló (' + respuesta.status + ': ' + detalle + '), recurriendo a buscador multi-fuente...');
+        console.warn('[buscarEnWeb] Searlo respondió error (' + respuesta.status + ': ' + detalle + ')');
       }
     } catch (e) {
-      console.warn('[buscarEnWeb] Excepción en Searlo (' + (e && e.message ? e.message : e) + '), recurriendo a buscador multi-fuente...');
+      console.warn('[buscarEnWeb] Excepción en Searlo:', e && e.message ? e.message : e);
+    }
+  }
+
+  // 2) Intentar con Tavily API (si está configurada)
+  if (keyTavily) {
+    try {
+      console.log('[buscarEnWeb] Consultando Tavily Search para: ' + query.slice(0, 80));
+      const respTav = await fetch('https://api.tavily.com/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          api_key: keyTavily,
+          query: query.slice(0, 400),
+          search_depth: 'basic',
+          max_results: 6,
+          include_answer: true
+        })
+      });
+      if (respTav.ok) {
+        const dataTav = await respTav.json();
+        const results = dataTav.results || [];
+        if (results.length) {
+          const fuentes = results.map(r => ({ titulo: r.title, url: r.url }));
+          const texto = (dataTav.answer ? `Resumen general: ${dataTav.answer}\n\n` : '') +
+            results.map((r, i) => `${i + 1}. ${r.title} — ${r.content || ''}`).join('\n');
+          console.log('[buscarEnWeb] Búsqueda Tavily exitosa.');
+          return { texto, fuentes };
+        }
+      }
+    } catch (eTav) {
+      console.warn('[buscarEnWeb] Excepción en Tavily:', eTav.message);
+    }
+  }
+
+  // 3) Intentar con Serper API (Google Search oficial si está configurada)
+  if (keySerper) {
+    try {
+      console.log('[buscarEnWeb] Consultando Serper (Google) para: ' + query.slice(0, 80));
+      const respSerp = await fetch('https://google.serper.dev/search', {
+        method: 'POST',
+        headers: {
+          'X-API-KEY': keySerper,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ q: query, gl: 'es', hl: 'es', num: 6 })
+      });
+      if (respSerp.ok) {
+        const dataSerp = await respSerp.json();
+        const organics = dataSerp.organic || [];
+        if (organics.length) {
+          const fuentes = organics.map(o => ({ titulo: o.title, url: o.link }));
+          const texto = organics.map((o, i) => `${i + 1}. ${o.title} — ${o.snippet || ''}`).join('\n');
+          console.log('[buscarEnWeb] Búsqueda Serper exitosa.');
+          return { texto, fuentes };
+        }
+      }
+    } catch (eSerp) {
+      console.warn('[buscarEnWeb] Excepción en Serper:', eSerp.message);
     }
   }
 
