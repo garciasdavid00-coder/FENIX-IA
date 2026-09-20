@@ -122,35 +122,9 @@ export default function MessageBubble({ mensaje }) {
               </div>
             )}
             
-            {esDocumento && !mensaje.cargando ? (
-              <div className="doc-card" onClick={abrirVistaPreviaPDFLocal}>
-                <div className="doc-card-icon">📕</div>
-                <div className="doc-card-info">
-                  <h4>{tituloDocumento}</h4>
-                  <span>Documento listo para visualizar o descargar</span>
-                </div>
-                <div className="doc-card-action">Abrir</div>
-              </div>
-            ) : (
-              <MarkdownContent contenido={esDocumento ? contenidoDocumentoFinal : textoLimpio} cargando={mensaje.cargando} />
-            )}
+            <MarkdownContent contenido={esDocumento ? contenidoDocumentoFinal : textoLimpio} cargando={mensaje.cargando} />
 
             {chartData && <TrendChart datos={chartData} />}
-
-            {/* Acceso rápido a Vista Previa PDF para respuestas detalladas */}
-            {!mensaje.cargando && textoLimpio && textoLimpio.length > 200 && !mensaje.error && !esDocumento && (
-              <div className="msg-doc-shortcut">
-                <button
-                  type="button"
-                  className="btn-doc-shortcut"
-                  onClick={abrirVistaPreviaPDFLocal}
-                  title="Abrir vista previa en hoja A4 y descargar PDF"
-                >
-                  <span className="btn-doc-icon">📕</span>
-                  <span>Vista previa / PDF</span>
-                </button>
-              </div>
-            )}
           </>
         )}
       </div>

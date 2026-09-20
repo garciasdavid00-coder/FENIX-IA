@@ -1006,48 +1006,28 @@ Escribe SOLO el documento completo comenzando con el marcador.`;
 
     async function procesarStreamConBusqueda(stream, mensajesOriginales, sistemaFinal, modoWeb) {
       // Fase 1: STREAMING PROGRESIVO con detector de marcadores en vivo.
-      // Detecta [BUSCAR_WEB] y [GENERAR_DOC] durante el stream.
+      // Detecta [BUSCAR_WEB] durante el stream.
       const MARCADOR_RE = /\[BUSCAR_WEB\]\s*:\s*([^\n]+)/i;
-      const MARCADOR_DOC_RE = /\[GENERAR_DOC\](?:\s*:?\s*([^\n]*))?/i;
       const ANCLA_MARCADOR = '[BUSCAR_WEB]: ';
-      const ANCLA_DOC = '[GENERAR_DOC]';
 
       // ¿Cuántos caracteres del final podrían ser parte de un marcador?
       function pendienteMarcador(texto) {
-        let nWeb = 0, nDoc = 0;
         const maxWeb = Math.min(texto.length, ANCLA_MARCADOR.length);
         for (let n = maxWeb; n >= 1; n--) {
-          if (ANCLA_MARCADOR.startsWith(texto.slice(-n))) { nWeb = n; break; }
+          if (ANCLA_MARCADOR.startsWith(texto.slice(-n))) return n;
         }
-        const maxDoc = Math.min(texto.length, ANCLA_DOC.length);
-        for (let n = maxDoc; n >= 1; n--) {
-          if (ANCLA_DOC.startsWith(texto.slice(-n))) { nDoc = n; break; }
-        }
-        return Math.max(nWeb, nDoc);
+        return 0;
       }
 
       let emitido = '';
       let comprometido = 0;
       let buscarDetectado = false;
-      let genDocDetectado = false;
       let buscarQuery = '';
-      let temaDocumento = '';
       let respuestaCompleta = '';
 
       await leerStreamSSE(stream, delta => {
         emitido = filtro.push(delta);
-        if (buscarDetectado || genDocDetectado) return;
-
-        // ¿El modelo emitió [GENERAR_DOC]?
-        const coincidenciaDoc = MARCADOR_DOC_RE.exec(emitido);
-        if (coincidenciaDoc && coincidenciaDoc[0].length >= ANCLA_DOC.length) {
-          genDocDetectado = true;
-          temaDocumento = (coincidenciaDoc[1] || '').trim();
-          respuestaCompleta = emitido;
-          enviarTexto(emitido.slice(0, coincidenciaDoc.index).trim());
-          if (lector && !lectorAbortado) { lector.cancel().catch(() => {}); }
-          return;
-        }
+        if (buscarDetectado) return;
 
         // ¿El modelo decidió buscar en la web?
         const coincidencia = MARCADOR_RE.exec(emitido);
@@ -1060,7 +1040,7 @@ Escribe SOLO el documento completo comenzando con el marcador.`;
           return;
         }
 
-      // Emitir solo la parte segura (la cola podría iniciar el marcador)
+        // Emitir solo la parte segura (la cola podría iniciar el marcador)
         const fiable = emitido.length - pendienteMarcador(emitido);
         if (fiable > comprometido) {
           enviarTexto(emitido.slice(0, fiable));
@@ -1069,32 +1049,18 @@ Escribe SOLO el documento completo comenzando con el marcador.`;
       }, { esActivo: () => !lectorAbortado, setLector: (r) => { lector = r; } });
 
       // Fin del stream: entregar lo que quedó pendiente
-      if (!buscarDetectado && !genDocDetectado) {
+      if (!buscarDetectado) {
         emitido = filtro.final();
-        const coincidenciaDocFinal = MARCADOR_DOC_RE.exec(emitido);
-        if (coincidenciaDocFinal) {
-          genDocDetectado = true;
-          temaDocumento = (coincidenciaDocFinal[1] || '').trim();
-          enviarTexto(emitido.slice(0, coincidenciaDocFinal.index).trim());
-        } else {
-          const coincidencia = MARCADOR_RE.exec(emitido);
-          if (coincidencia) {
-            buscarDetectado = true;
-            buscarQuery = coincidencia[1].trim();
-            respuestaCompleta = emitido;
-            enviarTexto(emitido.slice(0, coincidencia.index).trim());
-          } else if (emitido.length > comprometido) {
-            enviarTexto(emitido);
-            comprometido = emitido.length;
-          }
+        const coincidencia = MARCADOR_RE.exec(emitido);
+        if (coincidencia) {
+          buscarDetectado = true;
+          buscarQuery = coincidencia[1].trim();
+          respuestaCompleta = emitido;
+          enviarTexto(emitido.slice(0, coincidencia.index).trim());
+        } else if (emitido.length > comprometido) {
+          enviarTexto(emitido);
+          comprometido = emitido.length;
         }
-      }
-
-      // Si se detectó [GENERAR_DOC], generar el documento directamente
-      if (genDocDetectado) {
-        console.log('[chat] [GENERAR_DOC] interceptado — generando documento sobre:', temaDocumento);
-        await generarDocumentoDirecto(temaDocumento || 'el tema solicitado', mensajesOriginales, sistemaFinal);
-        return;
       }
 
       // Sin marcador: la respuesta ya se transmitió en tiempo real

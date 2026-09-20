@@ -75,13 +75,8 @@ function armarSistema({ lang = 'español', instruccion, memoriaContexto = '', ca
 2) Puedes buscar información en tiempo real en la web: cuando el usuario pregunte por hechos actuales, noticias recientes, cotizaciones, clima o eventos en vivo, responde ÚNICAMENTE con una sola línea en este formato:
 [BUSCAR_WEB]: <consulta breve y específica para el buscador, en español>
 
-3) Fotos reales de personajes y hechos históricos: en biografías, historia o documentos, inserta en línea separada el marcador:
-[FOTO_REAL: Nombre del personaje o evento histórico]
-
-4) Documentos, reportes y biografías:
-- NUNCA uses el marcador [GENERAR_DOC]. Escribe DIRECTAMENTE el documento completo en Markdown (# Título, ## Secciones, párrafos, viñetas, negritas).
-- Incluye al menos 3-5 marcadores [FOTO_REAL: nombre] relevantes a lo largo del documento.
-- El documento debe ser extenso, bien estructurado y de alta calidad (mínimo 500 palabras).`;
+3) Fotos reales de personajes y hechos históricos: en biografías, historia o artículos relevantes, inserta en línea separada el marcador:
+[FOTO_REAL: Nombre del personaje o evento histórico]`;
   }
 
   return { sistemaBase, sistemaFinal: sistemaBase };
