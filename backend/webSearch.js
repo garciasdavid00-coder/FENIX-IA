@@ -26,20 +26,50 @@ const PALABRAS_CLAVE_TIEMPO_REAL = [
  * Determina si un mensaje del usuario amerita consultar la web en vivo.
  * @param {string} mensaje
  * @param {Array} historial
- * @returns {boolean}
+ * @returns {Promise<boolean>}
  */
-function detectarNecesidadBusqueda(mensaje, historial = []) {
+async function detectarNecesidadBusqueda(mensaje, historial = []) {
   if (!mensaje || typeof mensaje !== 'string') return false;
   const texto = mensaje.trim();
 
-  // 1) Petición explícita
+  // 1) Petición explícita rápida
   if (/\b(busca|investiga|googlea|consulta\s+en\s+la\s+web|busca\s+en\s+la\s+web)\b/i.test(texto)) {
     return true;
   }
 
-  // 2) Patrones de tiempo real
+  // 2) Patrones obvios de tiempo real
   for (const regex of PALABRAS_CLAVE_TIEMPO_REAL) {
     if (regex.test(texto)) return true;
+  }
+
+  // 3) Clasificador rápido LLM para preguntas ambiguas sobre eventos o actualidad
+  try {
+    const clasificadorPrompt = `¿La siguiente pregunta del usuario requiere buscar información en internet en tiempo real (noticias, horarios de eventos actuales, resultados, precios recientes)? Responde únicamente "SI" o "NO".
+    
+Pregunta: "${texto}"
+Respuesta:`;
+
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: [{ role: 'user', content: clasificadorPrompt }],
+        temperature: 0,
+        max_tokens: 5
+      })
+    });
+    const data = await res.json();
+    const respuesta = data.choices && data.choices[0] && data.choices[0].message.content.trim().toUpperCase();
+    if (respuesta && respuesta.includes('SI')) {
+      console.log(`[WebSearch] LLM Clasificador decidió buscar para: "${texto}"`);
+      return true;
+    }
+  } catch (e) {
+    console.warn('[WebSearch] Error en clasificador:', e.message);
   }
 
   return false;
@@ -370,8 +400,13 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español' }) {
       const urlApi = new URL('https://api.searlo.tech/api/v1/search/web');
       urlApi.searchParams.set('q', query.slice(0, 500));
       urlApi.searchParams.set('limit', '8');
-      urlApi.searchParams.set('gl', 'us');
-      urlApi.searchParams.set('hl', 'es');
+      const langCodigo = (lang || 'es').slice(0, 2);
+      urlApi.searchParams.set('hl', langCodigo);
+      urlApi.searchParams.set('gl', langCodigo === 'es' ? 'mx' : 'us');
+      // Filtro de actualidad si parece que pregunta sobre algo reciente
+      if (/\b(hoy|ayer|hora|ahora|noticia|cu[aá]ndo)\b/i.test(query)) {
+        urlApi.searchParams.set('tbs', 'qdr:w'); // Última semana
+      }
 
       console.log('[buscarEnWeb] Consultando Searlo API para: ' + query.slice(0, 80));
 
@@ -386,7 +421,7 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español' }) {
           .filter(it => it && (it.title || it.name) && (it.link || it.url));
 
         if (items.length) {
-          const fuentes = items.slice(0, 6).map(it => ({
+          const fuentes = items.slice(0, 5).map(it => ({
             titulo: String(it.title || it.name).trim(),
             url: it.link || it.url
           }));
@@ -396,11 +431,11 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español' }) {
             .map((it, i) => {
               const titulo = String(it.title || it.name).trim();
               const snippet = String(it.snippet || it.content || it.description || '').trim();
-              return `${i + 1}. ${titulo}${snippet ? ' — ' + snippet : ''}`;
+              const date = it.date ? ` [Fecha: ${it.date}]` : '';
+              return `${i + 1}. ${titulo}${date}${snippet ? ' — ' + snippet : ''}`;
             })
             .join('\n');
 
-          console.log('[buscarEnWeb] Búsqueda Searlo exitosa (' + items.length + ' resultados).');
           return { texto, fuentes };
         }
       } else {

@@ -42,7 +42,7 @@ function instruccionUsuarioDe(instruccion) {
 // ------------------------------------------------------------
 // Prompt de sistema (variante según canal: chat, whatsapp, voz)
 // ------------------------------------------------------------
-function armarSistema({ lang = 'español', instruccion, memoriaContexto = '', canal = 'chat' }) {
+function armarSistema({ lang = 'español', instruccion, memoriaContexto = '', canal = 'chat', timeZone = 'America/Managua' }) {
   // 1. SYSTEM PROMPT FIJO (SIEMPRE PRIMERO: versión completa o reducida según canal)
   const promptFijo = obtenerSystemPrompt(canal);
 
@@ -62,6 +62,20 @@ function armarSistema({ lang = 'español', instruccion, memoriaContexto = '', ca
     sistemaBase += `\n\n-----\n## Instrucciones adicionales del usuario\n${instruccionExtra}`;
   }
 
+  // 4. FECHA Y HORA ACTUAL (inyectada al final)
+  const opcionesFecha = { 
+    timeZone, 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true
+  };
+  const fechaHoraActual = new Intl.DateTimeFormat('es-ES', opcionesFecha).format(new Date());
+  sistemaBase += `\n\n-----\n## Contexto temporal\nLa fecha y hora actual del usuario es: ${fechaHoraActual}. (Zona horaria: ${timeZone}). Úsalo como referencia temporal absoluta.`;
+
   // 4. CAPACIDADES OPERATIVAS DEL CANAL
   const canalNorm = String(canal || '').toLowerCase();
   const esCanalReducido = canalNorm === 'whatsapp' || canalNorm === 'wa' || canalNorm === 'voz' || canalNorm === 'voice';
@@ -72,8 +86,9 @@ function armarSistema({ lang = 'español', instruccion, memoriaContexto = '', ca
 1) Puedes crear imágenes: cuando el usuario pida generar, crear o dibujar una imagen, responde ÚNICAMENTE con una sola línea en este formato exacto:
 [GENERAR_IMAGEN]: <descripción breve y visual de la imagen, en inglés>
 
-2) Puedes buscar información en tiempo real en la web: cuando el usuario pregunte por hechos actuales, noticias recientes, cotizaciones, clima o eventos en vivo, responde ÚNICAMENTE con una sola línea en este formato:
-[BUSCAR_WEB]: <consulta breve y específica para el buscador, en español>
+2) Puedes buscar información en tiempo real en la web: cuando necesites datos actuales o el usuario lo pida, responde ÚNICAMENTE con una sola línea en este formato:
+[BUSCAR_WEB]: <consulta específica>
+Reglas de la consulta: debe incluir el tema central y los nombres relevantes. NUNCA copies instrucciones del usuario como "busca en la web" ni uses frases conversacionales.
 
 3) Fotos reales de personajes y hechos históricos: en biografías, historia o artículos relevantes, inserta en línea separada el marcador:
 [FOTO_REAL: Nombre del personaje o evento histórico]`;

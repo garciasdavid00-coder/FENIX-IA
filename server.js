@@ -590,7 +590,7 @@ app.delete('/api/memories/:id', async (req, res) => {
 
 app.post('/api/chat', async (req, res) => {
   try {
-    const { mensaje, historial, modelo, idioma, instruccion, webSearch: forzarWebSearch, canal = 'chat' } = req.body || {};
+    const { mensaje, historial, modelo, idioma, instruccion, webSearch: forzarWebSearch, canal = 'chat', timeZone } = req.body || {};
 
     if (!mensaje || typeof mensaje !== 'string') {
       return res.status(400).json({ error: 'Falta el campo "mensaje"' });
@@ -636,7 +636,7 @@ app.post('/api/chat', async (req, res) => {
     // si el campo falta, el modo por defecto es 'auto'.
     // ==========================================================
     const modoWeb = forzarWebSearch || 'auto';
-    const necesitaBusquedaAutomatica = modoWeb === 'on' || (modoWeb === 'auto' && webSearch.detectarNecesidadBusqueda(mensaje, historial));
+    const necesitaBusquedaAutomatica = modoWeb === 'on' || (modoWeb === 'auto' && await webSearch.detectarNecesidadBusqueda(mensaje, historial));
 
     if (necesitaBusquedaAutomatica) {
       res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
@@ -713,7 +713,8 @@ app.post('/api/chat', async (req, res) => {
       lang,
       instruccion: instruccionUsuario,
       memoriaContexto: bloqueMemorias,
-      canal
+      canal,
+      timeZone
     });
     const { mensajes, mensajesConversacion } = chatEngine.construirMensajes({
       mensaje,
@@ -984,8 +985,44 @@ Escribe SOLO el documento completo comenzando con el marcador.`;
         return;
       }
 
-      const query = buscarQuery;
-      console.log('[chat] [BUSCAR_WEB] detectado, consulta:', query);
+      let query = buscarQuery;
+      console.log('[chat] [BUSCAR_WEB] original del modelo:', query);
+
+      // Reescritor rápido: usa los últimos 4 mensajes para asegurar una consulta autocontenida
+      try {
+        const ultimos = mensajesOriginales.slice(-4).map(m => `${m.role}: ${m.content}`).join('\n');
+        const reescritorPrompt = `Eres un experto en extraer consultas de búsqueda web. A partir de la siguiente conversación y de la consulta original propuesta por el asistente, escribe UNA SOLA LÍNEA con la consulta final, autocontenida y optimizada para Google. No incluyas explicaciones, saludos ni frases como "busca en la web".
+        
+Conversación reciente:
+${ultimos}
+
+Consulta original propuesta: ${query}
+
+Consulta optimizada para Google:`;
+
+        const rewriteRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: 'llama-3.1-8b-instant',
+            messages: [{ role: 'user', content: reescritorPrompt }],
+            temperature: 0,
+            max_tokens: 50
+          })
+        });
+        const rewriteData = await rewriteRes.json();
+        if (rewriteData.choices && rewriteData.choices[0] && rewriteData.choices[0].message) {
+          const reescrita = rewriteData.choices[0].message.content.replace(/^["']|["']$/g, '').trim();
+          if (reescrita) query = reescrita;
+        }
+      } catch (e) {
+        console.warn('[chat] Error al reescribir la consulta, usando la original:', e.message);
+      }
+      
+      console.log('[chat] [BUSCAR_WEB] consulta final reescrita:', query);
 
       // Fase 2: búsqueda web en tiempo real
       let resultadoBusqueda = { texto: '', fuentes: [] };
@@ -995,13 +1032,14 @@ Escribe SOLO el documento completo comenzando con el marcador.`;
           apiKey: process.env.SEARLO_API_KEY,
           lang
         });
+        console.log(`[chat] Búsqueda finalizada: ${resultadoBusqueda.fuentes.length} resultados encontrados.`);
       } catch (e) {
         console.warn('[chat] Error en búsqueda web, continuando sin datos frescos:', e.message);
       }
 
       // Fase 3: segunda llamada al modelo con resultados de búsqueda
       const contextoBusqueda = resultadoBusqueda.fuentes.length
-        ? `\n\n--- INFORMACIÓN EN TIEMPO REAL (Google Search Grounding) ---\n${resultadoBusqueda.texto}\n\nFuentes: ${resultadoBusqueda.fuentes.map(f => f.titulo + ' - ' + f.url).join('; ')}`
+        ? `\n\n--- INFORMACIÓN EN TIEMPO REAL ---\n${resultadoBusqueda.texto}\n\nFuentes: ${resultadoBusqueda.fuentes.map(f => f.titulo + ' - ' + f.url).join('; ')}`
         : '';
 
       const mensajesConBusqueda = [
@@ -1048,14 +1086,10 @@ Escribe SOLO el documento completo comenzando con el marcador.`;
         return;
       }
 
-      // Stream de la respuesta final con detección de [GENERAR_DOC]
+      // Stream de la respuesta final con resultados de búsqueda web
       const filtro2 = crearFiltroRazonamiento();
       let bufferFinal = '';
       let primeraEmision2 = true;
-      let emitido2 = '';
-      let comprometido2 = 0;
-      let genDocDetectado2 = false;
-      let temaDocumento2 = '';
 
       function enviarTextoFinal(texto) {
         if (!texto) return;
@@ -1074,47 +1108,14 @@ Escribe SOLO el documento completo comenzando con el marcador.`;
       }
 
       await leerStreamSSE(respuestaIA2, delta => {
-        emitido2 = filtro2.push(delta);
-        if (genDocDetectado2) return;
-
-        const coincidenciaDoc = MARCADOR_DOC_RE.exec(emitido2);
-        if (coincidenciaDoc && coincidenciaDoc[0].length >= ANCLA_DOC.length) {
-          genDocDetectado2 = true;
-          temaDocumento2 = (coincidenciaDoc[1] || '').trim();
-          enviarTextoFinal(emitido2.slice(0, coincidenciaDoc.index).trim());
-          if (lector && !lectorAbortado) { lector.cancel().catch(() => {}); }
-          return;
-        }
-
-        const fiable = emitido2.length - pendienteMarcador(emitido2);
-        if (fiable > comprometido2) {
-          enviarTextoFinal(emitido2.slice(0, fiable));
-          comprometido2 = fiable;
-        }
+        const texto = filtro2.push(delta);
+        enviarTextoFinal(texto);
       }, {
         esActivo: () => !lectorAbortado,
         setLector: (r) => { lector = r; }
       });
 
-      if (!genDocDetectado2) {
-        emitido2 = filtro2.final();
-        const coincidenciaDocFinal = MARCADOR_DOC_RE.exec(emitido2);
-        if (coincidenciaDocFinal) {
-          genDocDetectado2 = true;
-          temaDocumento2 = (coincidenciaDocFinal[1] || '').trim();
-          enviarTextoFinal(emitido2.slice(0, coincidenciaDocFinal.index).trim());
-        } else if (emitido2.length > comprometido2) {
-          enviarTextoFinal(emitido2);
-          comprometido2 = emitido2.length;
-        }
-      }
-
-      if (genDocDetectado2) {
-        console.log('[chat] [GENERAR_DOC] interceptado en 2da llamada — generando documento sobre:', temaDocumento2);
-        // Generar documento usando los mensajes que YA incluyen los resultados de búsqueda
-        await generarDocumentoDirecto(temaDocumento2 || 'el tema solicitado', mensajesConBusqueda, sistemaFinal);
-        return;
-      }
+      enviarTextoFinal(filtro2.final());
 
       // Emitir fuentes al final si las hay
       if (resultadoBusqueda.fuentes && resultadoBusqueda.fuentes.length) {

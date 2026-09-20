@@ -153,6 +153,7 @@ export function useChatStream() {
         modelo: opciones.modelo || 'auto',
         idioma: opciones.idioma || idiomaLocal,
         instruccion,
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         ...(opciones.webSearch !== undefined ? { webSearch: opciones.webSearch } : {}),
         ...(opciones.chatId !== undefined ? { chatId: opciones.chatId } : {}),
       };
