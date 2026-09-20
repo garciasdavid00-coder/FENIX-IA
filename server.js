@@ -493,113 +493,15 @@ async function leerStreamSSE(respuestaIA, onTexto, opciones){
   if(buffer.trim()) procesarLinea(buffer);
 }
 
-// Filtra en tiempo real los bloques de "razonamiento" que mandan algunos modelos
-// (Qwen manda  thinking... response y Gemini "thinking..." al inicio).
-// Emite solo el texto visible, sin retractar lo que ya se mandó al cliente.
-function crearFiltroRazonamiento(){
-  const etiquetas = [
-    { abre: '<think>', cierra: '</think>' },
-    { abre: '<thought>', cierra: '</thought>' },
-    { abre: '<thinking>', cierra: '</thinking>' },
-    { abre: '<reasoning>', cierra: '</reasoning>' }
-  ];
-  const cierresSimples = [' response', ' response', '</think>', '</thought>', '</thinking>', '</reasoning>', ' response', '.'];
-
-  let emitido = '';        // texto confirmado (monótono creciente)
-  let cola = '';           // caracteres en espera (lookahead para detectar aperturas)
-  let enBloque = false;
-  let bloque = '';
-  let bloqueCierres = [];
-  let emitioTextoNormal = false;
-
-  function pareceApertura(s){
-    for(const e of etiquetas){
-      const a = e.abre;
-      if(a.startsWith(s) || s.startsWith(a)) return true;
-    }
-    // "thinking" pelado (con o sin espacio) solo cuenta al inicio del texto
-    if(!emitioTextoNormal){
-      const sTrim = s.trimStart();
-      if('thinking'.startsWith(sTrim) || sTrim.startsWith('thinking')) return true;
-    }
-    return false;
-  }
-
-  function procesarNormal(){
-    while(cola.length){
-      let retenerDesde = -1;
-      for(let p = 0; p < cola.length; p++){
-        if(pareceApertura(cola.slice(p))){ retenerDesde = p; break; }
-      }
-      if(retenerDesde === -1){
-        emitido += cola;
-        cola = '';
-        if(emitido.trim()) emitioTextoNormal = true;
-        return;
-      }
-      if(retenerDesde > 0){
-        emitido += cola.slice(0, retenerDesde);
-        cola = cola.slice(retenerDesde);
-        if(emitido.trim()) emitioTextoNormal = true;
-      }
-
-      // ¿Apertura con etiqueta confirmada?
-      let apertura = null;
-      for(const e of etiquetas){
-        if(cola.startsWith(e.abre)){ apertura = e; break; }
-      }
-      if(apertura && (cola.length > apertura.abre.length || apertura.abre.endsWith('>'))){
-        // lo que sigue a la etiqueta es contenido del bloque de razonamiento
-        bloque = cola.slice(apertura.abre.length);
-        cola = '';
-        enBloque = true;
-        bloqueCierres = [apertura.cierra];
-        return;
-      }
-
-      // ¿"thinking" pelado confirmado (solo al inicio del texto)?
-      if(!emitioTextoNormal){
-        const sTrim = cola.trimStart();
-        const pos = cola.length - sTrim.length;
-        if(sTrim.startsWith('thinking') && cola.length > pos + 'thinking'.length){
-          cola = cola.slice(pos + 'thinking'.length);
-          enBloque = true;
-          bloque = '';
-          bloqueCierres = cierresSimples;
-          return;
-        }
-      }
-
-      // Es una apertura parcial sin confirmar: esperar más texto
-      return;
-    }
-  }
-
+// Passthrough para que el frontend reciba las etiquetas <think> y las renderice.
+function crearFiltroRazonamiento() {
+  let emitido = '';
   return {
-    push(chunk){
-      if(enBloque){
-        bloque += chunk;
-        for(const c of bloqueCierres){
-          const idx = bloque.indexOf(c);
-          if(idx !== -1){
-            bloque = bloque.slice(idx + c.length);
-            cola += bloque;
-            bloque = '';
-            enBloque = false;
-            procesarNormal();
-            break;
-          }
-        }
-        return emitido;
-      }
-      cola += chunk;
-      procesarNormal();
+    push(chunk) {
+      emitido += chunk;
       return emitido;
     },
-    final(){
-      enBloque = false;         // descarta cualquier bloque sin cerrar
-      emitido += cola;          // emite lo que quedó pendiente
-      cola = '';
+    final() {
       return emitido;
     }
   };

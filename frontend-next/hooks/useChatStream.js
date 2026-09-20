@@ -170,6 +170,11 @@ export function useChatStream() {
           errLimite.limite = true;
           throw errLimite;
         }
+        if (dataError.error === 'CHAT_BLOQUEADO') {
+          const errBloqueado = new Error(dataError.mensaje || 'Esta conversación ha sido cerrada y finalizada por el uso de lenguaje ofensivo o insultos.');
+          errBloqueado.bloqueado = true;
+          throw errBloqueado;
+        }
         throw new Error(dataError.error || `Error en el servidor (${res.status})`);
       }
 
@@ -293,7 +298,7 @@ export function useChatStream() {
         setMensajes((prev) =>
           prev.map((msg) =>
             msg.id === idBot
-              ? { ...msg, contenido: `⚠️ ${mensajeError}`, error: true, limite: !!err.limite, cargando: false }
+              ? { ...msg, contenido: err.bloqueado ? mensajeError : `⚠️ ${mensajeError}`, error: true, bloqueado: !!err.bloqueado, limite: !!err.limite, cargando: false }
               : msg
           )
         );

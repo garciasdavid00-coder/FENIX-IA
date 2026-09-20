@@ -311,9 +311,10 @@ export function ChatProvider({ children }) {
       const id = idChat || Date.now().toString();
       const existe = prev.find((c) => c.id === id);
       let actualizados;
+      const estaBloqueado = nuevosMensajes.some((m) => m.bloqueado);
       if (existe) {
         actualizados = prev.map((c) =>
-          c.id === id ? { ...c, mensajes: nuevosMensajes, fecha: new Date().toISOString() } : c
+          c.id === id ? { ...c, mensajes: nuevosMensajes, bloqueado: !!(c.bloqueado || estaBloqueado), fecha: new Date().toISOString() } : c
         );
       } else {
         const primerMensaje = nuevosMensajes.find((m) => m.rol === 'user')?.contenido || 'Nuevo chat';
@@ -323,6 +324,7 @@ export function ChatProvider({ children }) {
           titulo,
           fecha: new Date().toISOString(),
           pinned: false,
+          bloqueado: estaBloqueado,
           proyectoId: proyectoActualId, // si entramos al chat desde un proyecto, queda asociado
           mensajes: nuevosMensajes,
         };

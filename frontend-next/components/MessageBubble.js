@@ -30,18 +30,34 @@ export default function MessageBubble({ mensaje }) {
     return { textoLimpio: raw, chartData: parsedChart };
   }, [mensaje?.contenido]);
 
-  const copiarTexto = () => {
-    if (!textoLimpio) return;
-    navigator.clipboard.writeText(textoLimpio);
-    setCopiado(true);
-    setTimeout(() => setCopiado(false), 2000);
+  const copiarTexto = async () => {
+    try {
+      await navigator.clipboard.writeText(mensaje.contenido);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch (e) {
+      console.error('Error al copiar:', e);
+    }
   };
 
+  const esUsuario = mensaje.rol === 'user';
+  
+  // Extraer el contenido de pensamiento (razonamiento del modelo) si lo hay
+  let textoFinal = textoLimpio || '';
+  let contenidoPensamiento = null;
+  
+  const thinkMatch = textoFinal.match(/<think>([\s\S]*?)(?:<\/think>|$)/i);
+  if (thinkMatch) {
+    contenidoPensamiento = thinkMatch[1].trim();
+    // Limpiamos el texto principal quitando el bloque <think> entero
+    textoFinal = textoFinal.replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, '').trim();
+  }
+
   const hablarTexto = () => {
-    if (!textoLimpio || typeof window === 'undefined') return;
+    if (!textoFinal || typeof window === 'undefined') return;
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(textoLimpio);
+      const utter = new SpeechSynthesisUtterance(textoFinal);
       utter.lang = 'es-ES';
       window.speechSynthesis.speak(utter);
     }
@@ -58,17 +74,15 @@ export default function MessageBubble({ mensaje }) {
     }
   };
 
-  const esUsuario = mensaje.rol === 'user';
-  
   // Detectar si el texto es un documento explícito y extraer el título
-  const esDocumento = textoLimpio && textoLimpio.includes('[ES_DOCUMENTO]');
+  const esDocumento = textoFinal && textoFinal.includes('[ES_DOCUMENTO]');
   let tituloDocumento = 'Documento generado';
-  let contenidoDocumentoFinal = textoLimpio;
+  let contenidoDocumentoFinal = textoFinal;
   
   if (esDocumento) {
-    const match = textoLimpio.match(/#\s+(.+)/);
+    const match = textoFinal.match(/#\s+(.+)/);
     if (match) tituloDocumento = match[1].trim();
-    contenidoDocumentoFinal = textoLimpio.replace(/\[ES_DOCUMENTO\]/g, '').trim();
+    contenidoDocumentoFinal = textoFinal.replace(/\[ES_DOCUMENTO\]/g, '').trim();
   }
 
   // Modificar abrirVistaPreviaPDF para que use el contenido sin el marcador
@@ -90,7 +104,7 @@ export default function MessageBubble({ mensaje }) {
 
       {/* Archivo adjunto del usuario si existe */}
       {esUsuario && mensaje.archivo && (
-        <div style={{ marginBottom: textoLimpio ? '8px' : '0' }}>
+        <div style={{ marginBottom: textoFinal ? '8px' : '0' }}>
           <FileAttachmentChip archivo={mensaje.archivo} compacto={true} />
         </div>
       )}
@@ -110,11 +124,11 @@ export default function MessageBubble({ mensaje }) {
           </>
         ) : esUsuario ? (
           <div style={{ whiteSpace: 'pre-wrap' }}>
-            {textoLimpio}
+            {textoFinal}
           </div>
         ) : (
           <>
-            {mensaje.cargando && !textoLimpio && (
+            {mensaje.cargando && !textoFinal && !contenidoPensamiento && (
               <div className="pensando-bubble" title="Fenix está pensando...">
                 <span className="pensando-dot" />
                 <span className="pensando-dot" />
@@ -122,9 +136,48 @@ export default function MessageBubble({ mensaje }) {
               </div>
             )}
             
-            <MarkdownContent contenido={esDocumento ? contenidoDocumentoFinal : textoLimpio} cargando={mensaje.cargando} />
+            {/* Razonamiento / Thinking */}
+            {contenidoPensamiento && (
+              <details className="think-details" open={mensaje.cargando}>
+                <summary>
+                  <span className="think-icon">🧠</span>
+                  {mensaje.cargando ? 'Pensando...' : 'Pensamiento'}
+                </summary>
+                <div className="think-content" style={{ whiteSpace: 'pre-wrap' }}>
+                  {contenidoPensamiento}
+                </div>
+              </details>
+            )}
+
+            {esDocumento && !mensaje.cargando ? (
+              <div className="doc-card" onClick={abrirVistaPreviaPDFLocal}>
+                <div className="doc-card-icon">📕</div>
+                <div className="doc-card-info">
+                  <h4>{tituloDocumento}</h4>
+                  <span>Documento listo para visualizar o descargar</span>
+                </div>
+                <div className="doc-card-action">Abrir</div>
+              </div>
+            ) : (
+              <MarkdownContent contenido={esDocumento ? contenidoDocumentoFinal : textoFinal} cargando={mensaje.cargando} />
+            )}
 
             {chartData && <TrendChart datos={chartData} />}
+
+            {/* Acceso rápido a Vista Previa PDF para respuestas detalladas */}
+            {!mensaje.cargando && textoFinal && textoFinal.length > 200 && !mensaje.error && !esDocumento && (
+              <div className="msg-doc-shortcut">
+                <button
+                  type="button"
+                  className="btn-doc-shortcut"
+                  onClick={abrirVistaPreviaPDFLocal}
+                  title="Abrir vista previa en hoja A4 y descargar PDF"
+                >
+                  <span className="btn-doc-icon">📕</span>
+                  <span>Vista previa / PDF</span>
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>

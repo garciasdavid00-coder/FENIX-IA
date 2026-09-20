@@ -176,7 +176,7 @@ export default function Sidebar() {
                   onClick={() => seleccionarChat(c.id)}
                   title={c.titulo}
                 >
-                  {c.pinned ? '📌 ' : ''}
+                  {c.bloqueado ? '🚫 ' : (c.pinned ? '📌 ' : '')}
                   {c.titulo}
                 </span>
 

@@ -20,6 +20,7 @@ const crypto = require('crypto');
 const db = require('../db');
 const memory = require('../backend/memoryManager');
 const chatEngine = require('../backend/chatEngine');
+const { detectarInsulto } = require('../backend/moderationMiddleware');
 const { fetchWithTimeout } = require('../utils/fetchWithTimeout');
 
 const router = express.Router();
@@ -231,7 +232,14 @@ async function procesarMensajeEntrante(message, value) {
       console.error('[WhatsApp] Error cargando memorias:', e.message);
     }
 
-    // 5) Respuesta del modelo (mismo motor que la web, non-streaming, versión reducida para WhatsApp).
+    // 5) Moderación: Cerrar la conversación si se detectan insultos
+    if (detectarInsulto(texto)) {
+      console.warn(`[WhatsApp] Insulto recibido de ${numero}. Cerrando conversación.`);
+      await enviarMensajeWhatsApp(numero, '🚫 Esta conversación ha sido finalizada y cerrada debido al uso de lenguaje ofensivo o insultos.');
+      return;
+    }
+
+    // 6) Respuesta del modelo (mismo motor que la web, non-streaming, versión reducida para WhatsApp).
     const resultado = await chatEngine.solicitarTextoCompleto({
       mensaje: texto,
       historial,
