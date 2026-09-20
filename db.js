@@ -210,7 +210,7 @@ function parsearClienteId(id) {
 // Sincroniza los chats y proyectos del usuario de forma segura (Upsert + reconciliación).
 // Protege el historial contra sobreescrituras vacías accidentales si el cliente
 // aún no había cargado su localStorage.
-async function sincronizarDatos(googleId, { chats, proyectos }) {
+async function sincronizarDatos(googleId, { chats, proyectos, borradoExplicito }) {
   if (!pool || !googleId) return null;
   const cliente = await pool.connect();
   try {
@@ -229,7 +229,8 @@ async function sincronizarDatos(googleId, { chats, proyectos }) {
     // PROTECCIÓN ANTI-PÉRDIDA: Si el cliente envía 0 chats pero la BD ya tiene
     // chats guardados, no ejecutamos borrado masivo (evita que una pestaña nueva
     // o un fallo de lectura local borre el historial de la cuenta en Neon).
-    if (listaChats.length === 0 && totalExistente > 0) {
+    // Si borradoExplicito es true, permitimos el borrado.
+    if (listaChats.length === 0 && totalExistente > 0 && !borradoExplicito) {
       console.warn(`[sincronizarDatos] Petición vacía ignorada para google_id ${googleId} para evitar pérdida de ${totalExistente} chats.`);
       await cliente.query('COMMIT');
       return { ok: true, omitidoPorProteccion: true };

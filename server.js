@@ -238,12 +238,12 @@ app.post('/api/sincronizar', async (req, res) => {
   if (!req.isAuthenticated || !req.isAuthenticated()) {
     return res.status(401).json({ error: 'Debes iniciar sesión.' });
   }
-  const { chats, proyectos } = req.body || {};
+  const { chats, proyectos, borradoExplicito } = req.body || {};
   if (!Array.isArray(chats) || !Array.isArray(proyectos)) {
     return res.status(400).json({ error: 'Formato inválido.' });
   }
   try {
-    await db.sincronizarDatos(req.user.id, { chats, proyectos });
+    await db.sincronizarDatos(req.user.id, { chats, proyectos, borradoExplicito });
     res.json({ ok: true });
   } catch (e) {
     console.error('Error al guardar historial:', e.message);

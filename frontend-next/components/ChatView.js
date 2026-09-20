@@ -195,48 +195,55 @@ export default function ChatView({ mensajes, generando, onEnviarMensaje, detener
               +
             </button>
 
-            {/* Selector de búsqueda web activa/inactiva */}
-            <button
-              type="button"
-              className={`websearch-toggle-btn ${busquedaWeb === 'on' ? 'active' : ''}`}
-              onClick={cambiarBusquedaWeb}
-              title={busquedaWeb === 'on' ? 'Búsqueda web activada (forzada)' : (busquedaWeb === 'off' ? 'Búsqueda web desactivada' : 'Búsqueda web automática')}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" width="16" height="16">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="2" y1="12" x2="22" y2="12" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-              </svg>
-              <span>{busquedaWeb === 'on' ? 'Web activa' : 'Buscar web'}</span>
-            </button>
-
-            <div className="chat-actions-right">
-              {/* Botón dictado por voz (en el input) */}
+            <div className="right-actions">
+              {/* Selector de búsqueda web activa/inactiva */}
               <button
                 type="button"
-                className={`mic-btn ${escuchando ? 'escuchando' : ''}`}
-                onClick={manejarClickMic}
-                title={escuchando ? 'Detener dictado' : 'Dictar mensaje'}
+                className={`web-btn ${busquedaWeb === 'on' ? 'forzado' : busquedaWeb === 'auto' ? 'activo' : 'apagado'}`}
+                onClick={cambiarBusquedaWeb}
+                title={
+                  busquedaWeb === 'auto'
+                    ? 'Búsqueda Web: Automática (se activa si la pregunta lo requiere)'
+                    : busquedaWeb === 'on'
+                      ? 'Búsqueda Web: Activada para todos los mensajes'
+                      : 'Búsqueda Web: Desactivada'
+                }
               >
-                <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17">
-                  <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
-                  <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="2" y1="12" x2="22" y2="12" />
+                  <path d="M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z" />
                 </svg>
               </button>
 
-              {/* Botón modo conversación por voz (abre modal de voz interactivo) */}
+              {/* Dictado por voz directo en caja de texto */}
               <button
                 type="button"
-                className="voice-mode-btn"
-                onClick={() => setVoiceModalOpen(true)}
-                title="Modo conversación de voz"
+                className={`mic-btn ${escuchando ? 'grabando activo' : ''}`}
+                onClick={manejarClickMic}
+                title={escuchando ? 'Detener dictado (escuchando...)' : 'Dictar por voz'}
               >
-                <div className="voice-mode-bars">
-                  <span className="voice-mode-bar" />
-                  <span className="voice-mode-bar" />
-                  <span className="voice-mode-bar" />
-                  <span className="voice-mode-bar" />
-                </div>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="20" height="20">
+                  <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
+                  <path d="M19 10v2a7 7 0 01-14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="23" />
+                </svg>
+              </button>
+
+              {/* Modo Conversación por Voz en Vivo */}
+              <button
+                type="button"
+                className="voice-call-btn"
+                onClick={() => setVoiceModalOpen(true)}
+                title="Voz en vivo (Modo conversación)"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+                  <path d="M12 3v18" />
+                  <path d="M8 7v10" />
+                  <path d="M16 7v10" />
+                  <path d="M4 11v2" />
+                  <path d="M20 11v2" />
+                </svg>
               </button>
 
               {/* Botón enviar / detener */}
