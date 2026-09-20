@@ -258,12 +258,18 @@ async function sincronizarDatos(googleId, { chats, proyectos, borradoExplicito }
     }
 
     // 2) Eliminación deliberada: si se enviaron chats, solo eliminamos los que
-    // el usuario explícitamente borró (no están en idsChatsEnviados)
+    // el usuario explícitamente borró (no están en idsChatsEnviados).
+    // Si borradoExplicito es true y enviaron un array vacío, eliminamos TODOS.
     if (idsChatsEnviados.length > 0) {
       await cliente.query(
         `DELETE FROM chats
          WHERE google_id = $1 AND cliente_id != ALL($2::bigint[])`,
         [googleId, idsChatsEnviados]
+      );
+    } else if (borradoExplicito) {
+      await cliente.query(
+        `DELETE FROM chats WHERE google_id = $1`,
+        [googleId]
       );
     }
 

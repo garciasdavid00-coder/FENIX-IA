@@ -163,21 +163,6 @@ export default function MessageBubble({ mensaje }) {
             )}
 
             {chartData && <TrendChart datos={chartData} />}
-
-            {/* Acceso rápido a Vista Previa PDF para respuestas detalladas */}
-            {!mensaje.cargando && textoFinal && textoFinal.length > 200 && !mensaje.error && !esDocumento && (
-              <div className="msg-doc-shortcut">
-                <button
-                  type="button"
-                  className="btn-doc-shortcut"
-                  onClick={abrirVistaPreviaPDFLocal}
-                  title="Abrir vista previa en hoja A4 y descargar PDF"
-                >
-                  <span className="btn-doc-icon">📕</span>
-                  <span>Vista previa / PDF</span>
-                </button>
-              </div>
-            )}
           </>
         )}
       </div>

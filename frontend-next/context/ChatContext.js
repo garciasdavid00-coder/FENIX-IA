@@ -220,14 +220,27 @@ export function ChatProvider({ children }) {
     }
   }, [chatActualId]);
 
-  const vaciarHistorial = useCallback(() => {
-    if (confirm('¿Estás seguro de que quieres eliminar TODOS los chats? Esta acción no se puede deshacer.')) {
+  const vaciarHistorial = useCallback(async () => {
+    if (typeof window !== 'undefined' && window.confirm('¿Estás seguro de que quieres eliminar TODOS los chats? Esta acción no se puede deshacer.')) {
       setChats([]);
       persistirChats([]);
       setChatActualId(null);
       setVistaActiva('chat');
+      
+      // Si el usuario está logueado, forzamos el borrado en la nube
+      if (autenticado) {
+        try {
+          await apiPost('/api/sincronizar', {
+            chats: [],
+            proyectos: proyectosRef.current,
+            borradoExplicito: true
+          });
+        } catch (e) {
+          console.error('Error al vaciar historial en la nube:', e);
+        }
+      }
     }
-  }, []);
+  }, [autenticado]);
 
   const togglePinChat = useCallback((id) => {
     setChats((prev) => {
