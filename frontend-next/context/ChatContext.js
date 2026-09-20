@@ -220,6 +220,15 @@ export function ChatProvider({ children }) {
     }
   }, [chatActualId]);
 
+  const vaciarHistorial = useCallback(() => {
+    if (confirm('¿Estás seguro de que quieres eliminar TODOS los chats? Esta acción no se puede deshacer.')) {
+      setChats([]);
+      persistirChats([]);
+      setChatActualId(null);
+      setVistaActiva('chat');
+    }
+  }, []);
+
   const togglePinChat = useCallback((id) => {
     setChats((prev) => {
       const actualizados = prev.map((c) =>
@@ -377,6 +386,7 @@ export function ChatProvider({ children }) {
         nuevoChat,
         seleccionarChat,
         eliminarChat,
+        vaciarHistorial,
         togglePinChat,
         guardarMensajesEnHistorial,
         proyectos,
