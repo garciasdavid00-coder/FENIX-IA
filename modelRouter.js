@@ -1,6 +1,4 @@
-// Router inteligente de modelos de Fenix IA.
-// Analiza el mensaje y elige automáticamente entre groq | gemini | deepseek.
-// Solo se usa cuando el usuario NO eligió un modelo manualmente (dropdown en "Auto").
+const { obtenerSystemPrompt, SYSTEM_PROMPT_COMPLETO, SYSTEM_PROMPT_REDUCIDO } = require('./config/systemPrompt');
 const reglas = require('./routerRules');
 
 function contarPalabras(texto){
@@ -61,4 +59,57 @@ function selectModel(userMessage, conversationHistory){
   return reglas.defaultModel;
 }
 
-module.exports = { selectModel };
+/**
+ * Formatea el system prompt y la conversación según los requerimientos de cada proveedor:
+ * - Groq y DeepSeek (compatibles con OpenAI): como mensaje con role: "system" al inicio de messages.
+ * - Gemini:
+ *     - Para API compatible con OpenAI: role: "system" al inicio de messages.
+ *     - Para API nativa / Gemini Live: systemInstruction separado de contents (sin role "system" dentro de contents).
+ *
+ * @param {Object} params
+ * @param {'groq'|'gemini'|'deepseek'|string} params.proveedor
+ * @param {string} params.sistemaFinal - prompt de sistema ya ensamblado
+ * @param {Array} [params.historial=[]]
+ * @param {string} params.mensaje
+ * @returns {{ messagesOpenAI: Array, geminiSystemInstruction: Object, geminiContents: Array }}
+ */
+function formatearMensajesParaProveedor({ proveedor, sistemaFinal, historial = [], mensaje }) {
+  const base = Array.isArray(historial) ? historial : [];
+
+  // Formato OpenAI (Groq, DeepSeek y Google OpenAI-compatible endpoint):
+  const messagesOpenAI = [
+    { role: 'system', content: sistemaFinal },
+    ...base,
+    { role: 'user', content: mensaje }
+  ];
+
+  // Formato Gemini nativo / Live (systemInstruction en la config del modelo, contents solo user/model):
+  const geminiSystemInstruction = {
+    parts: [{ text: sistemaFinal }]
+  };
+
+  const geminiContents = [
+    ...base.map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: typeof m.content === 'string' ? m.content : JSON.stringify(m.content) }]
+    })),
+    {
+      role: 'user',
+      parts: [{ text: mensaje }]
+    }
+  ];
+
+  return {
+    messagesOpenAI,
+    geminiSystemInstruction,
+    geminiContents
+  };
+}
+
+module.exports = {
+  selectModel,
+  obtenerSystemPrompt,
+  SYSTEM_PROMPT_COMPLETO,
+  SYSTEM_PROMPT_REDUCIDO,
+  formatearMensajesParaProveedor
+};

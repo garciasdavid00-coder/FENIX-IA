@@ -291,7 +291,8 @@ app.post('/api/voice-token', async (req, res) => {
     }
 
     // El valor del token viene en data.name (p. ej. "auth_tokens/xxxx").
-    res.json({ token: data.name || data.token, expiresAt: expireTime });
+    const systemPromptVoz = chatEngine.obtenerSystemPrompt ? chatEngine.obtenerSystemPrompt('voz') : '';
+    res.json({ token: data.name || data.token, expiresAt: expireTime, systemInstruction: systemPromptVoz });
   } catch (e) {
     console.error('Error en /api/voice-token:', e.message);
     res.status(500).json({ error: 'Error interno del servidor' });
@@ -687,7 +688,7 @@ app.delete('/api/memories/:id', async (req, res) => {
 
 app.post('/api/chat', async (req, res) => {
   try {
-    const { mensaje, historial, modelo, idioma, instruccion, webSearch: forzarWebSearch } = req.body;
+    const { mensaje, historial, modelo, idioma, instruccion, webSearch: forzarWebSearch, canal = 'chat' } = req.body || {};
 
     if (!mensaje || typeof mensaje !== 'string') {
       return res.status(400).json({ error: 'Falta el campo "mensaje"' });
@@ -809,12 +810,14 @@ app.post('/api/chat', async (req, res) => {
     const { sistemaFinal } = chatEngine.armarSistema({
       lang,
       instruccion: instruccionUsuario,
-      memoriaContexto: bloqueMemorias
+      memoriaContexto: bloqueMemorias,
+      canal
     });
     const { mensajes, mensajesConversacion } = chatEngine.construirMensajes({
       mensaje,
       historial,
-      sistemaFinal
+      sistemaFinal,
+      proveedor
     });
 
 

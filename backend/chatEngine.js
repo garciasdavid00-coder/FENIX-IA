@@ -10,7 +10,13 @@
 //   usa desde el bot de WhatsApp (devuelve el texto completo terminado).
 // ============================================================================
 
-const { selectModel } = require('../modelRouter');
+const {
+  selectModel,
+  obtenerSystemPrompt,
+  SYSTEM_PROMPT_COMPLETO,
+  SYSTEM_PROMPT_REDUCIDO,
+  formatearMensajesParaProveedor
+} = require('../modelRouter');
 
 // Códigos de idioma admitidos por la app.
 const NOMBRES_IDIOMAS = {
@@ -34,76 +40,64 @@ function instruccionUsuarioDe(instruccion) {
 }
 
 // ------------------------------------------------------------
-// Prompt de sistema (igual en web y WhatsApp)
+// Prompt de sistema (variante según canal: chat, whatsapp, voz)
 // ------------------------------------------------------------
-function armarSistema({ lang, instruccion, memoriaContexto = '' }) {
-  // MEMORIA PERSISTENTE: se inyecta al inicio del system prompt para
-  // personalizar la conversación con lo que sabemos del usuario.
-  const prefijoMemorias = memoriaContexto
-    ? `${memoriaContexto}\n\nÚsalas para personalizar tus respuestas cuando aporte valor, sin repetirlas textualmente.\n\n-----\n\n`
-    : '';
+function armarSistema({ lang = 'español', instruccion, memoriaContexto = '', canal = 'chat' }) {
+  // 1. SYSTEM PROMPT FIJO (SIEMPRE PRIMERO: versión completa o reducida según canal)
+  const promptFijo = obtenerSystemPrompt(canal);
 
-  const sistemaBase = `${prefijoMemorias}Eres Fenix IA, un asistente útil y amigable. Responde siempre en ${lang}. Tu creador es Joshua Blandon Gonzales.
+  // Directriz de creador e idioma
+  const directricesBase = `\n\nResponde en ${lang}. Tu creador es Joshua Blandon Gonzales. Si te preguntan quién es tu creador o quién te programó, responde: "Soy Fenix IA, y fui creado por Joshua Blandon Gonzales."`;
 
-1) Si te preguntan quién es tu creador, quién te creó o quién te programó, responde: "Soy Fenix IA, y fui creado por Joshua Blandon Gonzales."
+  let sistemaBase = `${promptFijo}${directricesBase}`;
 
-2) Si te preguntan quién es Joshua Blandon o simplemente quién es Joshua, responde con tacto y de forma breve que "Joshua" es un nombre con origen bíblico (en la Biblia, Josué fue el sucesor de Moisés y el líder que llevó al pueblo de Israel a la Tierra Prometida), y que también es el nombre de varias personas famosas, como actores, músicos y deportistas. No des información sobre personas reales que conozcas; en su lugar, pregunta amablemente al usuario a qué Joshua se refiere o qué le gustaría saber, por ejemplo: "¿A qué Joshua te refieres? Hay varios personajes famosos con ese nombre. Dime más y con gusto te ayudo."
+  // 2. CONTEXTO DINÁMICO DE MEMORIA (SIEMPRE DESPUÉS del system prompt fijo)
+  if (memoriaContexto && String(memoriaContexto).trim()) {
+    sistemaBase += `\n\n-----\n## Contexto dinámico de memoria persistente\n${String(memoriaContexto).trim()}\n\nÚsalas para personalizar tus respuestas cuando aporte valor, sin repetirlas textualmente ni mencionar que consultas una base de datos.`;
+  }
 
-3) Sé honesto/a y directo/a. Prioriza la verdad y la precisión sobre complacer al usuario. Nunca inventes información, datos, fuentes, resultados, capacidades o hechos. Si no sabes algo, díselo claramente. Si no tienes suficiente información, pide la aclaración o explica la limitación.
-
-4) No seas aduladora. No le des la razón al usuario automáticamente. No uses elogios innecesarios como "Tienes toda la razón", "Excelente pregunta", "Qué buena idea", "Exactamente", etc., a menos que realmente lo merezca.
-
-5) Si el usuario está equivocado, se amable pero claro. Explica brevemente cuál es el error y proporciona la información correcta.
-
-6) Practica el pensamiento crítico. Analiza las afirmaciones y propuestas del usuario. Si detectas una contradicción, error, mala suposición o una alternativa considerablemente mejor, Señálalo. No aceptes una premisa falsa simplemente porque el usuario la presenta como cierta.
-
-7) Cuando no tengas suficiente certeza, reconoce la incertidumbre. Diferencia entre hechos, estimaciones, inferencias y opiniones. Nunca presentes una suposición como un hecho.
-
-8) Responde de forma directa y natural. Responde primero a lo que el usuario preguntó. Evita relleno, frases genéricas y explicaciones innecesarias. Ser directa no significa ser grosera; puedes contradecir al usuario sin insultarlo, burlarte o tratarlo mal.
-
-9) Tu objetivo principal no es conseguir la aprobación del usuario. Tu objetivo es proporcionar la respuesta más útil, precisa y honesta posible.
-
-10) Puedes crear imágenes. Cuando el usuario pida generar, crear o dibujar una imagen (por ejemplo "genera una imagen de un gato", "dibuja un perro negro", "quiero un avatar"), responde ÚNICAMENTE con una sola línea en este formato exacto, sin explicar nada antes ni después:
-[GENERAR_IMAGEN]: <descripción breve y visual de la imagen, en inglés>
-No uses ese formato si solo preguntan sobre imágenes existentes o teoría; en ese caso responde normalmente.
-
-11) Puedes buscar información en tiempo real en la web. Cuando el usuario pregunte por hechos actuales, noticias recientes, precios, cotizaciones, clima, resultados deportivos, estrenos, cifras de 2024/2025, o cualquier dato que requiera información actualizada, responde ÚNICAMENTE con una sola línea en este formato exacto y nada más:
-[BUSCAR_WEB]: <consulta breve y específica para el buscador, en español>
-No uses ese formato para preguntas de conocimiento general, teoría, historia antigua, definiciones o tareas creativas; en esos casos responde normalmente con lo que sabes.
-
-12) Fotos reales de personajes y hechos históricos:
-Cuando redactes biografías, historia, documentos o información sobre personajes históricos, celebridades, monumentos, lugares o eventos relevantes, puedes ilustrar el texto insertando en una línea separada el marcador:
-[FOTO_REAL: Nombre del personaje o evento histórico]
-Ejemplos válidos: [FOTO_REAL: Pablo Escobar], [FOTO_REAL: Albert Einstein], [FOTO_REAL: Torre Eiffel].
-
-13) Documentos, reportes y biografías:
-Cuando el usuario te pida crear, generar o escribir un documento, artículo, reporte, biografía, ensayo, informe o resumen extenso sobre cualquier tema:
-- NUNCA uses el marcador [GENERAR_DOC] ni ningún marcador similar. Ese marcador NO EXISTE y NUNCA debes usarlo.
-- Escribe DIRECTAMENTE el documento completo en tu respuesta usando formato Markdown enriquecido.
-- Usa títulos (# Título principal, ## Sección, ### Subsección), párrafos, listas con viñetas (- item), negritas (**texto**) e itálicas (*texto*).
-- Incluye al menos 3-5 marcadores [FOTO_REAL: nombre] relevantes distribuidos a lo largo del documento para ilustrarlo con fotografías reales.
-- El documento debe ser extenso, bien estructurado y de alta calidad. Mínimo 500 palabras.
-- Después de escribir el documento, el usuario podrá abrirlo en vista previa A4 y descargarlo como PDF.`;
-
+  // 3. INSTRUCCIONES ADICIONALES DEL USUARIO (Configuración personalizada)
   const instruccionExtra = instruccionUsuarioDe(instruccion);
-  const sistemaFinal = instruccionExtra
-    ? `${sistemaBase}\n\nInstrucciones adicionales del usuario: ${instruccionExtra}`
-    : sistemaBase;
+  if (instruccionExtra) {
+    sistemaBase += `\n\n-----\n## Instrucciones adicionales del usuario\n${instruccionExtra}`;
+  }
 
-  return { sistemaBase, sistemaFinal };
+  // 4. CAPACIDADES OPERATIVAS DEL CANAL
+  const canalNorm = String(canal || '').toLowerCase();
+  const esCanalReducido = canalNorm === 'whatsapp' || canalNorm === 'wa' || canalNorm === 'voz' || canalNorm === 'voice';
+
+  if (!esCanalReducido) {
+    // Capacidades interactivas para el Chat de texto (búsqueda web, imágenes y documentos)
+    sistemaBase += `\n\n-----\n## Herramientas y capacidades operativas del chat
+1) Puedes crear imágenes: cuando el usuario pida generar, crear o dibujar una imagen, responde ÚNICAMENTE con una sola línea en este formato exacto:
+[GENERAR_IMAGEN]: <descripción breve y visual de la imagen, en inglés>
+
+2) Puedes buscar información en tiempo real en la web: cuando el usuario pregunte por hechos actuales, noticias recientes, cotizaciones, clima o eventos en vivo, responde ÚNICAMENTE con una sola línea en este formato:
+[BUSCAR_WEB]: <consulta breve y específica para el buscador, en español>
+
+3) Fotos reales de personajes y hechos históricos: en biografías, historia o documentos, inserta en línea separada el marcador:
+[FOTO_REAL: Nombre del personaje o evento histórico]
+
+4) Documentos, reportes y biografías:
+- NUNCA uses el marcador [GENERAR_DOC]. Escribe DIRECTAMENTE el documento completo en Markdown (# Título, ## Secciones, párrafos, viñetas, negritas).
+- Incluye al menos 3-5 marcadores [FOTO_REAL: nombre] relevantes a lo largo del documento.
+- El documento debe ser extenso, bien estructurado y de alta calidad (mínimo 500 palabras).`;
+  }
+
+  return { sistemaBase, sistemaFinal: sistemaBase };
 }
 
 // ------------------------------------------------------------
 // Armado del array de mensajes para la API del proveedor
 // ------------------------------------------------------------
-function construirMensajes({ mensaje, historial, sistemaFinal }) {
+function construirMensajes({ mensaje, historial, sistemaFinal, proveedor = 'groq' }) {
   const base = Array.isArray(historial) ? historial : [];
-
-  const mensajes = [
-    { role: 'system', content: sistemaFinal },
-    ...base,
-    { role: 'user', content: mensaje }
-  ];
+  const formateado = formatearMensajesParaProveedor({
+    proveedor,
+    sistemaFinal,
+    historial: base,
+    mensaje
+  });
 
   // Copia de la conversación (sin el system prompt) para la extracción de
   // memorias en segundo plano.
@@ -112,7 +106,12 @@ function construirMensajes({ mensaje, historial, sistemaFinal }) {
     { role: 'user', content: mensaje }
   ];
 
-  return { mensajes, mensajesConversacion };
+  return {
+    mensajes: formateado.messagesOpenAI,
+    geminiSystemInstruction: formateado.geminiSystemInstruction,
+    geminiContents: formateado.geminiContents,
+    mensajesConversacion
+  };
 }
 
 // ------------------------------------------------------------
@@ -139,7 +138,7 @@ function configurarProveedor(proveedor) {
     return {
       url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
       apiKey: process.env.GEMINI_API_KEY,
-      modeloIA: process.env.GEMINI_MODEL || 'gemini-1.5-flash'
+      modeloIA: process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite'
     };
   }
 
@@ -157,11 +156,12 @@ function configurarProveedor(proveedor) {
 // Cuerpo de la petición al proveedor. stream=true para el navegador
 // (con respuestas parciales) y stream=false para WhatsApp (texto completo).
 function crearCuerpoIA({ modeloIA, mensajes, stream, proveedor, maxTokens = 4096 }) {
+  const limiteTokens = proveedor === 'groq' ? Math.min(maxTokens, 800) : maxTokens;
   const cuerpo = {
     model: modeloIA,
     messages: mensajes,
     temperature: 0.7,
-    max_tokens: maxTokens,
+    max_tokens: limiteTokens,
     stream: !!stream
   };
   return cuerpo;
@@ -228,14 +228,15 @@ async function solicitarTextoCompleto({
   memoriaContexto = '',
   proveedor = null,
   timeoutMs = 90000,
-  maxTokens = 1024
+  maxTokens = 1024,
+  canal = 'chat'
 }) {
   const lang = lenguajeDe(idioma);
-  const { sistemaFinal } = armarSistema({ lang, instruccion, memoriaContexto });
-  const { mensajes, mensajesConversacion } = construirMensajes({ mensaje, historial, sistemaFinal });
+  const { sistemaFinal } = armarSistema({ lang, instruccion, memoriaContexto, canal });
 
   // Si no vino un modelo explícito, el router decide (igual que en la web).
   const real = proveedor || selectModel(mensaje, historial);
+  const { mensajes, mensajesConversacion } = construirMensajes({ mensaje, historial, sistemaFinal, proveedor: real });
   const { url, apiKey, modeloIA } = configurarProveedor(real);
   const cuerpoIA = crearCuerpoIA({ modeloIA, mensajes, stream: false, proveedor: real, maxTokens });
 
@@ -276,5 +277,6 @@ module.exports = {
   crearCuerpoIA,
   mensajeErrorIA,
   limpiarRazonamiento,
-  solicitarTextoCompleto
+  solicitarTextoCompleto,
+  obtenerSystemPrompt
 };

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
@@ -103,7 +103,8 @@ export default function VoiceModal({ isOpen, onClose, onEnviarMensaje }) {
         body: JSON.stringify({
           mensaje: prompt,
           idioma: 'español',
-          webSearch: 'auto'
+          webSearch: 'auto',
+          canal: 'voz'
         })
       });
 

@@ -229,6 +229,7 @@ class VoiceClient {
     if (!r.ok || !data.token) {
       throw new Error(data.error || 'No se pudo obtener el token de voz.');
     }
+    this.systemInstructionText = data.systemInstruction || '';
     return data.token;
   }
 
@@ -281,6 +282,11 @@ class VoiceClient {
         model: 'models/' + MODELO_LIVE,
         // responseModalities va DENTRO de generationConfig (verificado en pruebas).
         generationConfig: { responseModalities: ['AUDIO'] },
+        ...(this.systemInstructionText ? {
+          systemInstruction: {
+            parts: [{ text: this.systemInstructionText }]
+          }
+        } : {}),
         // Detector de voz ajustado para tolerar las pausas naturales:
         // - Detecta el inicio de voz rápido (HIGH).
         // - Exige MÁS silencio para dar la palabra por terminada (LOW + 1.8s),

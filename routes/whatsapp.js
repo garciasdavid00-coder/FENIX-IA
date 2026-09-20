@@ -231,13 +231,14 @@ async function procesarMensajeEntrante(message, value) {
       console.error('[WhatsApp] Error cargando memorias:', e.message);
     }
 
-    // 5) Respuesta del modelo (mismo motor que la web, non-streaming).
+    // 5) Respuesta del modelo (mismo motor que la web, non-streaming, versión reducida para WhatsApp).
     const resultado = await chatEngine.solicitarTextoCompleto({
       mensaje: texto,
       historial,
       idioma: 'es',
       memoriaContexto,
-      timeoutMs: TIME_OUT_IA
+      timeoutMs: TIME_OUT_IA,
+      canal: 'whatsapp'
     });
     const respuesta = sanitizarParaWhatsApp(resultado.texto);
 
