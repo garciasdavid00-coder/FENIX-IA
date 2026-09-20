@@ -22,14 +22,25 @@ export default function ChatView({ mensajes, generando, onEnviarMensaje, detener
   const containerRef = useRef(null);
 
   // Dictado por voz en tiempo real
-  const { escuchando, toggle: toggleDictado } = useSpeechRecognition({
+  const { escuchando, soportado, toggle: toggleDictado } = useSpeechRecognition({
     onResult: (texto) => {
       const base = textoBaseRef.current.trim();
       setTextoInput(base ? `${base} ${texto}` : texto);
+    },
+    onError: (err) => {
+      if (err === 'not-allowed') {
+        alert('Permiso de micrófono denegado. Por favor haz clic en el ícono de candado o controles del sitio junto a la barra de direcciones de tu navegador y permite el acceso al micrófono.');
+      } else if (err === 'no-soportado') {
+        alert('Tu navegador no soporta el reconocimiento de voz por Web Speech API. Te recomendamos usar Google Chrome o Microsoft Edge.');
+      }
     }
   });
 
   const manejarClickMic = () => {
+    if (!soportado && typeof window !== 'undefined' && !(window.SpeechRecognition || window.webkitSpeechRecognition)) {
+      alert('Tu navegador no soporta el reconocimiento de voz nativo. Prueba en Google Chrome o Microsoft Edge.');
+      return;
+    }
     textoBaseRef.current = textoInput;
     toggleDictado();
   };

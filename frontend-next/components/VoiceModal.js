@@ -78,6 +78,11 @@ export default function VoiceModal({ isOpen, onClose, onEnviarMensaje }) {
     },
     onError: (err) => {
       console.warn('[VoiceModal] Error de reconocimiento:', err);
+      if (err === 'not-allowed') {
+        alert('Permiso de micrófono denegado. Por favor haz clic en el ícono de candado o controles del sitio junto a la barra de direcciones de tu navegador y permite el acceso al micrófono.');
+      } else if (err === 'no-soportado') {
+        alert('Tu navegador no soporta el reconocimiento de voz. Te recomendamos usar Google Chrome o Microsoft Edge.');
+      }
     }
   });
 
