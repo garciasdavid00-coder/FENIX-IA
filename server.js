@@ -70,7 +70,7 @@ if (!googleHabilitado) {
 // Express detecte correctamente que la conexión es HTTPS.
 app.set('trust proxy', 1);
 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const FRONTEND_URL = process.env.FRONTEND_URL || (enProduccion ? '/' : 'http://localhost:3000');
 
 let origenesPermitidos = [];
 
