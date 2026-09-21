@@ -584,6 +584,20 @@ app.delete('/api/memories/:id', async (req, res) => {
 });
 
 app.post('/api/chat', async (req, res) => {
+  // --- PREVENCIÓN DE FUGAS (AbortController Leak) ---
+  // Rastrear los fetch a los modelos IA y los streams de lectura.
+  // Si el usuario cierra la pestaña, cortamos TODAS las peticiones en segundo plano.
+  const abortControllersActivos = [];
+  let lectorGlobal = null;
+
+  res.on('close', () => {
+    abortControllersActivos.forEach(c => c.abort());
+    if (!res.writableEnded && lectorGlobal) {
+      lectorGlobal.cancel().catch(() => {});
+    }
+  });
+  // --------------------------------------------------
+
   try {
     const { mensaje, historial, modelo, idioma, instruccion, webSearch: forzarWebSearch, canal = 'chat', timeZone } = req.body || {};
 
@@ -744,6 +758,7 @@ app.post('/api/chat', async (req, res) => {
     const MSG_TIMEOUT_IA = 'El modelo tardó demasiado en responder, intentá de nuevo.';
 
     const controladorIA = new AbortController();
+    abortControllersActivos.push(controladorIA);
     const temporizadorIA = setTimeout(() => controladorIA.abort(), TIMEOUT_IA_MS);
     let respuestaIA;
     try {
@@ -822,12 +837,7 @@ app.post('/api/chat', async (req, res) => {
       } catch (e) { /* cliente cerró */ }
     }
 
-    res.on('close', () => {
-      if (!res.writableEnded && lector && !lectorAbortado) {
-        lectorAbortado = true;
-        lector.cancel().catch(() => {});
-      }
-    });
+    // (El cierre de conexión ahora se maneja globalmente al inicio de la ruta)
 
     // ─────────────────────────────────────────────────────────────────────────
     // GENERACIÓN DE DOCUMENTO DIRECTO (fallback cuando el modelo emite [GENERAR_DOC])
@@ -857,6 +867,7 @@ Escribe SOLO el documento completo comenzando con el marcador.`;
 
       const bodyDoc = chatEngine.crearCuerpoIA({ modeloIA, mensajes: mensajesDoc, stream: true, proveedor, maxTokens: 4096 });
       const ctrlDoc = new AbortController();
+      abortControllersActivos.push(ctrlDoc);
       const timerDoc = setTimeout(() => ctrlDoc.abort(), TIMEOUT_IA_MS);
       let respDoc;
       try {
@@ -896,7 +907,7 @@ Escribe SOLO el documento completo comenzando con el marcador.`;
 
       await leerStreamSSE(respDoc, delta => enviarDoc(filtroDoc.push(delta)), {
         esActivo: () => !lectorAbortado,
-        setLector: (r) => { lector = r; }
+        setLector: (r) => { lector = r; lectorGlobal = r; }
       });
       enviarDoc(filtroDoc.final());
       res.write('data: [DONE]\n\n');
@@ -945,7 +956,7 @@ Escribe SOLO el documento completo comenzando con el marcador.`;
           enviarTexto(emitido.slice(0, fiable));
           comprometido = fiable;
         }
-      }, { esActivo: () => !lectorAbortado, setLector: (r) => { lector = r; } });
+      }, { esActivo: () => !lectorAbortado, setLector: (r) => { lector = r; lectorGlobal = r; } });
 
       // Fin del stream: entregar lo que quedó pendiente
       if (!buscarDetectado) {
@@ -1051,6 +1062,7 @@ Consulta optimizada para Google:`;
 
       // Mismo timeout que la primera llamada (los headers SSE ya se enviaron).
       const controladorIA2 = new AbortController();
+      abortControllersActivos.push(controladorIA2);
       const temporizadorIA2 = setTimeout(() => controladorIA2.abort(), TIMEOUT_IA_MS);
       let respuestaIA2;
       try {
@@ -1109,7 +1121,7 @@ Consulta optimizada para Google:`;
         enviarTextoFinal(texto);
       }, {
         esActivo: () => !lectorAbortado,
-        setLector: (r) => { lector = r; }
+        setLector: (r) => { lector = r; lectorGlobal = r; }
       });
 
       enviarTextoFinal(filtro2.final());
