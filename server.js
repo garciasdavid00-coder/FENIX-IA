@@ -21,6 +21,18 @@ const chatEngine = require('./backend/chatEngine');
 const webSearch = require('./backend/webSearch');
 const whatsappRouter = require('./routes/whatsapp');
 const moderationMiddleware = require('./backend/moderationMiddleware');
+const rateLimit = require('express-rate-limit');
+
+// ==========================================================
+// LIMITADOR DE TASA (Anti-Spam / Anti-DDoS)
+// ==========================================================
+const chatLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minuto
+  max: 15, // Límite de 15 peticiones por minuto por IP
+  message: { error: 'Demasiadas peticiones. Por favor, espera un minuto antes de enviar más mensajes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -604,7 +616,7 @@ function sendStatus(res, phase, label) {
   }
 }
 
-app.post('/api/chat', async (req, res) => {
+app.post('/api/chat', chatLimiter, async (req, res) => {
   // --- PREVENCIÓN DE FUGAS (AbortController Leak) ---
   // Rastrear los fetch a los modelos IA y los streams de lectura.
   // Si el usuario cierra la pestaña, cortamos TODAS las peticiones en segundo plano.

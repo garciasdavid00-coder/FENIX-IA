@@ -130,7 +130,28 @@ code{font-family:'Courier New',monospace;font-size:9pt;background:#f0f0f0;paddin
 </html>`;
 }
 
+
+// ==========================================
+// CONTROL DE CONCURRENCIA PARA RENDER
+// Evita Múltiples instancias de Chrome
+// ==========================================
+let pdfLock = Promise.resolve();
+
 async function generarPDF(titulo, contenidoMarkdown, imagenes = []) {
+  // Encolar la petición para evitar que 2+ PDFs corran a la vez y crasheen la RAM
+  const release = await new Promise(resolve => {
+    const nextLock = pdfLock.then(() => resolve).catch(() => resolve);
+    pdfLock = nextLock;
+  });
+
+  try {
+    return await _generarPDF_Interno(titulo, contenidoMarkdown, imagenes);
+  } finally {
+    release(); // Liberar el candado
+  }
+}
+
+async function _generarPDF_Interno(titulo, contenidoMarkdown, imagenes = []) {
   const urlsPorDescargar = new Map();
 
   for (const img of (imagenes || [])) {
@@ -172,7 +193,7 @@ async function generarPDF(titulo, contenidoMarkdown, imagenes = []) {
     const puppeteer = require('puppeteer');
     const opciones = {
       headless: 'new',
-      args: ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage','--disable-gpu','--disable-extensions'],
+      args: ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage','--disable-gpu','--disable-extensions','--single-process','--no-zygote','--disable-background-networking','--disable-default-apps'],
     };
     if (EN_PRODUCCION && process.env.PUPPETEER_EXECUTABLE_PATH) {
       opciones.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
