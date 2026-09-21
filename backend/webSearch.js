@@ -28,51 +28,84 @@ const PALABRAS_CLAVE_TIEMPO_REAL = [
  * @param {Array} historial
  * @returns {Promise<boolean>}
  */
-async function detectarNecesidadBusqueda(mensaje, historial = []) {
-  if (!mensaje || typeof mensaje !== 'string') return false;
-  const texto = mensaje.trim();
+const cacheBusquedas = new Map();
+function obtenerDeCache(query) {
+  const ahora = Date.now();
+  const cached = cacheBusquedas.get(query);
+  if (cached && (ahora - cached.timestamp < 5 * 60 * 1000)) {
+    return cached.resultado;
+  }
+  return null;
+}
+function guardarEnCache(query, resultado) {
+  cacheBusquedas.set(query, { resultado, timestamp: Date.now() });
+}
 
-  // 1) Petición explícita rápida
-  if (/\b(busca|investiga|googlea|consulta\s+en\s+la\s+web|busca\s+en\s+la\s+web)\b/i.test(texto)) {
-    return true;
+/**
+ * Evalúa si se debe buscar en la web.
+ * Devuelve: { buscar: boolean, consulta: string, via: string }
+ */
+async function evaluarBusquedaAutomatica(mensaje, historial = []) {
+  if (process.env.BUSQUEDA_AUTO === 'off') return { buscar: false };
+  const texto = String(mensaje || '').trim();
+  if (!texto) return { buscar: false };
+
+  // Filtro rápido para saltar (código o saludos muy cortos)
+  if (/^hola$/i.test(texto) || texto.includes('```')) {
+    return { buscar: false };
   }
 
-  // 2) Patrones obvios de tiempo real
-  for (const regex of PALABRAS_CLAVE_TIEMPO_REAL) {
-    if (regex.test(texto)) return true;
+  // Filtro rápido de palabras claras
+  const regexRapido = /\b(hoy|ahora|ayer|mañana|esta semana|último|última|resultado|quién ganó|a qué hora|cuándo|precio|clima|lluvia|noticias|dólar)\b/i;
+  if (regexRapido.test(texto) || /\b(busca|investiga)\b/i.test(texto)) {
+    console.log('[busqueda-auto] via=filtro, buscar=true, consulta="' + texto + '"');
+    return { buscar: true, consulta: extraerQueryBusqueda(texto), via: 'filtro' };
   }
 
-  // 3) Clasificador rápido LLM para preguntas ambiguas sobre eventos o actualidad
+  // Clasificador LLM
   try {
-    const clasificadorPrompt = `¿La siguiente pregunta del usuario requiere buscar información en internet en tiempo real (noticias, horarios de eventos actuales, resultados, precios recientes)? Responde únicamente "SI" o "NO".
-    
-Pregunta: "${texto}"
-Respuesta:`;
+    const startMs = Date.now();
+    const ultimos = historial.slice(-4).map(m => m.role + ': ' + m.content).join('\n');
+    const promptClasificador = `Analiza si el siguiente mensaje requiere buscar en internet (eventos y noticias recientes, resultados deportivos, horarios de eventos, clima, precios y tipo de cambio, personas en cargos actuales, versiones recientes de software, negocios o lugares locales, "hoy/ahora/último/actual", y cualquier dato que pueda haber cambiado).
+Responde SOLO con un JSON estricto con este formato: {"buscar": true|false, "consulta": "consulta autocontenida en el idioma del usuario"}.
+Ante la duda, "buscar": true.
+La consulta debe incluir nombres y contexto de los mensajes anteriores.
+No uses markdown en tu respuesta, SOLO el JSON puro.
 
+Mensajes anteriores:
+${ultimos}
+
+Mensaje actual:
+${texto}
+`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2000);
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` },
       body: JSON.stringify({
         model: 'llama-3.1-8b-instant',
-        messages: [{ role: 'user', content: clasificadorPrompt }],
+        messages: [{ role: 'user', content: promptClasificador }],
         temperature: 0,
-        max_tokens: 5
-      })
+        max_tokens: 150,
+        response_format: { type: 'json_object' }
+      }),
+      signal: controller.signal
     });
+    clearTimeout(timeout);
     const data = await res.json();
-    const respuesta = data.choices && data.choices[0] && data.choices[0].message.content.trim().toUpperCase();
-    if (respuesta && respuesta.includes('SI')) {
-      console.log(`[WebSearch] LLM Clasificador decidió buscar para: "${texto}"`);
-      return true;
+    const contenido = data.choices?.[0]?.message?.content?.trim();
+    if (contenido) {
+      const parsed = JSON.parse(contenido);
+      const elapsed = Date.now() - startMs;
+      console.log(`[busqueda-auto] via=clasificador, buscar=${parsed.buscar}, consulta="${parsed.consulta}", ms=${elapsed}`);
+      return { buscar: !!parsed.buscar, consulta: parsed.consulta || texto, via: 'clasificador' };
     }
   } catch (e) {
-    console.warn('[WebSearch] Error en clasificador:', e.message);
+    console.warn('[busqueda-auto] Error o timeout en clasificador:', e.name === 'AbortError' ? 'Timeout 2s' : e.message);
   }
-
-  return false;
+  return { buscar: false };
 }
 
 /**
@@ -224,7 +257,8 @@ async function ejecutarBusquedaWebCompleta({
   lang = 'español',
   apiKey,
   instruccionExtra = '',
-  memoriaContexto = ''
+  memoriaContexto = '',
+  timeZone
 }) {
   const query = extraerQueryBusqueda(mensaje);
   if (!query || !String(query).trim()) {
@@ -240,7 +274,7 @@ async function ejecutarBusquedaWebCompleta({
   // 1) Búsqueda Web Elegante vía Searlo (Google Search real y limpio)
   let busqueda = { texto: '', fuentes: [] };
   try {
-    busqueda = await buscarEnWeb({ consulta: query });
+    busqueda = await buscarEnWeb({ consulta: query, lang, timeZone });
   } catch (e) {
     console.error('[WebSearch] Error al buscar en Searlo:', e.message);
   }
@@ -380,7 +414,7 @@ INSTRUCCIONES GENERALES:
  * @param {{ consulta: string, apiKey?: string, lang?: string }} opts
  * @returns {Promise<{ texto: string, fuentes: {titulo: string, url: string}[] }>}
  */
-async function buscarEnWeb({ consulta, apiKey, lang = 'español' }) {
+async function buscarEnWeb({ consulta, apiKey, lang = 'español', timeZone = 'America/Managua' }) {
   const query = String(consulta || '').trim();
   if (!query) {
     console.warn('[buscarEnWeb] Consulta vacía; devolviendo respuesta segura.');
@@ -403,10 +437,6 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español' }) {
       const langCodigo = (lang || 'es').slice(0, 2);
       urlApi.searchParams.set('hl', langCodigo);
       urlApi.searchParams.set('gl', langCodigo === 'es' ? 'mx' : 'us');
-      // Filtro de actualidad si parece que pregunta sobre algo reciente
-      if (/\b(hoy|ayer|hora|ahora|noticia|cu[aá]ndo)\b/i.test(query)) {
-        urlApi.searchParams.set('tbs', 'qdr:w'); // Última semana
-      }
 
       console.log('[buscarEnWeb] Consultando Searlo API para: ' + query.slice(0, 80));
 
@@ -426,13 +456,35 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español' }) {
             url: it.link || it.url
           }));
 
+          const ahora = new Date();
+          const fmtCorto = new Intl.DateTimeFormat('es-ES', { 
+            timeZone, month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true 
+          });
+
           const texto = items
             .slice(0, 5)
             .map((it, i) => {
               const titulo = String(it.title || it.name).trim();
               const snippet = String(it.snippet || it.content || it.description || '').trim();
-              const date = it.date ? ` [Fecha: ${it.date}]` : '';
-              return `${i + 1}. ${titulo}${date}${snippet ? ' — ' + snippet : ''}`;
+              
+              let dateStr = '';
+              if (it.date) {
+                const d = new Date(it.date);
+                if (!isNaN(d.getTime())) {
+                  const diffMinutos = Math.floor((ahora - d) / 60000);
+                  let rel = '';
+                  if (diffMinutos >= 0 && diffMinutos < 60) rel = `hace ${diffMinutos} min`;
+                  else if (diffMinutos >= 60 && diffMinutos < 1440) rel = `hace ${Math.floor(diffMinutos / 60)}h`;
+                  else if (diffMinutos >= 1440 && diffMinutos < 2880) rel = 'ayer';
+                  else rel = `hace ${Math.floor(diffMinutos / 1440)} días`;
+                  
+                  dateStr = ` [Publicado: ${fmtCorto.format(d)} (${rel})]`;
+                } else {
+                  dateStr = ` [Fecha: ${it.date}]`;
+                }
+              }
+              
+              return `${i + 1}. ${titulo}${dateStr}${snippet ? ' — ' + snippet : ''}`;
             })
             .join('\n');
 
@@ -527,7 +579,9 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español' }) {
 }
 
 module.exports = {
-  detectarNecesidadBusqueda,
+  evaluarBusquedaAutomatica,
+  obtenerDeCache,
+  guardarEnCache,
   extraerQueryBusqueda,
   buscarWebMultiFuente,
   ejecutarBusquedaWebCompleta,
