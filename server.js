@@ -72,38 +72,33 @@ app.set('trust proxy', 1);
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
-// Lista de orígenes permitidos para peticiones con credenciales (cookies)
-const ORIGENES_BASE = [
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-  'http://localhost:3001',
-  'http://127.0.0.1:3001',
-  process.env.FRONTEND_URL
-].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
+let origenesPermitidos = [];
 
-// En local, el propio Express sirve la app en :3001 (mismo origen) y además
-// se permite el FRONTEND_URL definido en .env. En producción/desarrollo
-// remoto, FRONTEND_URL indica el origen del frontend real.
-const origenesPermitidos = enProduccion
-  ? ORIGENES_BASE
-  : [...ORIGENES_BASE, `http://localhost:${process.env.PORT || 3001}`, `http://127.0.0.1:${process.env.PORT || 3001}`];
+if (process.env.ALLOWED_ORIGINS) {
+  origenesPermitidos = process.env.ALLOWED_ORIGINS.split(',')
+    .map(o => o.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
+} else {
+  if (!enProduccion) {
+    origenesPermitidos = ['http://localhost:3000', 'http://localhost:3001'];
+  } else {
+    console.warn('CRÍTICO: ALLOWED_ORIGINS no está definida en producción. No se permitirá ningún origen cruzado.');
+    origenesPermitidos = [];
+  }
+}
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Permitir peticiones sin cabecera origin (curl, scripts internos, servidor)
+    // Permitir peticiones sin cabecera origin (WhatsApp, health checks, servidor a servidor)
     if (!origin) return callback(null, true);
 
-    // Orígenes permitidos explícitos
-    if (origenesPermitidos.includes(origin)) return callback(null, true);
+    // Lista blanca de orígenes EXACTOS
+    if (origenesPermitidos.includes(origin)) {
+      return callback(null, true);
+    }
 
-    // Permitir cualquier dominio o subdominio alojado en Render (*.onrender.com)
-    if (/^https?:\/\/.*\.onrender\.com$/i.test(origin)) return callback(null, true);
-
-    // Permitir localhost o 127.0.0.1 en cualquier puerto
-    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin)) return callback(null, true);
-
-    console.warn('[CORS] Origen no permitido:', origin);
-    // callback(null, false) rechaza CORS de forma limpia sin generar Error 500
+    console.warn('[CORS] Origen cruzado rechazado:', origin);
+    // Rechaza CORS sin crashear ni dar error 500
     callback(null, false);
   },
   credentials: true
@@ -654,7 +649,8 @@ app.post('/api/chat', async (req, res) => {
           lang,
           apiKey: process.env.GEMINI_API_KEY,
           instruccionExtra: instruccionUsuario,
-          memoriaContexto: bloqueMemorias
+          memoriaContexto: bloqueMemorias,
+          timeZone
         });
 
         // Emisión en pequeños bloques fluidos (efecto máquina de escribir)
@@ -1030,7 +1026,8 @@ Consulta optimizada para Google:`;
         resultadoBusqueda = await webSearch.buscarEnWeb({
           consulta: query,
           apiKey: process.env.SEARLO_API_KEY,
-          lang
+          lang,
+          timeZone
         });
         console.log(`[chat] Búsqueda finalizada: ${resultadoBusqueda.fuentes.length} resultados encontrados.`);
       } catch (e) {
