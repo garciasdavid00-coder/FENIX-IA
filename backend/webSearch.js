@@ -116,12 +116,12 @@ ${texto}
 function extraerQueryBusqueda(mensaje) {
   let q = String(mensaje || '').trim();
   
-  // Limpiar prefijos
+  // Limpiar prefijos de instrucciones
   const prefijos = [
     "por favor busca", "por favor investiga", "busca en internet", "busca en la web", 
     "busca", "investiga", "googlea", "averigua", "dime", "cual es", "cuál es", "que es", "qué es", "qué pasó", "que paso"
   ];
-  const lowerQ = q.toLowerCase();
+  let lowerQ = q.toLowerCase();
   for (const p of prefijos) {
     if (lowerQ.startsWith(p)) {
       q = q.substring(p.length).trim();
@@ -129,28 +129,22 @@ function extraerQueryBusqueda(mensaje) {
     }
   }
 
-  // Limpiar conectores iniciales
   q = q.replace(/^(sobre|acerca de|en)\s+/i, '').trim();
 
-  // Eliminar frases conversacionales sobre noticias
-  const frases = [
-    "las noticias del día de hoy en", "las noticias del dia de hoy en",
-    "noticias de hoy sobre", "noticias de hoy en", "noticias de hoy",
-    "noticias de", "ultimas noticias de", "últimas noticias de",
-    "noticias sobre", "eventos hot", "eventos relevantes", "cosas relevantes"
-  ];
-  let currentLower = q.toLowerCase();
-  for (const f of frases) {
-    if (currentLower.includes(f)) {
-      q = q.replace(new RegExp(f, 'gi'), ' ');
-      currentLower = q.toLowerCase();
-    }
-  }
+  // Limpiar basura conversacional pero MANTENER palabras clave (noticias, hoy, etc.)
+  q = q.replace(/\blas\s+noticias\b/gi, 'noticias');
+  q = q.replace(/\bdel\s+d[ií]a\s+de\s+hoy\b/gi, 'hoy');
+  q = q.replace(/\bel\s+d[ií]a\s+de\s+hoy\b/gi, 'hoy');
+  q = q.replace(/\bsobre\s+eventos\s+hot\b/gi, '');
+  q = q.replace(/\beventos\s+hot\b/gi, '');
+  q = q.replace(/\bcosas\s+relevantes\b/gi, '');
+  q = q.replace(/\beventos\s+relevantes\b/gi, '');
   
-  // Limpieza final de espacios y signos
+  // Si quedaron preposiciones sueltas
+  q = q.replace(/\b(de|en|sobre|las|los|la|el)\b/gi, '').replace(/\s+/g, ' ').trim();
+  
   q = q.replace(/^[¿¡'"“”\s]+|[?！!'"“”\s]+$/g, '').trim();
   
-  // Si la query quedó muy vacía, devolver la original para no romper la búsqueda
   if (q.length < 3) return mensaje;
   return q.slice(0, 150);
 }
