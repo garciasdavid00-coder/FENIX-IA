@@ -95,6 +95,7 @@ function similitud(a, b) {
 
 // Devuelve las memorias del usuario, las más recientes primero.
 async function getUserMemories(userId) {
+  console.log('[MemoryManager] Consultando memorias para userId:', userId);
   if (!pool || !userId) return [];
   const { rows } = await pool.query(
     `SELECT id, memory_text, category, updated_at
@@ -103,6 +104,7 @@ async function getUserMemories(userId) {
      ORDER BY updated_at DESC`,
     [userId]
   );
+  console.log('[MemoryManager] Memorias recuperadas:', rows.length);
   return rows;
 }
 
@@ -110,6 +112,7 @@ async function getUserMemories(userId) {
 // la actualiza (texto nuevo + updated_at) en lugar de insertar otra. Si el
 // usuario ya tiene MAX_MEMORIAS, borra la más antigua antes de insertar.
 async function addMemory(userId, memoryText, category) {
+  console.log('[MemoryManager] Intentando guardar memoria:', { userId, memoryText, category });
   if (!pool || !userId) return null;
 
   const texto = String(memoryText || '').trim().slice(0, 1000);
@@ -150,6 +153,7 @@ async function addMemory(userId, memoryText, category) {
      RETURNING id, memory_text, category`,
     [userId, texto, cat]
   );
+  console.log('[MemoryManager] Memoria guardada exitosamente en user_memories:', insertado.rows[0]);
   return insertado.rows[0] || null;
 }
 
@@ -194,12 +198,15 @@ async function deleteMemory(memoryId, userId) {
 // Cuenta mensajes por usuario y, cada MEMORY_EXTRACTION_INTERVAL, lanza la
 // extracción de memorias en segundo plano (sin bloquear la respuesta).
 function notificarMensaje(userId, mensajesConversacion) {
+  console.log('[MemoryManager] notificarMensaje llamado para userId:', userId, 'mensajes:', mensajesConversacion.length);
   if (!pool || !userId || !Array.isArray(mensajesConversacion) || !mensajesConversacion.length) return;
 
   const contador = (contadorMensajes.get(userId) || 0) + 1;
   contadorMensajes.set(userId, contador);
 
+  console.log('[MemoryManager] Contador actual:', contador, 'Umbral:', MEMORY_EXTRACTION_INTERVAL);
   if (contador >= MEMORY_EXTRACTION_INTERVAL) {
+    console.log('[MemoryManager] Disparando extractMemoriesFromConversation...');
     contadorMensajes.set(userId, 0);
     extractMemoriesFromConversation(userId, mensajesConversacion)
       .catch(e => console.error('Error extrayendo memorias:', e.message));
@@ -244,6 +251,7 @@ Reglas:
     ]
   };
 
+  console.log('[MemoryManager] Payload enviado a la IA para extraccin:', JSON.stringify(peticion, null, 2));
   let respuestaIA;
   try {
     respuestaIA = await fetch('https://api.groq.com/openai/v1/chat/completions', {

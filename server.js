@@ -646,7 +646,8 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
 
     // Resto de la lógica original
     const autenticado = !!(req.isAuthenticated && req.isAuthenticated());
-    const userId = req.user ? req.user.id : null;
+    const userId = req.user ? (req.user.google_id || req.user.id) : null;
+    console.log('[API/chat] Usuario logueado:', req.user ? { id: req.user.id, google_id: req.user.google_id, userIdFinal: userId } : 'Invitado');
     const LIMITE_SIN_LOGIN = 3;
     if(!autenticado){
       const usados = req.session.mensajesSinLogin || 0;
