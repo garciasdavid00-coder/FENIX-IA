@@ -455,7 +455,8 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español', timeZone = 'Am
   // 1) Intentar con Searlo API
   if (keySearlo) {
     try {
-      const urlApi = new URL('https://api.searlo.tech/api/v1/search/web');
+      const esNoticia = query.toLowerCase().includes('noticia') || query.toLowerCase().includes('news');
+      const urlApi = new URL(esNoticia ? 'https://api.searlo.tech/api/v1/search/news' : 'https://api.searlo.tech/api/v1/search/web');
       urlApi.searchParams.set('q', query.slice(0, 500));
       urlApi.searchParams.set('limit', '8');
       const langCodigo = (lang || 'es').slice(0, 2);
@@ -471,7 +472,7 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español', timeZone = 'Am
       const data = await respuesta.json().catch(() => ({}));
 
       if (respuesta.ok) {
-        const items = (data && (Array.isArray(data.organic) ? data.organic : (Array.isArray(data.items) ? data.items : (Array.isArray(data.results) ? data.results : []))))
+        const items = (data && (Array.isArray(data.organic) ? data.organic : (Array.isArray(data.news) ? data.news : (Array.isArray(data.items) ? data.items : (Array.isArray(data.results) ? data.results : [])))))
           .filter(it => it && (it.title || it.name) && (it.link || it.url));
 
         if (items.length) {

@@ -717,7 +717,7 @@ Fecha y Hora de la búsqueda: ${horaActual}
 ${datosWeb.fuentes.map(f => `- ${f.titulo}: ${f.url}`).join('\n')}
 
 Los siguientes son fragmentos extraídos de la web en tiempo real. 
-INSTRUCCIÓN OBLIGATORIA: Basa tu respuesta en estos datos. NO digas que no tienes acceso a internet o que no puedes leer las noticias, porque aquí tienes el contenido extraído que debes usar:
+INSTRUCCIÓN OBLIGATORIA: Basa tu respuesta ESTRICTAMENTE en estos datos proporcionados arriba. PROHIBIDO decir que no tienes acceso a titulares, contenido o internet. PROHIBIDO mandar al usuario a visitar los sitios manualmente. TÚ YA TIENES EL CONTENIDO AQUÍ, úsalo para responder y resumir las noticias directamente:
 <<<INICIO DATOS NO CONFIABLES>>>
 ${datosWeb.texto || ''}
 <<<FIN DATOS NO CONFIABLES>>>
