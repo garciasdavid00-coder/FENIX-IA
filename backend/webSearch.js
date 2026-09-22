@@ -456,8 +456,15 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español', timeZone = 'Am
   if (keySearlo) {
     try {
       const esNoticia = query.toLowerCase().includes('noticia') || query.toLowerCase().includes('news');
-      const urlApi = new URL(esNoticia ? 'https://api.searlo.tech/api/v1/search/news' : 'https://api.searlo.tech/api/v1/search/web');
-      urlApi.searchParams.set('q', query.slice(0, 500));
+      const esHoy = query.toLowerCase().includes('hoy') || query.toLowerCase().includes('última') || query.toLowerCase().includes('ultima');
+      const endpoint = esNoticia ? 'https://api.searlo.tech/api/v1/search/news' : 'https://api.searlo.tech/api/v1/search/web';
+      const urlApi = new URL(endpoint);
+      
+      let finalQuery = query.slice(0, 500);
+      if (esNoticia && esHoy && !finalQuery.includes('when:')) {
+        finalQuery += ' when:1d';
+      }
+      urlApi.searchParams.set('q', finalQuery);
       urlApi.searchParams.set('limit', '8');
       const langCodigo = (lang || 'es').slice(0, 2);
       urlApi.searchParams.set('hl', langCodigo);
@@ -505,7 +512,19 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español', timeZone = 'Am
             if (it.date) {
               const d = new Date(it.date);
               if (!isNaN(d.getTime())) {
-                dateStr = ' [Publicado recientemente]';
+                const diffMinutos = Math.floor((new Date() - d) / 60000);
+                let rel = '';
+                if (diffMinutos >= 0 && diffMinutos < 60) rel = `hace ${diffMinutos} min`;
+                else if (diffMinutos >= 60 && diffMinutos < 1440) rel = `hace ${Math.floor(diffMinutos / 60)}h`;
+                else if (diffMinutos >= 1440 && diffMinutos < 2880) rel = 'ayer';
+                else if (diffMinutos >= 2880 && diffMinutos < 43200) rel = `hace ${Math.floor(diffMinutos / 1440)} días`;
+                else rel = `hace ${Math.floor(diffMinutos / 43200)} meses`;
+                
+                // Formato exacto
+                const fechaCorta = d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+                dateStr = ` [Fecha de publicación: ${fechaCorta} (${rel})]`;
+              } else {
+                dateStr = ` [Fecha reportada: ${it.date}]`;
               }
             }
             

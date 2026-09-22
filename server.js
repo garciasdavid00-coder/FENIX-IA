@@ -717,7 +717,7 @@ Fecha y Hora de la búsqueda: ${horaActual}
 ${datosWeb.fuentes.map(f => `- ${f.titulo}: ${f.url}`).join('\n')}
 
 Los siguientes son fragmentos extraídos de la web en tiempo real. 
-INSTRUCCIÓN OBLIGATORIA: Basa tu respuesta ESTRICTAMENTE en estos datos proporcionados arriba. PROHIBIDO decir que no tienes acceso a titulares, contenido o internet. PROHIBIDO mandar al usuario a visitar los sitios manualmente. TÚ YA TIENES EL CONTENIDO AQUÍ, úsalo para responder y resumir las noticias directamente:
+INSTRUCCIÓN OBLIGATORIA: Basa tu respuesta ESTRICTAMENTE en estos datos proporcionados arriba. PROHIBIDO decir que no tienes acceso a titulares, contenido o internet. PROHIBIDO mandar al usuario a visitar los sitios manualmente. TÚ YA TIENES EL CONTENIDO AQUÍ, úsalo para responder y resumir las noticias directamente. Si las fuentes indican su fecha de publicación, MENCIONALA siempre en tu respuesta (ej: "Según noticias publicadas hoy 22 de septiembre...", o "La noticia más reciente que encontré es de hace 4 días..."). Esto es crítico para que el usuario conozca la recencia:
 <<<INICIO DATOS NO CONFIABLES>>>
 ${datosWeb.texto || ''}
 <<<FIN DATOS NO CONFIABLES>>>
