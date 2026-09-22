@@ -8,8 +8,9 @@ import MarkdownContent from '@/components/MarkdownContent';
 import TrendChart from '@/components/TrendChart';
 import WebSearchIndicator from '@/components/WebSearchIndicator';
 import FileAttachmentChip from '@/components/FileAttachmentChip';
+import StatusIndicator from '@/components/StatusIndicator';
 
-export default function MessageBubble({ mensaje }) {
+export default function MessageBubble({ mensaje, statusIndicator }) {
   const { abrirModalMemoria, abrirDocModal, abrirPanelDoc } = useChat();
   const [copiado, setCopiado] = useState(false);
 
@@ -129,11 +130,15 @@ export default function MessageBubble({ mensaje }) {
         ) : (
           <>
             {mensaje.cargando && !textoFinal && !contenidoPensamiento && (
-              <div className="pensando-bubble" title="Fenix está pensando...">
-                <span className="pensando-dot" />
-                <span className="pensando-dot" />
-                <span className="pensando-dot" />
-              </div>
+              statusIndicator ? (
+                <StatusIndicator phase={statusIndicator.phase} label={statusIndicator.label} />
+              ) : (
+                <div className="pensando-bubble" title="Fenix está pensando...">
+                  <span className="pensando-dot" />
+                  <span className="pensando-dot" />
+                  <span className="pensando-dot" />
+                </div>
+              )
             )}
             
             {/* Razonamiento / Thinking */}

@@ -63,6 +63,7 @@ function armarSistema({ lang = 'español', instruccion, memoriaContexto = '', ca
   }
 
   // 4. FECHA Y HORA ACTUAL (inyectada al final)
+  const ahora = new Date();
   const opcionesFecha = { 
     timeZone, 
     weekday: 'long', 
@@ -73,8 +74,14 @@ function armarSistema({ lang = 'español', instruccion, memoriaContexto = '', ca
     minute: 'numeric',
     hour12: true
   };
-  const fechaHoraActual = new Intl.DateTimeFormat('es-ES', opcionesFecha).format(new Date());
-  sistemaBase += `\n\n-----\n## Contexto temporal\nLa fecha y hora actual del usuario es: ${fechaHoraActual}. (Zona horaria: ${timeZone}). Úsalo como referencia temporal absoluta.`;
+  const fechaHoraActual = new Intl.DateTimeFormat('es-ES', opcionesFecha).format(ahora);
+  
+  // Calcular el desfase UTC para esta zona horaria
+  const formatterOffset = new Intl.DateTimeFormat('en-US', { timeZone, timeZoneName: 'shortOffset' });
+  const offsetString = formatterOffset.formatToParts(ahora).find(p => p.type === 'timeZoneName').value; // ej: "GMT-6"
+  const utcString = ahora.toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
+
+  sistemaBase += `\n\n-----\n## Contexto temporal\nLa fecha y hora actual del usuario es: ${fechaHoraActual}. (Zona horaria: ${timeZone}, Desfase: ${offsetString}).\nLa hora global actual es: ${utcString}.\nÚsalo como referencia temporal absoluta. NO derives fechas futuras para noticias. Los eventos que coinciden con las noticias provistas ya ocurrieron o están ocurriendo.`;
 
   // 4. CAPACIDADES OPERATIVAS DEL CANAL
   const canalNorm = String(canal || '').toLowerCase();

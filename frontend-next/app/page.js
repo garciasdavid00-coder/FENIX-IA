@@ -35,6 +35,7 @@ export default function HomePage() {
     enviarMensaje: enviarAlStream,
     detener,
     streamChatIdRef,
+    statusIndicator,
   } = useChatStream();
 
   // Control de cambio explícito de chat en barra lateral (evita parpadeos en blanco al enviar mensaje)
@@ -129,6 +130,7 @@ export default function HomePage() {
                   generando={generando}
                   onEnviarMensaje={manejarEnvio}
                   detener={detener}
+                  statusIndicator={statusIndicator}
                 />
               )}
             </>

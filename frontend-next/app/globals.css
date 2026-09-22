@@ -491,6 +491,11 @@ body{
   -webkit-overflow-scrolling:touch;
 }
 
+@keyframes msgIn{
+  from{ opacity:0; transform:translateY(12px) scale(0.98); }
+  to{ opacity:1; transform:translateY(0) scale(1); }
+}
+
 /* Base de mensajes */
 .msg{
   position:relative;
@@ -499,13 +504,8 @@ body{
   padding:0;
   border-radius:0;
   line-height:1.6;
-  opacity:1;
-  animation:msgIn .18s ease forwards;
-}
-
-@keyframes msgIn{
-  from{ opacity:0.7; transform:translateY(4px); }
-  to{ opacity:1; transform:translateY(0); }
+  opacity:0;
+  animation:msgIn .3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Indicador de pensamiento (dots pulsantes) */
@@ -602,7 +602,8 @@ body{
   box-shadow:none;
   padding:0;
   opacity:0;
-  transition:opacity 160ms ease;
+  transition:opacity 0.25s ease, transform 0.25s ease;
+  transform: translateY(3px);
   pointer-events:none;
 }
 .msg-user .msg-bar{
@@ -615,10 +616,40 @@ body{
 .msg-user:hover .msg-bar,
 .msg-bot:hover .msg-bar{
   opacity:1;
+  transform: translateY(0);
   pointer-events:auto;
 }
 @media (hover:none){
-  .msg-bar{ opacity:.75; pointer-events:auto; }
+  .msg-bar{ opacity:.75; transform: translateY(0); pointer-events:auto; }
+}
+
+.scroll-to-bottom-btn {
+  position: absolute;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--surface-alt);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 100;
+  animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: background 0.2s, transform 0.2s;
+}
+.scroll-to-bottom-btn:hover {
+  background: var(--hover-overlay);
+  transform: translateX(-50%) scale(1.05);
+}
+@keyframes popIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.9); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 }
 
 .msg-accion{

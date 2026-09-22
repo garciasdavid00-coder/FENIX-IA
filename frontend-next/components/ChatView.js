@@ -8,7 +8,7 @@ import { useChat } from '@/context/ChatContext';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { procesarArchivo } from '@/lib/fileParser';
 
-export default function ChatView({ mensajes, generando, onEnviarMensaje, detener }) {
+export default function ChatView({ mensajes, generando, onEnviarMensaje, detener, statusIndicator }) {
   const { busquedaWeb, cambiarBusquedaWeb, nuevoChat, chatActualId, chats } = useChat();
   const chatActual = chats.find((c) => c.id === chatActualId);
   const estaBloqueado = !!(chatActual?.bloqueado || mensajes.some((m) => m.bloqueado));
@@ -74,6 +74,7 @@ export default function ChatView({ mensajes, generando, onEnviarMensaje, detener
   const autoScrollHabilitadoRef = useRef(true);
   const ultimosMensajesLongitudRef = useRef(mensajes.length);
   const textareaRef = useRef(null);
+  const [mostrarBotonBajar, setMostrarBotonBajar] = useState(false);
 
   const manejarScrollMensajes = () => {
     const el = containerRef.current;
@@ -81,6 +82,16 @@ export default function ChatView({ mensajes, generando, onEnviarMensaje, detener
     const distAlFondo = el.scrollHeight - el.scrollTop - el.clientHeight;
     // Si está a menos de 100px del fondo, mantener auto-scroll pegado
     autoScrollHabilitadoRef.current = distAlFondo < 100;
+    setMostrarBotonBajar(distAlFondo > 150);
+  };
+
+  const bajarAlFondo = () => {
+    const el = containerRef.current;
+    if (el) {
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+      autoScrollHabilitadoRef.current = true;
+      setMostrarBotonBajar(false);
+    }
   };
 
   // Scroll directo en el contenedor sin mover la ventana ni el viewport móvil
@@ -135,11 +146,25 @@ export default function ChatView({ mensajes, generando, onEnviarMensaje, detener
     <div className="chat-view" id="vistaChat">
       {/* Contenedor de burbujas de mensajes */}
       <div className="messages" id="messages" ref={containerRef} onScroll={manejarScrollMensajes}>
-        {mensajes.map((msg) => (
-          <MessageBubble key={msg.id} mensaje={msg} />
+        {mensajes.map((msg, index) => (
+          <MessageBubble key={msg.id} mensaje={msg} statusIndicator={index === mensajes.length - 1 ? statusIndicator : null} />
         ))}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Botón flotante Ir al fondo */}
+      {mostrarBotonBajar && (
+        <button
+          onClick={bajarAlFondo}
+          className="scroll-to-bottom-btn"
+          aria-label="Ir al final"
+          title="Ir al último mensaje"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+      )}
 
       {/* Barra de entrada inferior */}
       {estaBloqueado ? (

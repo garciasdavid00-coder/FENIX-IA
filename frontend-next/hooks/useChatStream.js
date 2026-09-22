@@ -14,6 +14,7 @@ export function useChatStream() {
   const [mensajes, setMensajes] = useState([]);
   const [generando, setGenerando] = useState(false);
   const [error, setError] = useState(null);
+  const [statusIndicator, setStatusIndicator] = useState(null);
   const abortControllerRef = useRef(null);
   // Chat al que pertenece el stream en curso (capturado al enviar). Sirve para
   // que, si el usuario cambia de chat a mitad de generación, el resultado se
@@ -36,6 +37,7 @@ export function useChatStream() {
     streamChatIdRef.current = opciones.chatId || null;
 
     setError(null);
+    setStatusIndicator(null);
     const mensajeUsuario = {
       id: Date.now().toString(),
       rol: 'user',
@@ -208,6 +210,12 @@ export function useChatStream() {
               throw new Error(dataObj.error);
             }
 
+            // Status del backend
+            if (dataObj.phase && dataObj.label) {
+              setStatusIndicator({ phase: dataObj.phase, label: dataObj.label });
+              continue;
+            }
+
             // Búsqueda web en vivo
             if (dataObj.tipo === 'buscando_web' && dataObj.query) {
               setMensajes((prev) =>
@@ -233,6 +241,7 @@ export function useChatStream() {
             }
 
             if (typeof dataObj.texto === 'string' && dataObj.texto) {
+              setStatusIndicator(null);
               acumulado += dataObj.texto;
               // Oculta los marcadores crudos mientras llega el resto de la respuesta
               const visible = acumulado
@@ -296,6 +305,7 @@ export function useChatStream() {
         console.error('[useChatStream] Error:', err);
         const mensajeError = err.message || 'Error al conectar con Fenix IA';
         setError(mensajeError);
+        setStatusIndicator(null);
         setMensajes((prev) =>
           prev.map((msg) =>
             msg.id === idBot
@@ -325,5 +335,6 @@ export function useChatStream() {
     limpiarChat,
     setMensajes,
     streamChatIdRef,
+    statusIndicator,
   };
 }
