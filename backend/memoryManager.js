@@ -21,8 +21,8 @@ const contadorMensajes = new Map();
 
 // Modelo de Groq usado para extraer memorias (rápido y barato).
 // Si algún día deja de existir, se cae al modelo predeterminado del chat.
-const MODELO_EXTRACCION = 'qwen/qwen3.8-27b';
-const MODELO_FALLBACK = process.env.GROQ_MODEL || 'qwen/qwen3.8-27b';
+const MODELO_EXTRACCION = 'llama-3.1-8b-instant';
+const MODELO_FALLBACK = process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
 
 // ----------------------------------------------------------------------------
 // Utilidades
@@ -218,11 +218,13 @@ async function extractMemoriesFromConversation(userId, mensajesConversacion) {
   }
 
   // Solo miramos las últimas 40 líneas para acotar tamaño y costo.
-  const ultimoTramo = mensajesConversacion.slice(-40);
+  const ultimoTramo = mensajesConversacion.slice(-20);
 
   const peticion = {
     model: MODELO_EXTRACCION,
     temperature: 0.2,
+    max_tokens: 400,
+    response_format: { type: 'json_object' },
     messages: [
       {
         role: 'system',
@@ -231,8 +233,8 @@ async function extractMemoriesFromConversation(userId, mensajesConversacion) {
 Reglas:
 - NO extraigas saludos, frases sueltas, estados momentáneos ni información trivial.
 - Si la conversación no aporta datos nuevos y relevantes, devuelve [].
-- Solo responde con un array JSON válido, sin texto adicional, del formato:
-[{"text": "hecho sobre el usuario", "category": "personal"}, ...]
+- Solo responde con un objeto JSON válido con la propiedad "memorias" que contenga el array, del formato:
+{"memorias": [{"text": "hecho", "category": "personal"}]}
 - category debe ser uno de: personal, preferencia, proyecto, tecnico, temas.`
       },
       {
@@ -289,7 +291,16 @@ Reglas:
   let memoriasNuevas = [];
   try {
     const datos = await respuestaIA.json();
-    const contenido = datos.choices?.[0]?.message?.content || '';
+    let contenido = datos.choices?.[0]?.message?.content || '';
+    
+    // Si viene en objeto {"memorias": [...]}, extraerlo
+    try {
+      const obj = JSON.parse(contenido);
+      if (obj && Array.isArray(obj.memorias)) {
+        contenido = JSON.stringify(obj.memorias);
+      }
+    } catch(e) {}
+    
     memoriasNuevas = parsearArrayExtraido(contenido);
   } catch (e) {
     console.error('No se pudo interpretar la respuesta de extracción:', e.message);
