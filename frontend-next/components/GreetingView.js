@@ -4,16 +4,14 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useChat } from '@/context/ChatContext';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
-import VoiceModal from '@/components/VoiceModal';
 import FileAttachmentChip from '@/components/FileAttachmentChip';
 import { procesarArchivo } from '@/lib/fileParser';
 
 export default function GreetingView({ onEnviarMensaje, generando, detener }) {
   const { usuario } = useAuth();
-  const { busquedaWeb, cambiarBusquedaWeb } = useChat();
+  const { busquedaWeb, cambiarBusquedaWeb, setVoiceModalOpen } = useChat();
   const [textoInput, setTextoInput] = useState('');
   const [saludo, setSaludo] = useState('¡Qué gusto verte, Invitado!');
-  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [archivoAdjunto, setArchivoAdjunto] = useState(null);
   const [arrastrando, setArrastrando] = useState(false);
   const textoBaseRef = useRef('');
@@ -241,11 +239,7 @@ export default function GreetingView({ onEnviarMensaje, generando, detener }) {
       </div>
 
       {/* Modal de Conversación por Voz en Vivo */}
-      <VoiceModal
-        isOpen={voiceModalOpen}
-        onClose={() => setVoiceModalOpen(false)}
-        onEnviarMensaje={onEnviarMensaje}
-      />
+
 
       {/* Pills de sugerencias */}
       <div className="pills">

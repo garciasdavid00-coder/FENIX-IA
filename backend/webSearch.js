@@ -534,11 +534,19 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español', timeZone = 'Am
           const resArray = await Promise.all(textosPromesas);
           const texto = resArray.join('\n\n');
 
+          // Si el texto final tiene muy poco contenido (ej. Searlo trajo puros títulos sin snippets 
+          // y fetchWebContent fue bloqueado), forzamos un fallback a otro proveedor
+          if (texto.length < 250) {
+            console.warn('[buscarEnWeb] Searlo trajo resultados pero casi sin contenido (posible bloqueo bot). Forzando fallback...');
+            throw new Error('Searlo sin contenido útil');
+          }
+
           return { texto, fuentes };
         }
       } else {
         const detalle = (data && data.message) || (data && data.error) || String(respuesta.status);
         console.warn('[buscarEnWeb] Searlo respondió error (' + respuesta.status + ': ' + detalle + ')');
+        throw new Error('Error en Searlo API');
       }
     } catch (e) {
       console.warn('[buscarEnWeb] Excepción en Searlo:', e && e.message ? e.message : e);

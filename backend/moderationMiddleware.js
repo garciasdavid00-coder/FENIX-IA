@@ -1,11 +1,13 @@
 // ============================================================================
 // backend/moderationMiddleware.js — Moderación y Cierre de Conversaciones
 // ============================================================================
-// Detecta insultos y lenguaje ofensivo. Cuando se recibe un insulto,
-// CIERRA y bloquea inmediatamente la conversación.
+// Detecta insultos y lenguaje ofensivo. Cuando se reciben 5 insultos reales,
+// CIERRA y bloquea la conversación.
+// Distingue entre autocrítica/angustia y verdaderos insultos usando LLM.
 // ============================================================================
 
 const db = require('../db');
+const { solicitarTextoCompleto } = require('./chatEngine');
 
 const patronesInsultos = [
   /\bput[ao]s?\b/i,
@@ -52,36 +54,65 @@ const patronesInsultos = [
 ];
 
 const MENSAJE_BLOQUEADO =
-  'Esta conversación ha sido cerrada y finalizada debido al uso de lenguaje ofensivo o insultos. No se pueden enviar más mensajes en este chat. Por favor, inicia una nueva conversación con respeto.';
+  'Esta conversación ha sido cerrada y finalizada debido al uso reiterado de lenguaje ofensivo o insultos. No se pueden enviar más mensajes en este chat. Por favor, inicia una nueva conversación con respeto.';
 
 function normalizarMensaje(texto) {
   if (typeof texto !== 'string') return '';
   let r = texto.toLowerCase();
-  // Normalizar leetspeak
   const leet = { '4': 'a', '0': 'o', '5': 's', '1': 'i', '3': 'e', '7': 't', '@': 'a', '$': 's' };
   for (const [k, v] of Object.entries(leet)) {
     r = r.replace(new RegExp('\\' + k, 'g'), v);
   }
-  // Quitar acentos
   r = r.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  // Reducir caracteres repetidos consecutivos (ej: puuuuta -> puta)
   r = r.replace(/(.)\1{2,}/g, '$1$1');
   return r;
 }
 
-function detectarInsulto(texto) {
+function detectarInsultoRegex(texto) {
   if (!texto || typeof texto !== 'string') return false;
   const normalizado = normalizarMensaje(texto);
   for (const regex of patronesInsultos) {
     if (regex.test(normalizado)) return true;
   }
-  // También probar quitando espacios o puntos entre letras (ej: p.u.t.a -> puta)
   const colapsado = normalizado.replace(/[\.\-_,;:\*\+\s]/g, '');
   for (const regex of patronesInsultos) {
-    // Si la palabra colapsada contiene la raíz
     if (regex.test(colapsado)) return true;
   }
   return false;
+}
+
+async function clasificarContexto(mensaje) {
+  // Pre-filtro rápido con Regex para no gastar llamadas LLM en mensajes normales
+  if (!detectarInsultoRegex(mensaje)) {
+    return 'SAFE';
+  }
+
+  const prompt = `Analiza el siguiente mensaje de un usuario en un chat y clasifícalo en UNA de las siguientes tres categorías:
+1. "SAFE": El mensaje no es un insulto (falsa alarma) o es jerga inofensiva.
+2. "SELF_DISTRESS": El usuario usa lenguaje fuerte, groserías o insultos dirigidos HACIA SÍ MISMO (ej. "soy una mierda", "soy un idiota", "me odio") o expresa angustia emocional profunda.
+3. "INSULT_TO_OTHERS": El usuario usa lenguaje ofensivo, groserías o insultos dirigidos hacia el bot, hacia otra persona, o de forma maliciosa/agresiva en general.
+
+Mensaje del usuario: "${mensaje}"
+
+Responde ÚNICAMENTE con la palabra clave exacta (SAFE, SELF_DISTRESS o INSULT_TO_OTHERS), sin puntos ni explicaciones.`;
+
+  try {
+    const result = await solicitarTextoCompleto({
+      mensaje: prompt,
+      historial: [],
+      proveedor: 'groq',
+      maxTokens: 10,
+      idioma: 'es'
+    });
+    
+    const texto = result.texto.trim().toUpperCase();
+    if (texto.includes('INSULT_TO_OTHERS')) return 'INSULT_TO_OTHERS';
+    if (texto.includes('SELF_DISTRESS')) return 'SELF_DISTRESS';
+    return 'SAFE';
+  } catch (error) {
+    // Si falla el clasificador, asumimos insulto real por precaución ya que pasó el regex
+    return 'INSULT_TO_OTHERS';
+  }
 }
 
 function moderationMiddleware() {
@@ -94,9 +125,8 @@ function moderationMiddleware() {
       const puedeContarBD = !!googleId && Number.isFinite(chatIdNumerico);
 
       // Sesión para invitados
-      if (!req.session.chatsBloqueados) {
-        req.session.chatsBloqueados = [];
-      }
+      if (!req.session.chatsBloqueados) req.session.chatsBloqueados = [];
+      if (!req.session.insultCounts) req.session.insultCounts = {};
 
       // 1) ¿El chat ya está bloqueado previamente?
       if (puedeContarBD) {
@@ -110,38 +140,43 @@ function moderationMiddleware() {
         return res.status(403).json({ error: 'CHAT_BLOQUEADO', mensaje: MENSAJE_BLOQUEADO });
       }
 
-      // 2) Detectar si el mensaje actual contiene insultos
-      const esInsulto = detectarInsulto(mensaje);
+      // 2) Detectar contexto usando LLM
+      const clasificacion = await clasificarContexto(mensaje);
 
-      if (esInsulto) {
-        console.warn(`[Moderación] Insulto detectado en chat ${chatId || 'sin-id'}. Cerrando conversación.`);
+      if (clasificacion === 'INSULT_TO_OTHERS') {
+        let isBlocked = false;
+        let currentCount = 0;
 
-        // Bloquear en BD
         if (puedeContarBD) {
-          await db.registrarInsulto(googleId, chatIdNumerico, mensaje);
+          const result = await db.registrarInsulto(googleId, chatIdNumerico, mensaje);
+          if (result) {
+            isBlocked = result.is_blocked;
+            currentCount = result.insult_count;
+          }
+        } else if (chatId) {
+          req.session.insultCounts[chatId] = (req.session.insultCounts[chatId] || 0) + 1;
+          currentCount = req.session.insultCounts[chatId];
+          if (currentCount >= 5) {
+            isBlocked = true;
+            if (!req.session.chatsBloqueados.includes(chatId)) {
+              req.session.chatsBloqueados.push(chatId);
+            }
+          }
         }
 
-        // Bloquear en sesión
-        if (chatId && !req.session.chatsBloqueados.includes(chatId)) {
-          req.session.chatsBloqueados.push(chatId);
+        if (isBlocked) {
+          console.warn(`[Moderación] Límite de insultos (5) alcanzado en chat ${chatId || 'sin-id'}. Cerrando conversación.`);
+          req.moderation = { chatBloqueado: true, contadorActual: currentCount, identificador: googleId || 'sesion' };
+          return res.status(403).json({ error: 'CHAT_BLOQUEADO', mensaje: MENSAJE_BLOQUEADO });
         }
-
-        req.moderation = {
-          chatBloqueado: true,
-          contadorActual: 1,
-          identificador: googleId || 'sesion'
-        };
-
-        return res.status(403).json({
-          error: 'CHAT_BLOQUEADO',
-          mensaje: MENSAJE_BLOQUEADO
-        });
       }
 
+      // Si es SELF_DISTRESS o SAFE o no ha llegado a 5 insultos, dejamos pasar el mensaje
       req.moderation = {
         chatBloqueado: false,
         contadorActual: 0,
-        identificador: googleId || 'sesion'
+        identificador: googleId || 'sesion',
+        selfDistress: clasificacion === 'SELF_DISTRESS'
       };
 
       next();
@@ -154,5 +189,5 @@ function moderationMiddleware() {
 }
 
 module.exports = moderationMiddleware;
-module.exports.detectarInsulto = detectarInsulto;
+module.exports.detectarInsulto = detectarInsultoRegex;
 module.exports.MENSAJE_BLOQUEADO = MENSAJE_BLOQUEADO;

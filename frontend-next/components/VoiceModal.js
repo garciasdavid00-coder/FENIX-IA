@@ -21,6 +21,7 @@ export default function VoiceModal({ isOpen, onClose, onEnviarMensaje }) {
   const silencioTimerRef = useRef(null);
   const activeUtteranceRef = useRef(null);
   const textoUsuarioPendienteRef = useRef('');
+  const abortControllerRef = useRef(null);
 
   // Cargar lista de voces disponibles en el navegador
   useEffect(() => {
@@ -50,17 +51,36 @@ export default function VoiceModal({ isOpen, onClose, onEnviarMensaje }) {
   // Reconocimiento de voz del usuario con protección anti-eco
   const { escuchando, soportado, iniciar, detener } = useSpeechRecognition({
     onResult: (texto, isFinal) => {
-      if (estadoRef.current !== 'escuchando') return;
+      const limpio = texto.trim();
+      if (!limpio) return;
 
-      textoUsuarioPendienteRef.current = texto;
-      setTranscripcionUsuario(texto);
+      if (estadoRef.current === 'pensando') return;
+
+      if (estadoRef.current === 'hablando') {
+        const textoIA = (window.__fenixUtterance?.text || '').toLowerCase();
+        const loQueEscucho = limpio.toLowerCase();
+        
+        // Heurística anti-eco simple
+        if (loQueEscucho.length < 5 || textoIA.includes(loQueEscucho) || loQueEscucho.includes(textoIA)) {
+          return;
+        }
+
+        // BARGE-IN DETECTADO: El usuario habló encima
+        if (abortControllerRef.current) abortControllerRef.current.abort();
+        detenerTTS();
+        setEstado('escuchando');
+        setRespuestaIA((prev) => prev + " [Interrumpido por el usuario]");
+      }
+
+      textoUsuarioPendienteRef.current = limpio;
+      setTranscripcionUsuario(limpio);
 
       if (silencioTimerRef.current) clearTimeout(silencioTimerRef.current);
       silencioTimerRef.current = setTimeout(() => {
-        if (estadoRef.current === 'escuchando' && texto.trim().length >= 2) {
-          enviarConsultaVoz(texto.trim());
+        if (estadoRef.current === 'escuchando' && limpio.length >= 2) {
+          enviarConsultaVoz(limpio);
         }
-      }, 2000); // 2 segundos de pausa para hablar
+      }, 2000);
     },
     onError: (err) => {
       console.warn('[VoiceModal] Error de reconocimiento:', err);
@@ -98,14 +118,9 @@ export default function VoiceModal({ isOpen, onClose, onEnviarMensaje }) {
 
     const finalizar = () => {
       if (esUltima && estadoRef.current === 'hablando') {
-        setTimeout(() => {
-          if (estadoRef.current === 'hablando') {
-            setEstado('escuchando');
-            setTranscripcionUsuario('');
-            textoUsuarioPendienteRef.current = '';
-            iniciar();
-          }
-        }, 350);
+        setEstado('escuchando');
+        setTranscripcionUsuario('');
+        textoUsuarioPendienteRef.current = '';
       }
     };
 
@@ -122,14 +137,23 @@ export default function VoiceModal({ isOpen, onClose, onEnviarMensaje }) {
   // Enviar la consulta de voz al backend (Streaming TTS)
   const enviarConsultaVoz = async (prompt) => {
     if (!prompt || !prompt.trim()) return;
+    if (estadoRef.current === 'pensando') return; // Evitar doble petición si el usuario sigue hablando
+    
     if (silencioTimerRef.current) clearTimeout(silencioTimerRef.current);
     
     setEstado('pensando');
-    detener(); // Apagar micrófono
+    // Mantenemos el micrófono encendido (barge-in)
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     try {
       const res = await apiFetch('/api/chat', {
         method: 'POST',
+        signal: controller.signal,
         body: JSON.stringify({
           mensaje: prompt,
           idioma: 'español',
@@ -139,7 +163,19 @@ export default function VoiceModal({ isOpen, onClose, onEnviarMensaje }) {
         })
       });
 
-      if (!res.ok) throw new Error(`Servidor respondió ${res.status}`);
+      if (!res.ok) {
+        if (res.status === 403) {
+          try {
+            const data = await res.json();
+            if (data.error === 'CHAT_BLOQUEADO') {
+              setEstado('hablando');
+              hablarOracion(data.mensaje, true);
+              return;
+            }
+          } catch (e) {}
+        }
+        throw new Error(`Servidor respondió ${res.status}`);
+      }
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -161,14 +197,9 @@ export default function VoiceModal({ isOpen, onClose, onEnviarMensaje }) {
              // Si el buffer estaba vacío pero no mandamos NADA, decimos algo genérico
              if (oracionesEnviadas === 0) hablarOracion('Lo tengo.', true);
              else {
-               // Ya mandamos oraciones, así que simplemente reactivamos el micro
-               setTimeout(() => {
-                 if (estadoRef.current === 'hablando' || estadoRef.current === 'pensando') {
-                   setEstado('escuchando');
-                   setTranscripcionUsuario('');
-                   iniciar();
-                 }
-               }, 350);
+               // Ya mandamos oraciones, pero ninguna tenía esUltima=true.
+               // Encolamos una oración vacía para que dispare el finalizador cuando termine de hablar.
+               hablarOracion(' ', true);
              }
           }
           break;
@@ -220,10 +251,11 @@ export default function VoiceModal({ isOpen, onClose, onEnviarMensaje }) {
       }
 
       if (typeof onEnviarMensaje === 'function') {
-        try { onEnviarMensaje(prompt, { canalVoz: true }); } catch (e) {}
+        try { onEnviarMensaje(prompt, { canalVoz: true, respuestaPrecalculada: respuestaTotal }); } catch (e) {}
       }
 
     } catch (err) {
+      if (err.name === 'AbortError') return;
       console.error('[VoiceModal] Error procesando voz:', err);
       setEstado('hablando');
       hablarOracion('Disculpa, tuve un problema de conexión. ¿Podrías repetir?', true);

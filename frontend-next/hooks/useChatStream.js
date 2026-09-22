@@ -125,6 +125,16 @@ export function useChatStream() {
       return;
     }
 
+    if (opciones.respuestaPrecalculada) {
+      setMensajes((prev) =>
+        prev.map((m) =>
+          m.id === idBot ? { ...m, contenido: opciones.respuestaPrecalculada, cargando: false } : m
+        )
+      );
+      setGenerando(false);
+      return;
+    }
+
     let acumulado = '';
 
     try {

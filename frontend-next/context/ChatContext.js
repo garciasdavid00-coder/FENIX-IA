@@ -54,6 +54,7 @@ export function ChatProvider({ children }) {
   const [memoriaModal, setMemoriaModal] = useState(null); // null | { texto }
   const [docModal, setDocModal] = useState(null); // null | { titulo, contenido }
   const [panelDoc, setPanelDoc] = useState({ abierto: false, titulo: '', contenido: '' });
+  const [voiceModalOpen, setVoiceModalOpen] = useState(false); // Estado global para VoiceModal
 
   // Cargar tema guardado en localStorage + históricos locales
   useEffect(() => {
@@ -424,10 +425,14 @@ export function ChatProvider({ children }) {
         docModal,
         abrirDocModal,
         cerrarDocModal,
+        setDocModal,
         panelDoc,
         abrirPanelDoc,
         cerrarPanelDoc,
         togglePanelDoc,
+        setPanelDoc,
+        voiceModalOpen,
+        setVoiceModalOpen,
       }}
     >
       {children}

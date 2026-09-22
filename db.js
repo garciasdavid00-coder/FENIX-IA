@@ -189,10 +189,10 @@ async function registrarInsulto(googleId, clienteId, titulo = 'Nuevo chat') {
   if (!pool || !googleId || clienteId == null) return null;
   const { rows } = await pool.query(
     `INSERT INTO chats (google_id, cliente_id, titulo, mensajes, insult_count, is_blocked)
-     VALUES ($1, $2, $3, '[]'::jsonb, 1, TRUE)
+     VALUES ($1, $2, $3, '[]'::jsonb, 1, FALSE)
      ON CONFLICT (google_id, cliente_id) DO UPDATE SET
        insult_count = chats.insult_count + 1,
-       is_blocked   = TRUE,
+       is_blocked   = (chats.insult_count + 1) >= 5,
        actualizado_en = NOW()
      RETURNING insult_count, is_blocked`,
     [googleId, clienteId, String(titulo || '').slice(0, 200) || 'Nuevo chat']

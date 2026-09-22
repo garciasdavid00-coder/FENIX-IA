@@ -9,11 +9,10 @@ import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { procesarArchivo } from '@/lib/fileParser';
 
 export default function ChatView({ mensajes, generando, onEnviarMensaje, detener, statusIndicator }) {
-  const { busquedaWeb, cambiarBusquedaWeb, nuevoChat, chatActualId, chats } = useChat();
+  const { busquedaWeb, cambiarBusquedaWeb, nuevoChat, chatActualId, chats, setVoiceModalOpen } = useChat();
   const chatActual = chats.find((c) => c.id === chatActualId);
   const estaBloqueado = !!(chatActual?.bloqueado || mensajes.some((m) => m.bloqueado));
   const [textoInput, setTextoInput] = useState('');
-  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [archivoAdjunto, setArchivoAdjunto] = useState(null);
   const [arrastrando, setArrastrando] = useState(false);
   const textoBaseRef = useRef('');
@@ -313,12 +312,7 @@ export default function ChatView({ mensajes, generando, onEnviarMensaje, detener
         </div>
       )}
 
-      {/* Modal de Conversación por Voz en Vivo */}
-      <VoiceModal
-        isOpen={voiceModalOpen}
-        onClose={() => setVoiceModalOpen(false)}
-        onEnviarMensaje={onEnviarMensaje}
-      />
+
     </div>
   );
 }

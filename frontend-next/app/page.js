@@ -13,6 +13,7 @@ import MemoriasView from '@/components/MemoriasView';
 import ModalMemoria from '@/components/ModalMemoria';
 import ModalDocumento from '@/components/ModalDocumento';
 import PanelDocumento from '@/components/PanelDocumento';
+import VoiceModal from '@/components/VoiceModal';
 import { useChat } from '@/context/ChatContext';
 import { useChatStream } from '@/hooks/useChatStream';
 
@@ -26,6 +27,8 @@ export default function HomePage() {
     modeloSeleccionado,
     busquedaWeb,
     panelDoc,
+    voiceModalOpen,
+    setVoiceModalOpen,
   } = useChat();
 
   const {
@@ -145,6 +148,12 @@ export default function HomePage() {
       <ModalMemoria />
       {/* Modal global de vista previa de documentos */}
       <ModalDocumento />
+      {/* Modal global de Voz */}
+      <VoiceModal
+        isOpen={voiceModalOpen}
+        onClose={() => setVoiceModalOpen(false)}
+        onEnviarMensaje={manejarEnvio}
+      />
     </div>
   );
 }

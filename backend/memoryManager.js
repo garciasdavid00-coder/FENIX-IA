@@ -21,8 +21,8 @@ const contadorMensajes = new Map();
 
 // Modelo de Groq usado para extraer memorias (rápido y barato).
 // Si algún día deja de existir, se cae al modelo predeterminado del chat.
-const MODELO_EXTRACCION = 'qwen/qwen3.8-27b';
-const MODELO_FALLBACK = process.env.GROQ_MODEL || 'qwen/qwen3.8-27b';
+const MODELO_EXTRACCION = 'llama-3.1-8b-instant';
+const MODELO_FALLBACK = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
 
 // ----------------------------------------------------------------------------
 // Utilidades
