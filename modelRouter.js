@@ -73,14 +73,23 @@ function selectModel(userMessage, conversationHistory){
  * @param {string} params.mensaje
  * @returns {{ messagesOpenAI: Array, geminiSystemInstruction: Object, geminiContents: Array }}
  */
-function formatearMensajesParaProveedor({ proveedor, sistemaFinal, historial = [], mensaje }) {
+function formatearMensajesParaProveedor({ proveedor, sistemaFinal, historial = [], mensaje, imagenBase64 }) {
   const base = Array.isArray(historial) ? historial : [];
+
+  // Support vision via arrays in OpenAI format
+  let userContent = mensaje;
+  if (imagenBase64) {
+    userContent = [
+      { type: 'text', text: mensaje },
+      { type: 'image_url', image_url: { url: imagenBase64 } }
+    ];
+  }
 
   // Formato OpenAI (Groq, DeepSeek y Google OpenAI-compatible endpoint):
   const messagesOpenAI = [
     { role: 'system', content: sistemaFinal },
     ...base,
-    { role: 'user', content: mensaje }
+    { role: 'user', content: userContent }
   ];
 
   // Formato Gemini nativo / Live (systemInstruction en la config del modelo, contents solo user/model):

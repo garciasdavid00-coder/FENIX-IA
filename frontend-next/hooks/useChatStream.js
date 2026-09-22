@@ -149,8 +149,15 @@ export function useChatStream() {
         mensajeParaIA = `[DOCUMENTO/ARCHIVO ADJUNTO: "${opciones.archivo.nombre}" (${opciones.archivo.tamano})]\n\`\`\`\n${opciones.archivo.contenidoTexto}\n\`\`\`\n\n[INSTRUCCIÓN/PREGUNTA DEL USUARIO]:\n${textoMensaje.trim()}`;
       }
 
+      let imagenBase64 = null;
+      if (opciones.archivo && opciones.archivo.esImagen && opciones.archivo.miniaturaUrl) {
+        imagenBase64 = opciones.archivo.miniaturaUrl;
+        mensajeParaIA = textoMensaje.trim(); 
+      }
+
       const payload = {
         mensaje: mensajeParaIA,
+        imagenBase64,
         historial,
         modelo: opciones.modelo || 'auto',
         idioma: opciones.idioma || idiomaLocal,

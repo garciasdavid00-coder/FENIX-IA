@@ -107,13 +107,14 @@ Reglas de la consulta: debe incluir el tema central y los nombres relevantes. NU
 // ------------------------------------------------------------
 // Armado del array de mensajes para la API del proveedor
 // ------------------------------------------------------------
-function construirMensajes({ mensaje, historial, sistemaFinal, proveedor = 'groq' }) {
+function construirMensajes({ mensaje, historial, sistemaFinal, proveedor = 'groq', imagenBase64 }) {
   const base = Array.isArray(historial) ? historial : [];
   const formateado = formatearMensajesParaProveedor({
     proveedor,
     sistemaFinal,
     historial: base,
-    mensaje
+    mensaje,
+    imagenBase64
   });
 
   // Copia de la conversación (sin el system prompt) para la extracción de
