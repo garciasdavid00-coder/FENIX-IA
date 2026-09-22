@@ -85,7 +85,7 @@ ${texto}
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: 'qwen/qwen3.8-27b',
         messages: [{ role: 'user', content: promptClasificador }],
         temperature: 0,
         max_tokens: 150,

@@ -20,9 +20,8 @@ const CATEGORIAS = ['personal', 'preferencia', 'proyecto', 'tecnico', 'temas'];
 const contadorMensajes = new Map();
 
 // Modelo de Groq usado para extraer memorias (rápido y barato).
-// Si algún día deja de existir, se cae al modelo predeterminado del chat.
-const MODELO_EXTRACCION = 'llama-3.1-8b-instant';
-const MODELO_FALLBACK = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+const MODELO_EXTRACCION = 'openai/gpt-oss-20b';
+const MODELO_FALLBACK = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
 
 // ----------------------------------------------------------------------------
 // Utilidades

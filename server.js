@@ -740,10 +740,28 @@ ${datosWeb.texto || ''}
       if (proveedor === 'gemini' && !GEMINI_API_KEY) proveedor = 'groq';
     }
 
+    // Inyección de instrucciones de moderación (insulto detectado pero no bloqueado)
+    let instruccionModeracion = '';
+    if (req.moderation && req.moderation.insertarAdvertencia) {
+      const conteo = req.moderation.contadorActual || 0;
+      const restantes = req.moderation.strikesRestantes || 0;
+      instruccionModeracion = `\n\n[ALERTA SISTEMA MODERACION - OBLIGATORIA]:
+El usuario usó lenguaje ofensivo. Strike ${conteo}/5.
+DEBES incluir en tu respuesta el siguiente aviso textual:
+"⚠️ Aviso ${conteo}/5: Detecté lenguaje inapropiado. ${restantes > 0 ? `Te quedan ${restantes} aviso(s) antes de que esta conversación se cierre.` : 'Esta es tu ÚLTIMA advertencia antes del bloqueo.'}"`;
+    }
+
+    // Inyección de instrucción de empatía (usuario en angustia)
+    let instruccionAngustia = '';
+    if (req.moderation && req.moderation.selfDistress) {
+      instruccionAngustia = `\n\n[AVISO SISTEMA - USUARIO EN POSIBLE ANGUSTIA]:
+El usuario parece expresar angustia emocional o autocrítica intensa. Responde con MÁXIMA EMPATÍA, sin juzgar. NO menciones el sistema de moderación.`;
+    }
+
     const { sistemaFinal } = chatEngine.armarSistema({
       lang,
       instruccion: instruccionUsuario,
-      memoriaContexto: (bloqueMemorias || '') + contextoBusquedaPrevia,
+      memoriaContexto: (bloqueMemorias || '') + contextoBusquedaPrevia + instruccionModeracion + instruccionAngustia,
       canal,
       timeZone
     });
@@ -1038,7 +1056,7 @@ Consulta optimizada para Google:`;
             'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
           },
           body: JSON.stringify({
-            model: 'llama-3.1-8b-instant',
+            model: 'qwen/qwen3.8-27b',
             messages: [{ role: 'user', content: reescritorPrompt }],
             temperature: 0,
             max_tokens: 50

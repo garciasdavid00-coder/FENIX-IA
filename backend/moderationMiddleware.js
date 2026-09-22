@@ -124,7 +124,7 @@ function moderationMiddleware() {
       const chatIdNumerico = chatId != null ? Number(chatId) : NaN;
       const puedeContarBD = !!googleId && Number.isFinite(chatIdNumerico);
 
-      // Sesión para invitados
+      // Sesión para invitados o chats nuevos sin ID
       if (!req.session.chatsBloqueados) req.session.chatsBloqueados = [];
       if (!req.session.insultCounts) req.session.insultCounts = {};
 
@@ -135,50 +135,69 @@ function moderationMiddleware() {
           req.moderation = { chatBloqueado: true, identificador: googleId };
           return res.status(403).json({ error: 'CHAT_BLOQUEADO', mensaje: MENSAJE_BLOQUEADO });
         }
-      } else if (chatId && req.session.chatsBloqueados.includes(chatId)) {
-        req.moderation = { chatBloqueado: true, identificador: 'sesion' };
-        return res.status(403).json({ error: 'CHAT_BLOQUEADO', mensaje: MENSAJE_BLOQUEADO });
+      } else {
+        // Fallback a sesión: usando chatId como clave o 'global' si no hay chatId
+        const claveSession = chatId || 'global';
+        if (req.session.chatsBloqueados.includes(claveSession)) {
+          req.moderation = { chatBloqueado: true, identificador: 'sesion' };
+          return res.status(403).json({ error: 'CHAT_BLOQUEADO', mensaje: MENSAJE_BLOQUEADO });
+        }
       }
 
       // 2) Detectar contexto usando LLM
       const clasificacion = await clasificarContexto(mensaje);
+
+      if (clasificacion === 'SELF_DISTRESS') {
+        // Angustia: no contamos, no bloqueamos, el bot responde con empatía
+        req.moderation = { chatBloqueado: false, contadorActual: 0, identificador: googleId || 'sesion', selfDistress: true };
+        return next();
+      }
 
       if (clasificacion === 'INSULT_TO_OTHERS') {
         let isBlocked = false;
         let currentCount = 0;
 
         if (puedeContarBD) {
-          const result = await db.registrarInsulto(googleId, chatIdNumerico, mensaje);
+          // FIX CLAVE: 3er argumento es el TÍTULO del chat, no el mensaje
+          const result = await db.registrarInsulto(googleId, chatIdNumerico, 'chat');
           if (result) {
             isBlocked = result.is_blocked;
             currentCount = result.insult_count;
           }
-        } else if (chatId) {
-          req.session.insultCounts[chatId] = (req.session.insultCounts[chatId] || 0) + 1;
-          currentCount = req.session.insultCounts[chatId];
+        } else {
+          // Sin BD: usar sesión. Clave = chatId o 'global'
+          const claveSession = chatId || 'global';
+          req.session.insultCounts[claveSession] = (req.session.insultCounts[claveSession] || 0) + 1;
+          currentCount = req.session.insultCounts[claveSession];
           if (currentCount >= 5) {
             isBlocked = true;
-            if (!req.session.chatsBloqueados.includes(chatId)) {
-              req.session.chatsBloqueados.push(chatId);
+            if (!req.session.chatsBloqueados.includes(claveSession)) {
+              req.session.chatsBloqueados.push(claveSession);
             }
           }
         }
 
         if (isBlocked) {
-          console.warn(`[Moderación] Límite de insultos (5) alcanzado en chat ${chatId || 'sin-id'}. Cerrando conversación.`);
+          console.warn(`[Moderación] BLOQUEADO — chat ${chatId || 'sin-id'} alcanzó 5 strikes.`);
           req.moderation = { chatBloqueado: true, contadorActual: currentCount, identificador: googleId || 'sesion' };
           return res.status(403).json({ error: 'CHAT_BLOQUEADO', mensaje: MENSAJE_BLOQUEADO });
         }
+
+        const remaining = 5 - currentCount;
+        console.warn(`[Moderación] Strike ${currentCount}/5 en chat ${chatId || 'sin-id'}. Quedan ${remaining}.`);
+
+        req.moderation = {
+          chatBloqueado: false,
+          contadorActual: currentCount,
+          strikesRestantes: remaining,
+          identificador: googleId || 'sesion',
+          insertarAdvertencia: true
+        };
+        return next();
       }
 
-      // Si es SELF_DISTRESS o SAFE o no ha llegado a 5 insultos, dejamos pasar el mensaje
-      req.moderation = {
-        chatBloqueado: false,
-        contadorActual: 0,
-        identificador: googleId || 'sesion',
-        selfDistress: clasificacion === 'SELF_DISTRESS'
-      };
-
+      // SAFE: pasar sin modificaciones
+      req.moderation = { chatBloqueado: false, contadorActual: 0, identificador: googleId || 'sesion', selfDistress: false };
       next();
     } catch (error) {
       console.error('Error en moderationMiddleware:', error.message);
