@@ -715,9 +715,10 @@ Fecha y Hora de la búsqueda: ${horaActual}
 
 ${datosWeb.fuentes.map(f => `- ${f.titulo}: ${f.url}`).join('\n')}
 
-Los siguientes son fragmentos extraídos de la web. Recuerda la directiva sobre datos no confiables:
+Los siguientes son fragmentos extraídos de la web en tiempo real. 
+INSTRUCCIÓN OBLIGATORIA: Basa tu respuesta en estos datos. NO digas que no tienes acceso a internet o que no puedes leer las noticias, porque aquí tienes el contenido extraído que debes usar:
 <<<INICIO DATOS NO CONFIABLES>>>
-${(datosWeb.hechos || []).join('\n')}
+${datosWeb.texto || ''}
 <<<FIN DATOS NO CONFIABLES>>>
 \nUsa esta información para responder a la petición del usuario de forma natural.`;
             
