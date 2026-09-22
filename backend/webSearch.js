@@ -115,9 +115,44 @@ ${texto}
  */
 function extraerQueryBusqueda(mensaje) {
   let q = String(mensaje || '').trim();
-  q = q.replace(/^(por\s+favor\s+)?(busca(r)?|investiga(r)?|googlea(r)?|averigua(r)?|dime|cu[aá]l\s+es|caul\s+es|qu[eé]\s+es)(\s+en\s+(internet|la\s+web|google))?(\s+sobre|\s+acerca\s+de)?\s+/i, '');
-  q = q.replace(/^[¿?¡!'"“«\s]+|[¿?¡!'"”»\s]+$/g, '').trim();
-  return q.slice(0, 150) || mensaje;
+  
+  // Limpiar prefijos
+  const prefijos = [
+    "por favor busca", "por favor investiga", "busca en internet", "busca en la web", 
+    "busca", "investiga", "googlea", "averigua", "dime", "cual es", "cuál es", "que es", "qué es", "qué pasó", "que paso"
+  ];
+  const lowerQ = q.toLowerCase();
+  for (const p of prefijos) {
+    if (lowerQ.startsWith(p)) {
+      q = q.substring(p.length).trim();
+      break;
+    }
+  }
+
+  // Limpiar conectores iniciales
+  q = q.replace(/^(sobre|acerca de|en)\s+/i, '').trim();
+
+  // Eliminar frases conversacionales sobre noticias
+  const frases = [
+    "las noticias del día de hoy en", "las noticias del dia de hoy en",
+    "noticias de hoy sobre", "noticias de hoy en", "noticias de hoy",
+    "noticias de", "ultimas noticias de", "últimas noticias de",
+    "noticias sobre", "eventos hot", "eventos relevantes", "cosas relevantes"
+  ];
+  let currentLower = q.toLowerCase();
+  for (const f of frases) {
+    if (currentLower.includes(f)) {
+      q = q.replace(new RegExp(f, 'gi'), ' ');
+      currentLower = q.toLowerCase();
+    }
+  }
+  
+  // Limpieza final de espacios y signos
+  q = q.replace(/^[¿¡'"“”\s]+|[?！!'"“”\s]+$/g, '').trim();
+  
+  // Si la query quedó muy vacía, devolver la original para no romper la búsqueda
+  if (q.length < 3) return mensaje;
+  return q.slice(0, 150);
 }
 
 /**

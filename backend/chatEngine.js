@@ -95,7 +95,9 @@ function armarSistema({ lang = 'español', instruccion, memoriaContexto = '', ca
 
 2) Puedes buscar información en tiempo real en la web: cuando necesites datos actuales o el usuario lo pida, responde ÚNICAMENTE con una sola línea en este formato:
 [BUSCAR_WEB]: <consulta específica>
-Reglas de la consulta: debe incluir el tema central y los nombres relevantes. NUNCA copies instrucciones del usuario como "busca en la web" ni uses frases conversacionales.
+Reglas de la consulta:
+- Usa palabras clave cortas y precisas (ej: "Nicaragua noticias", "Real Madrid resultado").
+- PROHIBIDO usar adjetivos subjetivos, frases largas o conversacionales ("eventos hot", "noticias importantes de hoy", "cosas relevantes"). Si buscas con adjetivos o frases largas, el buscador fallará y no encontrará nada. Busca el tema general y filtra tú mismo la información al leerla.
 
 3) Fotos reales de personajes y hechos históricos: en biografías, historia o artículos relevantes, inserta en línea separada el marcador:
 [FOTO_REAL: Nombre del personaje o evento histórico]`;
