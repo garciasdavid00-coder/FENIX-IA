@@ -414,6 +414,30 @@ INSTRUCCIONES GENERALES:
  * @param {{ consulta: string, apiKey?: string, lang?: string }} opts
  * @returns {Promise<{ texto: string, fuentes: {titulo: string, url: string}[] }>}
  */
+
+async function fetchWebContent(url) {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    const resp = await fetch(url, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+    });
+    clearTimeout(timeoutId);
+    if (!resp.ok) return '';
+    const html = await resp.text();
+    // Strip HTML tags and normalize spaces
+    const text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
+                     .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ')
+                     .replace(/<[^>]+>/g, ' ')
+                     .replace(/\s+/g, ' ')
+                     .trim();
+    return text.substring(0, 1200); // return first 1200 chars
+  } catch (e) {
+    return '';
+  }
+}
+
 async function buscarEnWeb({ consulta, apiKey, lang = 'español', timeZone = 'America/Managua' }) {
   const query = String(consulta || '').trim();
   if (!query) {
@@ -461,32 +485,34 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español', timeZone = 'Am
             timeZone, month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true 
           });
 
-          const texto = items
-            .slice(0, 5)
-            .map((it, i) => {
-              const titulo = String(it.title || it.name).trim();
-              const snippet = String(it.snippet || it.content || it.description || '').trim();
-              
-              let dateStr = '';
-              if (it.date) {
-                const d = new Date(it.date);
-                if (!isNaN(d.getTime())) {
-                  const diffMinutos = Math.floor((ahora - d) / 60000);
-                  let rel = '';
-                  if (diffMinutos >= 0 && diffMinutos < 60) rel = `hace ${diffMinutos} min`;
-                  else if (diffMinutos >= 60 && diffMinutos < 1440) rel = `hace ${Math.floor(diffMinutos / 60)}h`;
-                  else if (diffMinutos >= 1440 && diffMinutos < 2880) rel = 'ayer';
-                  else rel = `hace ${Math.floor(diffMinutos / 1440)} días`;
-                  
-                  dateStr = ` [Publicado: ${fmtCorto.format(d)} (${rel})]`;
-                } else {
-                  dateStr = ` [Fecha: ${it.date}]`;
-                }
+          
+          const topItems = items.slice(0, 5);
+
+          const textosPromesas = topItems.map(async (it, i) => {
+            const titulo = String(it.title || it.name).trim();
+            const url = it.link || it.url;
+            let snippet = String(it.snippet || it.content || it.description || '').trim();
+            
+            if (i < 3 && url && (!snippet || snippet.length < 150 || query.toLowerCase().includes('noticias'))) {
+              const extraContent = await fetchWebContent(url);
+              if (extraContent && extraContent.length > 200) {
+                snippet += " | EXTRAÍDO DEL ARTÍCULO HOY: " + extraContent.slice(0, 1500) + "...";
               }
-              
-              return `${i + 1}. ${titulo}${dateStr}${snippet ? ' — ' + snippet : ''}`;
-            })
-            .join('\n');
+            }
+
+            let dateStr = '';
+            if (it.date) {
+              const d = new Date(it.date);
+              if (!isNaN(d.getTime())) {
+                dateStr = ' [Publicado recientemente]';
+              }
+            }
+            
+            return `${i + 1}. ${titulo}${dateStr} — ${snippet}`;
+          });
+
+          const resArray = await Promise.all(textosPromesas);
+          const texto = resArray.join('\n\n');
 
           return { texto, fuentes };
         }
