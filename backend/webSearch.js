@@ -60,10 +60,6 @@ async function evaluarBusquedaAutomatica(mensaje, historial = []) {
   const regexRapido = /\b(hoy|ahora|ayer|mañana|esta semana|último|última|resultado|quién ganó|a qué hora|cuándo|precio|clima|lluvia|noticias|dólar)\b/i;
   if (regexRapido.test(texto) || /\b(busca|investiga)\b/i.test(texto)) {
     forzarBusqueda = true;
-    if (!historial || historial.length === 0) {
-      console.log('[busqueda-auto] via=filtro, buscar=true, consulta="' + texto + '"');
-      return { buscar: true, consulta: extraerQueryBusqueda(texto), via: 'filtro' };
-    }
   }
 
   // Clasificador LLM
@@ -488,107 +484,47 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español', timeZone = 'Am
   const keySearlo = apiKey || process.env.SEARLO_API_KEY;
   const keyTavily = process.env.TAVILY_API_KEY;
   const keySerper = process.env.SERPER_API_KEY;
+  const keySerpApi = process.env.SERPAPI_API_KEY;
 
-  // 1) Intentar con Searlo API
-  if (keySearlo) {
+  // 1) Intentar con SerpApi (Principal)
+  if (keySerpApi) {
     try {
-      const esNoticia = query.toLowerCase().includes('noticia') || query.toLowerCase().includes('news');
-      const esHoy = query.toLowerCase().includes('hoy') || query.toLowerCase().includes('última') || query.toLowerCase().includes('ultima');
-      const endpoint = esNoticia ? 'https://api.searlo.tech/api/v1/search/news' : 'https://api.searlo.tech/api/v1/search/web';
-      const urlApi = new URL(endpoint);
+      console.log('[buscarEnWeb] Consultando SerpApi para: ' + query.slice(0, 80));
+      const esNoticia = query.toLowerCase().includes('noticia') || query.toLowerCase().includes('news') || query.toLowerCase().includes('ayer') || query.toLowerCase().includes('hoy');
       
-      let finalQuery = query.slice(0, 500);
-      if (esNoticia && esHoy && !finalQuery.includes('when:')) {
-        finalQuery += ' when:1d';
-      }
-      urlApi.searchParams.set('q', finalQuery);
-      urlApi.searchParams.set('limit', '8');
-      const langCodigo = (lang || 'es').slice(0, 2);
-      urlApi.searchParams.set('hl', langCodigo);
-      urlApi.searchParams.set('gl', langCodigo === 'es' ? 'mx' : 'us');
-
-      console.log('[buscarEnWeb] Consultando Searlo API para: ' + query.slice(0, 80));
-
-      const respuesta = await fetch(urlApi, {
-        headers: { 'x-api-key': keySearlo }
-      });
-
-      const data = await respuesta.json().catch(() => ({}));
-
-      if (respuesta.ok) {
-        const items = (data && (Array.isArray(data.organic) ? data.organic : (Array.isArray(data.news) ? data.news : (Array.isArray(data.items) ? data.items : (Array.isArray(data.results) ? data.results : [])))))
-          .filter(it => it && (it.title || it.name) && (it.link || it.url));
-
+      const urlSerpApi = new URL('https://serpapi.com/search.json');
+      urlSerpApi.searchParams.set('q', query);
+      urlSerpApi.searchParams.set('api_key', keySerpApi);
+      urlSerpApi.searchParams.set('hl', 'es');
+      urlSerpApi.searchParams.set('gl', 'ni'); // Geolocation Nicaragua para mayor relevancia regional
+      urlSerpApi.searchParams.set('engine', esNoticia ? 'google_news' : 'google');
+      
+      const respSerpApi = await fetch(urlSerpApi);
+      if (respSerpApi.ok) {
+        const dataSerpApi = await respSerpApi.json();
+        const items = esNoticia ? (dataSerpApi.news_results || []) : (dataSerpApi.organic_results || []);
+        
         if (items.length) {
-          const fuentes = items.slice(0, 5).map(it => ({
-            titulo: String(it.title || it.name).trim(),
-            url: it.link || it.url
-          }));
-
-          const ahora = new Date();
-          const fmtCorto = new Intl.DateTimeFormat('es-ES', { 
-            timeZone, month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true 
-          });
-
-          
-          const topItems = items.slice(0, 5);
-
-          const textosPromesas = topItems.map(async (it, i) => {
-            const titulo = String(it.title || it.name).trim();
-            const url = it.link || it.url;
-            let snippet = String(it.snippet || it.content || it.description || '').trim();
-            
-            if (i < 3 && url && (!snippet || snippet.length < 150 || query.toLowerCase().includes('noticias'))) {
-              const extraContent = await fetchWebContent(url);
-              if (extraContent && extraContent.length > 200) {
-                snippet += " | EXTRAÍDO DEL ARTÍCULO HOY: " + extraContent.slice(0, 1500) + "...";
-              }
-            }
-
-            let dateStr = '';
-            if (it.date) {
-              const d = new Date(it.date);
-              if (!isNaN(d.getTime())) {
-                const diffMinutos = Math.floor((new Date() - d) / 60000);
-                let rel = '';
-                if (diffMinutos >= 0 && diffMinutos < 60) rel = `hace ${diffMinutos} min`;
-                else if (diffMinutos >= 60 && diffMinutos < 1440) rel = `hace ${Math.floor(diffMinutos / 60)}h`;
-                else if (diffMinutos >= 1440 && diffMinutos < 2880) rel = 'ayer';
-                else if (diffMinutos >= 2880 && diffMinutos < 43200) rel = `hace ${Math.floor(diffMinutos / 1440)} días`;
-                else rel = `hace ${Math.floor(diffMinutos / 43200)} meses`;
-                
-                // Formato exacto
-                const fechaCorta = d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-                dateStr = ` [Fecha de publicación: ${fechaCorta} (${rel})]`;
-              } else {
-                dateStr = ` [Fecha reportada: ${it.date}]`;
-              }
-            }
-            
-            return `${i + 1}. ${titulo}${dateStr} — ${snippet}`;
-          });
-
-          const resArray = await Promise.all(textosPromesas);
-          const texto = resArray.join('\n\n');
-
-          // Si el texto final tiene muy poco contenido (ej. Searlo trajo puros títulos sin snippets 
-          // y fetchWebContent fue bloqueado), forzamos un fallback a otro proveedor
-          if (texto.length < 250) {
-            console.warn('[buscarEnWeb] Searlo trajo resultados pero casi sin contenido (posible bloqueo bot). Forzando fallback...');
-            throw new Error('Searlo sin contenido útil');
-          }
-
+          const fuentes = items.map(o => ({ titulo: o.title, url: o.link }));
+          const texto = items.map((o, i) => {
+            const dateStr = o.date ? ` [${o.date}]` : '';
+            const sourceStr = o.source ? ` (Fuente: ${typeof o.source === 'object' ? o.source.name : o.source})` : '';
+            return `${i + 1}. ${o.title}${dateStr}${sourceStr} — ${o.snippet || ''}`;
+          }).join('\n');
+          console.log(`[buscarEnWeb] Búsqueda SerpApi exitosa (${esNoticia ? 'google_news' : 'google'}).`);
           return { texto, fuentes };
+        } else {
+          console.warn(`[buscarEnWeb] SerpApi no trajo resultados para ${esNoticia ? 'google_news' : 'google'}.`);
         }
       } else {
-        const detalle = (data && data.message) || (data && data.error) || String(respuesta.status);
-        console.warn('[buscarEnWeb] Searlo respondió error (' + respuesta.status + ': ' + detalle + ')');
-        throw new Error('Error en Searlo API');
+        console.warn('[buscarEnWeb] Error de SerpApi status:', respSerpApi.status);
       }
-    } catch (e) {
-      console.warn('[buscarEnWeb] Excepción en Searlo:', e && e.message ? e.message : e);
+    } catch (eSerpApi) {
+      console.warn('[buscarEnWeb] Excepción en SerpApi:', eSerpApi.message);
     }
   }
+
+  
 
   // 2) Intentar con Tavily API (si está configurada)
   if (keyTavily) {

@@ -1,0 +1,2 @@
+Error de groq: {"error":{"message":"Request too large for model `qwen/qwen3.8-27b` in organization `org_01kzjkd063e119a793tzk594jb` service tier `on_demand` on input tokens per minute (ITPM): Limit 7000, Requested 11144, please reduce your message size and try again. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+
