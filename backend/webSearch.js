@@ -56,10 +56,14 @@ async function evaluarBusquedaAutomatica(mensaje, historial = []) {
   }
 
   // Filtro rápido de palabras claras
+  let forzarBusqueda = false;
   const regexRapido = /\b(hoy|ahora|ayer|mañana|esta semana|último|última|resultado|quién ganó|a qué hora|cuándo|precio|clima|lluvia|noticias|dólar)\b/i;
   if (regexRapido.test(texto) || /\b(busca|investiga)\b/i.test(texto)) {
-    console.log('[busqueda-auto] via=filtro, buscar=true, consulta="' + texto + '"');
-    return { buscar: true, consulta: extraerQueryBusqueda(texto), via: 'filtro' };
+    forzarBusqueda = true;
+    if (!historial || historial.length === 0) {
+      console.log('[busqueda-auto] via=filtro, buscar=true, consulta="' + texto + '"');
+      return { buscar: true, consulta: extraerQueryBusqueda(texto), via: 'filtro' };
+    }
   }
 
   // Clasificador LLM
@@ -100,10 +104,14 @@ ${texto}
       const parsed = JSON.parse(contenido);
       const elapsed = Date.now() - startMs;
       console.log(`[busqueda-auto] via=clasificador, buscar=${parsed.buscar}, consulta="${parsed.consulta}", ms=${elapsed}`);
-      return { buscar: !!parsed.buscar, consulta: parsed.consulta || texto, via: 'clasificador' };
+      return { buscar: forzarBusqueda ? true : !!parsed.buscar, consulta: parsed.consulta || extraerQueryBusqueda(texto), via: 'clasificador' };
     }
   } catch (e) {
     console.warn('[busqueda-auto] Error o timeout en clasificador:', e.name === 'AbortError' ? 'Timeout 2s' : e.message);
+  }
+  
+  if (forzarBusqueda) {
+    return { buscar: true, consulta: extraerQueryBusqueda(texto), via: 'filtro_fallback' };
   }
   return { buscar: false };
 }

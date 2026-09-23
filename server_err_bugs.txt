@@ -1,0 +1,2 @@
+Error de deepseek: {"error":{"message":"Authentication Fails, Your api key: ****fa00 is invalid","type":"authentication_error","param":null,"code":"invalid_request_error"}}
+[Moderación] Strike 1/5 en chat test-voz. Quedan 4.

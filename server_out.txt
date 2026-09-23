@@ -1,0 +1,10 @@
+[frontend] Sirviendo app React/Next.js (frontend-next/out)
+Servidor corriendo en http://localhost:3001
+Base de datos conectada y lista.
+[API/chat] Usuario logueado: Invitado
+[busqueda-auto] via=clasificador, buscar=false, consulta="eres una mierda y un idiota, no sirves", ms=290
+[Router] → groq (regla 2: mensaje corto)
+[API/chat] Usuario logueado: Invitado
+[busqueda-auto] via=filtro, buscar=true, consulta="cuales son las noticias de hoy en nicaragua"
+[buscarEnWeb] Consultando Searlo API para: cuales son noticias hoy nicaragua
+[Router] → groq (regla 2: mensaje corto)

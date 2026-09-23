@@ -1,0 +1,7 @@
+[frontend] Sirviendo app React/Next.js (frontend-next/out)
+Servidor corriendo en http://localhost:3001
+Base de datos conectada y lista.
+[API/chat] Usuario logueado: Invitado
+[busqueda-auto] via=clasificador, buscar=true, consulta="noticias de Nicaragua del día anterior a hoy", ms=868
+[buscarEnWeb] Consultando Searlo API para: noticias de Nicaragua del día anterior a hoy
+[Router] → groq (regla 2: mensaje corto)

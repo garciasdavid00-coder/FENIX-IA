@@ -1,0 +1,33 @@
+[frontend] Sirviendo app React/Next.js (frontend-next/out)
+Servidor corriendo en http://localhost:3001
+Base de datos conectada y lista.
+[API/chat] Usuario logueado: {
+  id: 'test_user_memoria_777',
+  google_id: 'test_user_memoria_777',
+  userIdFinal: 'test_user_memoria_777'
+}
+[MemoryManager] Consultando memorias para userId: test_user_memoria_777
+[MemoryManager] Memorias recuperadas: 1
+[busqueda-auto] via=clasificador, buscar=false, consulta="Recuerdas cómo me llamo y a qué me dedico?", ms=1037
+[Router] → groq (regla 2: mensaje corto)
+[MemoryManager] notificarMensaje llamado para userId: test_user_memoria_777 mensajes: 1
+[MemoryManager] Contador actual: 1 Umbral: 1
+[MemoryManager] Disparando extractMemoriesFromConversation...
+[MemoryManager] Payload enviado a la IA para extraccin: {
+  "model": "openai/gpt-oss-20b",
+  "temperature": 0.2,
+  "max_tokens": 400,
+  "response_format": {
+    "type": "json_object"
+  },
+  "messages": [
+    {
+      "role": "system",
+      "content": "Eres un extractor de datos personales. A partir de una conversación, saca los hechos y preferencias DURADEROS sobre el usuario: nombres, edades, profesión, idiomas, gustos, preferencias, proyectos en curso, herramientas o información técnica relevante, y los TEMAS IMPORTANTES que le interesan (aquellos temas que repite, sobre los que pide consejo o quiere aprender).\n\nReglas:\n- NO extraigas saludos, frases sueltas, estados momentáneos ni información trivial.\n- Si la conversación no aporta datos nuevos y relevantes, devuelve [].\n- Solo responde con un objeto JSON válido con la propiedad \"memorias\" que contenga el array, del formato:\n{\"memorias\": [{\"text\": \"hecho\", \"category\": \"personal\"}]}\n- category debe ser uno de: personal, preferencia, proyecto, tecnico, temas."
+    },
+    {
+      "role": "user",
+      "content": "Conversación:\n[{\"role\":\"user\",\"content\":\"�Recuerdas c�mo me llamo y a qu� me dedico?\"}]"
+    }
+  ]
+}
