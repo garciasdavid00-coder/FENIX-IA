@@ -700,7 +700,7 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
               consulta: evalBusqueda.consulta,
               lang,
               timeZone,
-              apiKey: process.env.SEARLO_API_KEY
+              
             });
             if (datosWeb && datosWeb.fuentes && datosWeb.fuentes.length > 0) {
               webSearch.guardarEnCache(evalBusqueda.consulta, datosWeb);
@@ -1078,7 +1078,7 @@ Consulta optimizada para Google:`;
       try {
         resultadoBusqueda = await webSearch.buscarEnWeb({
           consulta: query,
-          apiKey: process.env.SEARLO_API_KEY,
+          
           lang,
           timeZone
         });

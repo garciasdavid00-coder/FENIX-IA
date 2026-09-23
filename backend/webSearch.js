@@ -304,13 +304,7 @@ async function ejecutarBusquedaWebCompleta({
   // ¿Es una consulta sobre divisas / tipo de cambio?
   const esTipoCambio = detectarConsultaTipoCambio(mensaje);
 
-  // 1) Búsqueda Web Elegante vía Searlo (Google Search real y limpio)
-  let busqueda = { texto: '', fuentes: [] };
-  try {
-    busqueda = await buscarEnWeb({ consulta: query, lang, timeZone });
-  } catch (e) {
-    console.error('[WebSearch] Error al buscar en Searlo:', e.message);
-  }
+  
 
   // Para consultas de divisas limitamos las fuentes a 2-3 para no saturar
   const fuentesFinales = esTipoCambio
@@ -441,7 +435,7 @@ INSTRUCCIONES GENERALES:
 }
 
 /**
- * Busca en la web usando la API de Searlo (SERP de Google) y devuelve
+ * Busca en la web usando SerpApi y devuelve
  * un contexto de texto + array de fuentes reales clicables.
  * El modelo de chat redacta la respuesta final con ese contexto.
  * @param {{ consulta: string, apiKey?: string, lang?: string }} opts
@@ -481,8 +475,7 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español', timeZone = 'Am
     };
   }
 
-  const keySearlo = apiKey || process.env.SEARLO_API_KEY;
-  const keyTavily = process.env.TAVILY_API_KEY;
+    const keyTavily = process.env.TAVILY_API_KEY;
   const keySerper = process.env.SERPER_API_KEY;
   const keySerpApi = process.env.SERPAPI_API_KEY;
 
