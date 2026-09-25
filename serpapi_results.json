@@ -1,0 +1,1392 @@
+{
+  "search_metadata": {
+    "id": "6ab603bffd81c873525ed75a",
+    "status": "Success",
+    "json_endpoint": "https://serpapi.com/searches/BbwqZprOWorFDTeu3F1wt_mVNDlTu8CUEkUnL3LcON4/6ab603bffd81c873525ed75a.json",
+    "markdown_endpoint": "https://serpapi.com/searches/BbwqZprOWorFDTeu3F1wt_mVNDlTu8CUEkUnL3LcON4/6ab603bffd81c873525ed75a.md",
+    "created_at": "2026-09-25 05:16:47 UTC",
+    "processed_at": "2026-09-25 05:16:47 UTC",
+    "google_news_url": "https://news.google.com/search?q=noticias+de+hoy+Nicaragua&hl=es&gl=NI",
+    "raw_html_file": "https://serpapi.com/searches/BbwqZprOWorFDTeu3F1wt_mVNDlTu8CUEkUnL3LcON4/6ab603bffd81c873525ed75a.html",
+    "total_time_taken": 0.66
+  },
+  "search_parameters": {
+    "engine": "google_news",
+    "gl": "ni",
+    "hl": "es",
+    "q": "noticias de hoy Nicaragua"
+  },
+  "news_results": [
+    {
+      "position": 1,
+      "title": "¿Dónde ver partido República Dominicana vs. Nicaragua por Concacaf Nations League 2026? Horarios y canales TV",
+      "source": {
+        "name": "El Comercio Perú",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://elcomercio.pe&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://elcomercio.pe/mag/usa/en-vivo-us/donde-ver-partido-republica-dominicana-vs-nicaragua-en-vivo-y-gratis-hoy-por-concacaf-nations-league-2026-horarios-y-canales-tv-online-nnda-nnrt-noticia/",
+      "thumbnail": "https://elcomercio.pe/resizer/v2/APHO2WKMX5BGFBT56TAYDRHYBU.png?auth=32160da5b526edfefef80ca02c29bfaf3edcb430b14e48edeb2d47012891941a&width=3600&height=2430&quality=75&smart=true",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNXpkVjlZWTE5YVZ5MDBOWEJTVFJESEF4aWlCU2dLTWdhTmdaRFJPQWM",
+      "date": "09/25/2026, 02:02 AM, +0000 UTC",
+      "iso_date": "2026-09-25T02:02:39Z"
+    },
+    {
+      "position": 2,
+      "title": "Qué canal pasa República Dominicana vs Nicaragua hoy: dónde ver gratis y EN VIVO la Concacaf Nations League",
+      "source": {
+        "name": "365Scores",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.365scores.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.365scores.com/es/news/tele-republica-dominicana-vs-nicaragua/",
+      "thumbnail": "https://www.365scores.com/es/news/wp-content/uploads/2026/09/photo_5015032822925823286_y.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iMkNnNXZhR1JPYUc1M2FGcENXREp3VFJDZkF4ampCU2dLTWd1UkVaSkxrV3Ryam5sTmV3",
+      "date": "09/24/2026, 10:23 PM, +0000 UTC",
+      "iso_date": "2026-09-24T22:23:00Z"
+    },
+    {
+      "position": 3,
+      "title": "¿A qué hora juega y en qué canal transmiten República Dominicana vs. Nicaragua por Concacaf Nations League 2026?",
+      "source": {
+        "name": "Gestión",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://gestion.pe&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Jairo Cruz Rua"
+        ]
+      },
+      "link": "https://gestion.pe/mix/sports/a-que-hora-juega-y-en-que-canal-transmiten-republica-dominicana-vs-nicaragua-en-vivo-y-gratis-hoy-por-concacaf-nations-league-2026-nnda-nnrt-noticia/",
+      "thumbnail": "https://gestion.pe/resizer/v2/FYGNRCRFMVHO5O66YL7EVFQQM4.jpg?auth=d0c5a90f3d4b04868e3208f32952f621388a4dad191baa0d162eaca1663626ce&width=2320&height=1320&quality=75&smart=true",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNXBPSGREZFVkVWRGZzVjWHBSVFJDaUF4amVCU2dLTWdZQk1JNGpGd3M",
+      "date": "09/25/2026, 02:06 AM, +0000 UTC",
+      "iso_date": "2026-09-25T02:06:50Z"
+    },
+    {
+      "position": 4,
+      "title": "Cómo funciona la red trasnacional de espionaje y acoso a opositores del gobierno de Ortega y Murillo en Nicaragua, según la ONU",
+      "source": {
+        "name": "BBC",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.bbc.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Felipe Llambias"
+        ]
+      },
+      "link": "https://www.bbc.com/mundo/articles/cvg80dv88rgo",
+      "thumbnail": "https://ichef.bbci.co.uk/news/1024/branded_mundo/8787/live/161a1e60-23d6-11f1-92f6-6d3dbba93239.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNHdaRlJRWXpaWU5qUlRTbUptVFJDZkF4ampCU2dLTWdZVkZJVE5sUVE",
+      "date": "03/20/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-03-20T07:00:00Z"
+    },
+    {
+      "position": 5,
+      "title": "Clima hoy en Managua, Nicaragua: el pronóstico del tiempo para este viernes 25 septiembre de 2026",
+      "source": {
+        "name": "Clarin.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.clarin.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.clarin.com/informacion-general/clima-hoy-managua-nicaragua-pronostico-tiempo-viernes-25-septiembre-2026_0_BHXagkQZwc.html",
+      "thumbnail": "https://www.clarin.com/img/2025/04/30/f4xLaY8eq_1200x630__1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNHpNekJJVkZocVdHZG5WV28wVFJDUkF4ajhCU2dLTWdaRklvejJIQW8",
+      "date": "09/25/2026, 03:35 AM, +0000 UTC",
+      "iso_date": "2026-09-25T03:35:28Z"
+    },
+    {
+      "position": 6,
+      "title": "Canal 6 transmitió el partido Nicaragua 2-3 Rep. Dominicana por Concacaf Nations League 2026",
+      "source": {
+        "name": "El Comercio Perú",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://elcomercio.pe&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Jesus Yupanqui Quilca"
+        ]
+      },
+      "link": "https://elcomercio.pe/mag/usa/en-vivo-us/canal-6-en-vivo-gratis-donde-ver-partido-nicaragua-vs-dominicana-en-directo-por-concacaf-nations-league-2026-nnda-nnrt-noticia/",
+      "thumbnail": "https://elcomercio.pe/resizer/v2/J25W3F6A5NABXJ3QZAEQUGMVJA.jpg?auth=b3d8d3a6deec9aae7506d81449ee7364b68fb8a65feadf6d5d0d6846c0a9a6e8&width=2400&height=1620&quality=75&smart=true",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNTJhR1ZQUjFNNFZsVlBSazh0VFJESEF4aWlCU2dLTWdtSlVZcnpyS2E1N1FF",
+      "date": "09/25/2026, 02:03 AM, +0000 UTC",
+      "iso_date": "2026-09-25T02:03:51Z"
+    },
+    {
+      "position": 7,
+      "title": "Estrecho de Ormuz, lluvia negra, Nicaragua, satélites... Las noticias del martes",
+      "source": {
+        "name": "news.un.org",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://news.un.org&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://news.un.org/es/story/2026/03/1541225",
+      "thumbnail": "https://global.unitednations.entermediadb.net/assets/mediadb/services/module/asset/downloads/preset/Libraries/Production%20Library/15-11-2022_Unsplash_oil-rig.jpg/image1170x530cropped.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNVNVek5OTlZSVVltMXhkMjEyVFJEMUFoaTNCaWdLTWdrSkE0U21qbXBjOVFB",
+      "date": "03/10/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-03-10T07:00:00Z"
+    },
+    {
+      "position": 8,
+      "title": "#EEUU reacciona al anuncio de #DanielOrtega de que no habrá más elecciones en #Nicaragua, mediante un llamado de #MarcoRubio a la comunidad internacional. LEE MÁS en #DiarioDeCuba LINK en el primer comentario 👇",
+      "source": {
+        "name": "facebook.com",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.facebook.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.facebook.com/DIARIODECUBA/posts/eeuu-reacciona-al-anuncio-de-danielortega-de-que-no-habr%C3%A1-m%C3%A1s-elecciones-en-nica/1603031787845533/",
+      "thumbnail": "https://lookaside.fbsbx.com/lookaside/crawler/media/?media_id=1603031757845536",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNXJWSEpmZUVGbGMwaDFWakowVFJEckJCanZBeWdLTWdrQkVvNEV4YVhZcGdJ",
+      "date": "07/22/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-22T07:00:00Z"
+    },
+    {
+      "position": 9,
+      "title": "Canal 6 transmitió el partido Nicaragua 2-3 Dominicana por Liga de Naciones Concacaf (24/09/2026)",
+      "source": {
+        "name": "Gestión",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://gestion.pe&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://gestion.pe/mix/sports/canal-6-en-vivo-gratis-donde-ver-partido-nicaragua-vs-rep-dominicana-via-futbol-tv-y-online-nnda-nnrt-noticia/",
+      "thumbnail": "https://gestion.pe/resizer/v2/JXFVCXXU5JACROPDX6CQMGP55A.png?auth=59c873454f7a456895f33324bb25bae291a6d7af571f7d7d3510a352aa05ae6f&width=2320&height=1320&quality=75&smart=true",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNUJhMVExVXpsZlgzSm5WMHc1VFJDaUF4amVCU2dLTWdrTlVvcjF0S1dCYWdJ",
+      "date": "09/25/2026, 02:07 AM, +0000 UTC",
+      "iso_date": "2026-09-25T02:07:20Z"
+    },
+    {
+      "position": 10,
+      "title": "Nicaragua rompe relaciones con Italia por caso de fugitivo",
+      "source": {
+        "name": "DW.com",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.dw.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.dw.com/es/nicaragua-rompe-relaciones-con-italia-por-caso-de-fugitivo-protegido-por-ortega/a-77996280",
+      "thumbnail": "https://static.dw.com/image/18301933_804.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUVRVVo0VjNOVlltaGhhemcyVFJDcUJCaXFCQ2dLTWdiQndvUVR3UU0",
+      "date": "07/16/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-16T07:00:00Z"
+    },
+    {
+      "position": 11,
+      "title": "Nicaragua: el oro que sostiene al régimen y lo aísla del mundo",
+      "source": {
+        "name": "IPS Agencia de Noticias",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://ipsnoticias.net&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://ipsnoticias.net/2026/08/nicaragua-el-oro-que-sostiene-al-regimen-y-lo-aisla-del-mundo/",
+      "thumbnail": "https://ipsnoticias.net/wp-content/uploads/2026/08/Nicaragua-y-su-oro-1-400x300.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVJVRk5wT1RBM2VrUXhZV2x3VFJDc0FoaVFBeWdLTWdZSm9aYkd0Z1k",
+      "date": "08/25/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-08-25T07:00:00Z"
+    },
+    {
+      "position": 12,
+      "title": "Daniel Ortega: “Aquí no volverá a haber elecciones”",
+      "source": {
+        "name": "Confidencial Nicaragua",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://confidencial.digital&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://confidencial.digital/noticias/daniel-ortega-aqui-no-volvera-a-haber-elecciones/",
+      "thumbnail": "https://confidencial.digital/wp-content/uploads/2026/07/Daniel-Ortega-190726-13.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUtlVEJrVW5CVFNrNVpkV0ZoVFJEM0F4amlCQ2dLTWdZQkFwWVNKUWs",
+      "date": "07/20/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-20T07:00:00Z"
+    },
+    {
+      "position": 13,
+      "title": "Liberan decenas de presos políticos en Nicaragua, en aparente respuesta a solicitud de EE.UU.",
+      "source": {
+        "name": "BBC",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.bbc.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Rafael Rojas Abuchaibe"
+        ]
+      },
+      "link": "https://www.bbc.com/mundo/articles/cd0y2yj8l0no",
+      "thumbnail": "https://ichef.bbci.co.uk/news/1024/branded_mundo/6185/live/f7d00520-ee68-11f0-9e38-cf6cd344f06b.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNUZUbDluZUZWNmRGbFVabU4zVFJDZkF4ampCU2dLTWdrQklJd0txcWU1eGdJ",
+      "date": "01/10/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-01-10T08:00:00Z"
+    },
+    {
+      "position": 14,
+      "title": "La mala noticia que le dio EE. UU. a Daniel Ortega tras anunciar que eliminará las elecciones en Nicaragua",
+      "source": {
+        "name": "semana.com",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.semana.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.semana.com/mundo/articulo/la-mala-noticia-que-le-dio-ee-uu-a-daniel-ortega-tras-anunciar-que-eliminara-las-elecciones-en-nicaragua/202621/",
+      "thumbnail": "https://www.semana.com/resizer/v2/CM7A7AZULRAOJFUMADVVAJX2FE.jpg?auth=d1f73ec13b6554aedb6dda1312212cd8b23f524126b29bb50a3dc34c231bbc10&smart=true&quality=75&width=1280&height=1280",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNHlUbEZFZDNrNE5VZFpTSE55VFJDcUJCaXFCQ2dLTWdZVlJwZ3BvZ2c",
+      "date": "07/21/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-21T07:00:00Z"
+    },
+    {
+      "position": 15,
+      "title": "Euro hoy en Nicaragua: precio y cotización de la divisa este jueves 24 de septiembre de 2026",
+      "source": {
+        "name": "Clarin.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.clarin.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.clarin.com/economia/euro-hoy-en-nicaragua-precio-y-cotizacion-de-la-divisa-este-jueves-24-de-septiembre-de-2026_0_DylRBfO9ej.html",
+      "thumbnail": "https://www.clarin.com/img/2020/10/07/V8Hxgsjgi_1200x630__1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iNkNnNTNkMjlMYzJNd1Vua3dOMDgxVFJDUkF4ajhCU2dLTWc0QkFJSUxvYWRFQml0UmJLYWFKQQ",
+      "date": "09/24/2026, 10:45 AM, +0000 UTC",
+      "iso_date": "2026-09-24T10:45:12Z"
+    },
+    {
+      "position": 16,
+      "title": "El presidente del Parlamento de #Nicaragua, #GustavoPorras, defiende el anuncio de #DanielOrtega de que no habrá elecciones en el país, pero dice que sí se celebrarán... aunque no serán democráticas. LEE MÁS en #DiarioDeCuba LINK en el primer co",
+      "source": {
+        "name": "facebook.com",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.facebook.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.facebook.com/DIARIODECUBA/posts/el-presidente-del-parlamento-de-nicaragua-gustavoporras-defiende-el-anuncio-de-d/1603782467770465/",
+      "thumbnail": "https://lookaside.fbsbx.com/lookaside/crawler/media/?media_id=1603782437770468",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUxRVE5MVVRkbU1sRkpkMVZPVFJEckJCanZBeWdLTWdZUklvekhRQVU",
+      "date": "07/23/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-23T07:00:00Z"
+    },
+    {
+      "position": 17,
+      "title": "Qué queda de la oposición dentro de Nicaragua y por qué Daniel Ortega quiere abolir las elecciones",
+      "source": {
+        "name": "BBC",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.bbc.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Atahualpa Amerise"
+        ]
+      },
+      "link": "https://www.bbc.com/mundo/articles/clyez7yv4vvo",
+      "thumbnail": "https://ichef.bbci.co.uk/news/1024/branded_mundo/2184/live/baee5190-879a-11f1-9d55-0b6742729f5d.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNVhUR2hKVDJGUWVGZFVabkpTVFJDZkF4ampCU2dLTWdrQlk1QXlLZWpRandF",
+      "date": "07/24/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-24T07:00:00Z"
+    },
+    {
+      "position": 18,
+      "title": "Clima hoy en Managua, Nicaragua: el pronóstico del tiempo para este jueves 24 septiembre de 2026",
+      "source": {
+        "name": "Clarin.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.clarin.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.clarin.com/informacion-general/clima-hoy-managua-nicaragua-pronostico-tiempo-jueves-24-septiembre-2026_0_zGaHXzdioi.html",
+      "thumbnail": "https://www.clarin.com/img/2025/04/30/NTddMGN8q_1200x630__1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iJ0NnNHpaRmhzVUY5d1JUVlZWVzAyVFJDUkF4ajhCU2dLTWdNTkVBdw",
+      "date": "09/24/2026, 03:35 AM, +0000 UTC",
+      "iso_date": "2026-09-24T03:35:39Z"
+    },
+    {
+      "position": 19,
+      "title": "Clima hoy en Managua, Nicaragua: el pronóstico del tiempo para este miércoles 23 septiembre de 2026",
+      "source": {
+        "name": "Clarin.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.clarin.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.clarin.com/informacion-general/clima-hoy-managua-nicaragua-pronostico-tiempo-miercoles-23-septiembre-2026_0_MkJt5ONgCd.html",
+      "thumbnail": "https://www.clarin.com/img/2025/04/30/IwtFsKZTQ_1200x630__1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iJ0NnNWpTbVpJVm5sWFl5MVdkSEZDVFJDUkF4ajhCU2dLTWdNTndSWQ",
+      "date": "09/23/2026, 03:35 AM, +0000 UTC",
+      "iso_date": "2026-09-23T03:35:37Z"
+    },
+    {
+      "position": 20,
+      "title": "La “incómoda” fecha que los dictadores de Nicaragua quieren borrar del calendario cívico",
+      "source": {
+        "name": "Infobae",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.infobae.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.infobae.com/nicaragua/2026/08/09/la-incomoda-fecha-que-ortega-y-murillo-quieren-borrar-del-calendario-civico-nicaraguense/",
+      "thumbnail": "https://www.infobae.com/resizer/v2/HZQDZNQF7NH4LFTDHVJ7TLIG2I.jpg?auth=f3965870420c0fb6fd6575420bdd5d0609ae878d97cdf6ca1b939bc567cc6cb5&smart=true&width=1200&height=675&quality=85",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNW5ZamQ1VDJwNVYxTlJiMGhIVFJDZkF4ampCU2dLTWdZQm9JcVZ1QVU",
+      "date": "08/09/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-08-09T07:00:00Z"
+    },
+    {
+      "position": 21,
+      "title": "Censura, periodistas exiliados y zonas de “silencio informativo”: así arrasó la dictadura de Ortega con la libertad de expresión en Nicaragua",
+      "source": {
+        "name": "Infobae",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.infobae.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Lucas Martín Goyret"
+        ]
+      },
+      "link": "https://www.infobae.com/nicaragua/2026/04/18/censura-periodistas-exiliados-y-zonas-de-silencio-informativo-asi-arraso-la-dictadura-de-ortega-con-la-libertad-de-expresion-en-nicaragua/",
+      "thumbnail": "https://www.infobae.com/resizer/v2/QW2BEYZC5RATZB3YFJ5BKXMSV4.png?auth=eb6f4ab3073f252a7f4a6c778cb981b0484a33bdb2d178cddebfe7827facac20&smart=true&width=1200&height=675&quality=85",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNW1ObFJvVnpKMmRURkdSV2RSVFJDZkF4ampCU2dLTWdrQkFJWkxzYVd4UWdN",
+      "date": "04/18/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-18T07:00:00Z"
+    },
+    {
+      "position": 22,
+      "title": "Huracán Melissa, Nicaragua, Sudán, Gaza… Las noticias del jueves",
+      "source": {
+        "name": "news.un.org",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://news.un.org&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://news.un.org/es/story/2025/10/1540658",
+      "thumbnail": "https://global.unitednations.entermediadb.net/assets/mediadb/services/module/asset/downloads/preset/Libraries/Production%20Library/30-10-2025_UNESCO_Jamaica.jpg/image1170x530cropped.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVdhV2RwV1VkalVrUlpTV1l5VFJEMUFoaTNCaWdLTWdaVk1JQlpTQU0",
+      "date": "10/30/2025, 07:00 AM, +0000 UTC",
+      "iso_date": "2025-10-30T07:00:00Z"
+    },
+    {
+      "position": 23,
+      "title": "Nicaragua celebra 47 años de la Revolución Sandinista",
+      "source": {
+        "name": "Prensa Latina",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.prensa-latina.cu&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.prensa-latina.cu/2026/07/19/nicaragua-celebra-47-anos-de-la-revolucion-sandinista/",
+      "thumbnail": "https://www.prensa-latina.cu/wp-content/uploads/2026/07/revolucion-sandinista-1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUtkRWgwTWpkcE9HSmFhMlpNVFJEQ0F4aXBCU2dLTWdZQklvUklFZ28",
+      "date": "07/19/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-19T07:00:00Z"
+    },
+    {
+      "position": 24,
+      "title": "Sacerdote huyó de Nicaragua y reza a diario para que Dios libere al país “de ese régimen cruel”",
+      "source": {
+        "name": "ACI Prensa",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.aciprensa.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.aciprensa.com/noticias/127073/sacerdote-dejo-nicaragua-persecucion",
+      "thumbnail": "https://res.cloudinary.com/ewtn/image/upload/v1784751209/ewtn-news/es/NICARAGUA22726_biig5j.jpg?w=900&h=500",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNWpTWE5JVjNOalJuUlVRVVUxVFJDMkF4aTlCU2dLTWdhdE00YVFMUWM",
+      "date": "07/22/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-22T07:00:00Z"
+    },
+    {
+      "position": 25,
+      "title": "RD debuta hoy en la Liga A de Liga de Naciones frente a Nicaragua",
+      "source": {
+        "name": "elcaribe.com.do",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.elcaribe.com.do&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.elcaribe.com.do/deportes/futbol/futbol-nacional/rd-debuta-hoy-en-la-liga-a-de-liga-de-naciones-frente-a-nicaragua/",
+      "thumbnail": "https://img.mmc.com.do/elcaribe-bucket/uploads/2026/09/FUTBOL-RdD.jpg.webp",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVJNMjF2VEZVMkxVdFVhVTR3VFJDdEF4akxCU2dLTWdhQkVZekpFQXM",
+      "date": "09/24/2026, 04:00 AM, +0000 UTC",
+      "iso_date": "2026-09-24T04:00:00Z"
+    },
+    {
+      "position": 26,
+      "title": "El diario La Prensa de Nicaragua cumple 100 años con su redacción en el exilio por la censura del régimen",
+      "source": {
+        "name": "Infobae",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.infobae.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Fabián Medina Sánchez"
+        ]
+      },
+      "link": "https://www.infobae.com/america/america-latina/2026/03/01/el-diario-la-prensa-de-nicaragua-cumple-100-anos-con-su-redaccion-en-el-exilio-por-la-censura-del-regimen/",
+      "thumbnail": "https://www.infobae.com/resizer/v2/GMFHSZJM2NCZBAWSEZKIU4HGQQ.jpg?auth=52725cdc6333d1d39b1ed2d5accca01ac6de2a2a9e5fa57e24ee37802cb22db8&smart=true&width=1200&height=675&quality=85",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNHhWUzFVYzJZdGFISkRPRlZqVFJDZkF4ampCU2dLTWdhbFFaQXRJUVk",
+      "date": "02/28/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-02-28T08:00:00Z"
+    },
+    {
+      "position": 27,
+      "title": "Las noticias más relevantes de Nicaragua (17 al 23 de mayo)",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/05/23/nacionales/3703076-ultimas-noticias-nicaragua-hoy-canasta-basica",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2026/02/DSC_0778-1200x675.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNHhhbk5VWVVoSFMzSktjMXBSVFJDZkF4ampCU2dLTWdtQkFZWkdQU055TGdJ",
+      "date": "05/23/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-23T07:00:00Z"
+    },
+    {
+      "position": 28,
+      "title": "Nicaragua: Expertos de la ONU instan a la comunidad internacional a pasar de la observación a la acción",
+      "source": {
+        "name": "news.un.org",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://news.un.org&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://news.un.org/es/story/2025/10/1540657",
+      "thumbnail": "https://global.unitednations.entermediadb.net/assets/mediadb/services/module/asset/downloads/preset/Libraries/Production%20Library/28-05-2021_FAO_Nicaragua.jpg/image1170x530cropped.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iJ0NnNTZTVmt0VUhrM1NWSmZWMkZvVFJEMUFoaTNCaWdLTWdPQmdndw",
+      "date": "10/30/2025, 07:00 AM, +0000 UTC",
+      "iso_date": "2025-10-30T07:00:00Z"
+    },
+    {
+      "position": 29,
+      "title": "Gobierno de Nicaragua cierra embajada en República Dominicana",
+      "source": {
+        "name": "Listín Diario",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://listindiario.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://listindiario.com/la-republica/20260910/gobierno-nicaragua-cierra-embajada-republica-dominicana_921527.html",
+      "thumbnail": "https://listindiario.com/files/article_main_microformat/files/fp/uploads/2026/07/23/6a62089189ea2.r_d.309-239-0.jpeg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVNNbVUzTm05dGVXUnpXVU10VFJDZkF4ampCU2dLTWdhWlFwWXlvUWc",
+      "date": "09/10/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-09-10T07:00:00Z"
+    },
+    {
+      "position": 30,
+      "title": "Nicaragua condena todas formas de guerra y clama por la paz",
+      "source": {
+        "name": "Prensa Latina",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.prensa-latina.cu&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.prensa-latina.cu/2026/03/01/nicaragua-condena-todas-formas-de-guerra-y-clama-por-la-paz/",
+      "date": "03/01/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-03-01T08:00:00Z"
+    },
+    {
+      "position": 31,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 03 de Junio",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-03-de-junio/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/06/4-24.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iMkNnNTRkbGw2ZEVoeVdVNHdjVFV3VFJDZkF4ampCU2dLTWdzQkVvYjBpS3VacHRxUVBR",
+      "date": "06/03/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-03T07:00:00Z"
+    },
+    {
+      "position": 32,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 25 de mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-25-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/4-242.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNTRkSFUxU0RGRGFXOHhZVTVOVFJDZkF4ampCU2dLTWdtQjRJakUwcVJNTkFF",
+      "date": "05/25/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-25T07:00:00Z"
+    },
+    {
+      "position": 33,
+      "title": "Nicaragua destituye a su embajadora en Cuba tras apenas 50 días en el cargo",
+      "source": {
+        "name": "CiberCuba",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.cibercuba.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.cibercuba.com/noticias/2026-03-28-u1-e208512-s27061-nid324332-nicaragua-destituye-embajadora-cuba-tras-apenas-50",
+      "thumbnail": "https://cdn0.celebritax.com/sites/default/files/styles/watermark_100/public/1774730602-nicaragua-destituye-embajadora-cuba-tras-apenas-50-dias-cargo.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNWFWM2xWTWpacmVEWXdTM2w0VFJDUkF4ajhCU2dLTWdZWkk1d3BuUW8",
+      "date": "03/28/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-03-28T07:00:00Z"
+    },
+    {
+      "position": 34,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 22 de mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-22-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/4-220.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVZOSGhLWlRac1YwVTNVMmhHVFJDZkF4ampCU2dLTWdhbFJJeXVJUWs",
+      "date": "05/22/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-22T07:00:00Z"
+    },
+    {
+      "position": 35,
+      "title": "Daniel Ortega no dijo que estaba destruyendo la prensa libre, dijo que estaba combatiendo la desinformación",
+      "source": {
+        "name": "TV Azteca",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tvazteca.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tvazteca.com/aztecanoticias/el-dictador-daniel-ortega-dijo-que-estaba-combatiendo-la-desinformacion-y-hoy-nicaragua-no-tiene-prensa-libre/",
+      "thumbnail": "https://tvazteca.brightspotcdn.com/dims4/default/b671351/2147483647/strip/true/crop/1168x720+0+0/resize/1200x740!/format/jpg/quality/90/?url=https%3A%2F%2Ftv-azteca-production-tv-azteca.s3.us-west-2.amazonaws.com%2Fbrightspot%2F8e%2Fbb%2Fedb08eb041ddb3580f75f798b071%2Fdictador-daniel-ortega-dijo-que-estaba-combatiendo-la-desinformacion.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNHdORE15WnkxalpYcHFkMDVNVFJDekF4akJCU2dLTWdhSkk1TGtsZ28",
+      "date": "08/12/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-08-12T07:00:00Z"
+    },
+    {
+      "position": 36,
+      "title": "Hoy las reinas del Caribe se enfrentan a Nicaragua",
+      "source": {
+        "name": "Remolacha",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://remolacha.net&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://remolacha.net/2026/09/hoy-las-reinas-del-caribe-se-enfrentan-a-nicaragua/",
+      "thumbnail": "https://i0.wp.com/remolacha.net/wp-content/uploads/2026/08/Reinas-del-Caribe-2-scaled.png?fit=2560%2C1436&ssl=1",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iMkNnNWxjMVJsWVRCME5EbEhaMkYyVFJDZkF4amtCU2dLTWdzQk1JNk1MS2ZJcEJwVHFn",
+      "date": "09/11/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-09-11T07:00:00Z"
+    },
+    {
+      "position": 37,
+      "title": "Obispo Báez de Nicaragua: Los “ladrones y bandidos” de hoy son los poderosos que roban la libertad",
+      "source": {
+        "name": "ACI Prensa",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.aciprensa.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Walter Sánchez Silva"
+        ]
+      },
+      "link": "https://www.aciprensa.com/noticias/124583/obispo-baez-de-nicaragua-los-ladrones-y-bandidos-de-hoy-son-los-poderosos-que-roban-la-libertad",
+      "thumbnail": "https://res.cloudinary.com/ewtn/image/upload/ewtn-news/es/imagespp/silvio-baez-domingo-del-buen-pastor-26042026-1777321174?w=900&h=500",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNTZhRlZEU1VRd1lWVmplV2cwVFJDMkF4aTlCU2dLTWdZOUpKUlJIUWs",
+      "date": "04/27/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-27T07:00:00Z"
+    },
+    {
+      "position": 38,
+      "title": "Copresidentes de Nicaragua condenan agresión militar contra Venezuela",
+      "source": {
+        "name": "Prensa Latina",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.prensa-latina.cu&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.prensa-latina.cu/2026/01/03/copresidentes-de-nicaragua-condenan-agresion-militar-contra-venezuela/",
+      "thumbnail": "https://www.prensa-latina.cu/wp-content/uploads/2026/01/venezuela-nicaragua-telef-1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNXNOM1l3WkRSWE9IbFVhM1ZUVFJDMkF4aTlCU2dLTWdB",
+      "date": "01/03/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-01-03T08:00:00Z"
+    },
+    {
+      "position": 39,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 18 de mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-18-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/4-166.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNDFVV2MzWmtwT1ZXNVdOMUptVFJDZkF4ampCU2dLTWdB",
+      "date": "05/18/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-18T07:00:00Z"
+    },
+    {
+      "position": 40,
+      "title": "La presión sobre la prensa independiente en Nicaragua aumenta en el primer trimestre de 2026",
+      "source": {
+        "name": "Infobae",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.infobae.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Katlen Urquilla"
+        ]
+      },
+      "link": "https://www.infobae.com/nicaragua/2026/04/10/la-presion-sobre-la-prensa-independiente-en-nicaragua-aumenta-en-el-primer-trimestre-de-2026/",
+      "thumbnail": "https://www.infobae.com/resizer/v2/7GNRIZIXQ5GN7M4EPIYVCOVS7I.jpg?auth=1645318abe0645105807c9efdbe8b04895b60fe4ec889dc3a1cf97d91ee28fa0&smart=true&width=1200&height=675&quality=85",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNU9ObEZuTkV4SVMweFFSMHhtVFJDZkF4ampCU2dLTWdrVlE1SXpuV21pREFJ",
+      "date": "04/09/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-09T07:00:00Z"
+    },
+    {
+      "position": 41,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 04 de Junio",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-04-de-junio/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/06/4-43.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNWhPR2xIZGxocFIyRkRhamd5VFJDZkF4ampCU2dLTWdrQmdJU1FVQ081OVFB",
+      "date": "06/04/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-04T07:00:00Z"
+    },
+    {
+      "position": 42,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 14 de mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-14-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/4-131.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUVhbk5IVTFaNVdUWldOamgwVFJDZkF4ampCU2dLTWdhQlVJUWxYUUk",
+      "date": "05/14/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-14T07:00:00Z"
+    },
+    {
+      "position": 43,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 05 de Junio",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-05-de-junio/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/06/4-55.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNVNVbUYwU1RGMVlWbFllbFF3VFJDZkF4ampCU2dLTWdB",
+      "date": "06/05/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-05T07:00:00Z"
+    },
+    {
+      "position": 44,
+      "title": "Nicaragua | Las noticias más leídas en LA PRENSA este 2025",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2025/12/30/nacionales/3578428-nicaragua-noticias-mas-leidas-la-prensa-2025",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2025/12/sitio-web-del-diario-LA-PRENSA-2.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNUpPRXA1T1RkbmIySTBVMGh0VFJDYUF4alFCU2dLTWdB",
+      "date": "12/30/2025, 08:00 AM, +0000 UTC",
+      "iso_date": "2025-12-30T08:00:00Z"
+    },
+    {
+      "position": 45,
+      "title": "Nicaragua está entre los países con mayor restricción a la libertad de prensa, señala la SIP",
+      "source": {
+        "name": "Infobae",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.infobae.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Katlen Urquilla"
+        ]
+      },
+      "link": "https://www.infobae.com/nicaragua/2026/03/10/nicaragua-esta-entre-los-paises-con-mayor-restriccion-a-la-libertad-de-prensa-senala-la-sip/",
+      "thumbnail": "https://www.infobae.com/resizer/v2/7GNRIZIXQ5GN7M4EPIYVCOVS7I.jpg?auth=1645318abe0645105807c9efdbe8b04895b60fe4ec889dc3a1cf97d91ee28fa0&smart=true&width=1200&height=675&quality=85",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNU9ObEZuTkV4SVMweFFSMHhtVFJDZkF4ampCU2dLTWdrVlE1SXpuV21pREFJ",
+      "date": "03/10/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-03-10T07:00:00Z"
+    },
+    {
+      "position": 46,
+      "title": "Nicaragua reiteró solidaridad con Venezuela ante agresiones de EEUU",
+      "source": {
+        "name": "Prensa Latina",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.prensa-latina.cu&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.prensa-latina.cu/2025/12/22/nicaragua-reitero-solidaridad-con-venezuela-ante-agresiones-de-eeuu/",
+      "thumbnail": "https://www.prensa-latina.cu/wp-content/uploads/2025/12/Venezuela-Nicaragua-Banderas-1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNXBNVGRKVmxsNVdWbG5MWE51VFJEZ0F4aUFCU2dLTWdZQmNJN0d3Z1k",
+      "date": "12/22/2025, 08:00 AM, +0000 UTC",
+      "iso_date": "2025-12-22T08:00:00Z"
+    },
+    {
+      "position": 47,
+      "title": "Exiliados piden a Trump perseguir a Ortega en Nicaragua como hizo con Maduro en Venezuela",
+      "source": {
+        "name": "El Nuevo Diario",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://elnuevodiario.com.do&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://elnuevodiario.com.do/exiliados-piden-a-trump-perseguir-a-ortega-en-nicaragua-como-hizo-con-maduro-en-venezuela/",
+      "thumbnail": "https://i0.wp.com/nuevodiario-assets.s3.us-east-2.amazonaws.com/wp-content/uploads/2026/08/ortega.webp?fit=900%2C600&quality=80&ssl=1",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNHRkWGQ0WmxkdVRsVnNUSGhFVFJERUF4aW1CU2dLTWdrZEFKVE1JU2ttUWdN",
+      "date": "08/21/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-08-21T07:00:00Z"
+    },
+    {
+      "position": 48,
+      "title": "Estas son las noticias más importantes de Nicaragua para este 22 de abril",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua-para-este-22-de-abril/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/04/4-205.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNDRaRlF3WkU0eFJtMWhSa0ZTVFJDZkF4ampCU2dLTWdZQklvVHhWQU0",
+      "date": "04/22/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-22T07:00:00Z"
+    },
+    {
+      "position": 49,
+      "title": "Béisbol cubano cayó ante Nicaragua, comprometió final en Dominicana",
+      "source": {
+        "name": "Prensa Latina",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.prensa-latina.cu&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.prensa-latina.cu/2026/08/06/beisbol-cubano-cayo-ante-nicaragua-comprometio-final-en-dominicana/",
+      "date": "08/06/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-08-06T07:00:00Z"
+    },
+    {
+      "position": 50,
+      "title": "Estas son las noticias más importantes de Nicaragua para este 21de abril",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua-para-este-21de-abril/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/04/4-190.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVZRVGhEWTA1SFJUaGlPWHBTVFJDZkF4ampCU2dLTWdZQkVvalZFQXM",
+      "date": "04/21/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-21T07:00:00Z"
+    },
+    {
+      "position": 51,
+      "title": "Nicaragua abandona la Unesco en protesta por el premio al diario 'La Prensa'",
+      "source": {
+        "name": "France 24",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.france24.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.france24.com/es/am%C3%A9rica-latina/20250504-nicaragua-abandona-la-unesco-en-protesta-por-el-premio-al-diario-la-prensa",
+      "thumbnail": "https://s.france24.com/media/display/acc59444-10c1-11f0-a199-005056a90284/w:1024/p:16x9/000_33PD6V3.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNVRWMHBqZFhGRGMzaHpiSGwyVFJDZkF4ampCU2dLTWdrQk1aU1hwQ2lpaGdJ",
+      "date": "05/04/2025, 07:00 AM, +0000 UTC",
+      "iso_date": "2025-05-04T07:00:00Z"
+    },
+    {
+      "position": 52,
+      "title": "Diario La Prensa de Nicaragua cumple 100 años con su redacción en el exilio",
+      "source": {
+        "name": "Diario Libre",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.diariolibre.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.diariolibre.com/mundo/america-latina/2026/03/02/diario-la-prensa-de-nicaragua-cumple-100-anos-con-su-redaccion/3454977",
+      "thumbnail": "https://resources.diariolibre.com/images/2026/03/02/diario-la-prensa-de-nicaragua-cumple-100-anos-con-su-redaccion-deb65895.jpeg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNVpSalJrU1dvME5ERlBhVmR5VFJERkF4aWxCU2dLTWdB",
+      "date": "03/02/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-03-02T08:00:00Z"
+    },
+    {
+      "position": 53,
+      "title": "Gobierno habría facilitado residencia en Nicaragua a Carlos Ramón González, hoy prófugo; Petro lo niega",
+      "source": {
+        "name": "Yahoo",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://es-us.noticias.yahoo.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://es-us.noticias.yahoo.com/gobierno-habr%C3%ADa-facilitado-residencia-nicaragua-213500151.html",
+      "thumbnail": "https://s.yimg.com/lo/mysterio/api/76ff2842d48cb7d356f47587f40cfbb71c9af587aba0f35546151e2d37862064/lightyear_networkapi/resizefill_w960%3Bquality_80%3Bformat_webp/https%3A%2F%2Fmedia.zenfs.com%2Fes%2Fvalora_628%2F452819cf8d10064e2058160c2d2d5705",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNDNkMUp1UTI5RVJFMUVORFU0VFJDbkF4alZCU2dLTWdB",
+      "date": "08/14/2025, 07:00 AM, +0000 UTC",
+      "iso_date": "2025-08-14T07:00:00Z"
+    },
+    {
+      "position": 54,
+      "title": "Nicaragua libera presos políticos en el 19 aniversario del Gobierno en medio de la presión de EE.UU.",
+      "source": {
+        "name": "RTVE.es",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.rtve.es&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.rtve.es/noticias/20260110/nicaragua-libera-presos-politicos-19-aniversario-del-gobierno-medio-presion-eeuu/16889767.shtml",
+      "thumbnail": "https://img2.rtve.es/n/16889767?w=1600",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUhOVWRNU3pkcVpUQXdSRFpLVFJDZkF4amlCU2dLTWdZQlFKUlBIUWs",
+      "date": "01/11/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-01-11T08:00:00Z"
+    },
+    {
+      "position": 55,
+      "title": "Resumen de las noticias principales del 17 de Marzo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/resumen-de-las-noticias-principales-del-17-de-marzo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/03/1-526.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNDVUWE15UWxwNVdrZDBXa1puVFJDZkF4ampCU2dLTWdB",
+      "date": "03/17/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-03-17T07:00:00Z"
+    },
+    {
+      "position": 56,
+      "title": "Estas son las noticias más importantes de Nicaragua para este 08 de Mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua-para-este-08-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/4-70.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNVlkSFJNTVdkc1ZUQk1lazQxVFJDZkF4ampCU2dLTWdB",
+      "date": "05/08/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-08T07:00:00Z"
+    },
+    {
+      "position": 57,
+      "title": "¿Cómo se fabrica una noticia?, asunto Nicaragua",
+      "source": {
+        "name": "DiarioVea",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://diariovea.com.ve&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://diariovea.com.ve/como-se-fabrica-una-noticia-asunto-nicaragua/",
+      "thumbnail": "https://i0.wp.com/diariovea.com.ve/wp-content/uploads/2026/07/Como-se-fabrica-una-noticia-asunto-Nicaragua.jpg?resize=1068%2C668&ssl=1",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVdUREZWTm1VNE9VdHJNMFZLVFJDMkF4aThCU2dLTWdZaE5vNE1tZ1k",
+      "date": "07/27/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-27T07:00:00Z"
+    },
+    {
+      "position": 58,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 01 de Junio",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-01-de-junio/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/06/4-1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNXBiR2hNUVZkZlIyWXRabEZsVFJDZkF4ampCU2dLTWdB",
+      "date": "06/01/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-01T07:00:00Z"
+    },
+    {
+      "position": 59,
+      "title": "Estas son las noticias más importantes de Nicaragua para este 06 de Mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua-para-este-06-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/1-110.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNUVOVkl4Y1RVeWVWUjBaVzlYVFJDZkF4ampCU2dLTWdB",
+      "date": "05/06/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-06T07:00:00Z"
+    },
+    {
+      "position": 60,
+      "title": "Nicaragua inaugurará quinto tramo de carretera en litoral Pacífico",
+      "source": {
+        "name": "Prensa Latina",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.prensa-latina.cu&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.prensa-latina.cu/2026/07/02/nicaragua-inaugurara-quinto-tramo-de-carretera-en-litoral-pacifico/",
+      "thumbnail": "https://www.prensa-latina.cu/wp-content/uploads/2026/07/Nicaragua-carretera-litoral1-1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNWllbkp5TTFoMk1ubHVXVEJhVFJDZkF4ampCU2dLTWdrQkFJUnlRT09ZcEFJ",
+      "date": "07/02/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-02T07:00:00Z"
+    },
+    {
+      "position": 61,
+      "title": "Estas son las noticias más importantes de Nicaragua para este 05 de Mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua-para-este-05-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/1-78.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNW5aVmxQZGxOcmNteHhOSGd6VFJDZkF4ampCU2dLTWdhQmNvWW5XUU0",
+      "date": "05/05/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-05T07:00:00Z"
+    },
+    {
+      "position": 62,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 28 de mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-28-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/4-283.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUlaREppTXpRMFlXNDNlVmR3VFJDZkF4ampCU2dLTWdhQjRJckV6QVE",
+      "date": "05/28/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-28T07:00:00Z"
+    },
+    {
+      "position": 63,
+      "title": "Diputados destacan avances de Nicaragua en importantes sectores",
+      "source": {
+        "name": "Prensa Latina",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.prensa-latina.cu&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.prensa-latina.cu/2026/01/13/diputados-destacan-avances-de-nicaragua-en-importantes-sectores/",
+      "thumbnail": "https://www.prensa-latina.cu/wp-content/uploads/2026/01/FOTO-1-NICARAGUA-PARLAMENTO1-1-1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNWljMlZGVUZjMldrWlNkVkZsVFJERUF4aW5CU2dLTWdrQklJSXJyV09wOHdB",
+      "date": "01/13/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-01-13T08:00:00Z"
+    },
+    {
+      "position": 64,
+      "title": "Fuerte temblor de magnitud 5,2 sacudió Nicaragua en la mañana de este 26 de junio",
+      "source": {
+        "name": "Noticias Caracol",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.noticiascaracol.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.noticiascaracol.com/mundo/fuerte-temblor-de-magnitud-5-2-sacudio-nicaragua-en-la-manana-de-este-26-de-junio-so35",
+      "thumbnail": "https://caracoltv.brightspotcdn.com/dims4/default/6c0f956/2147483647/strip/true/crop/1280x720+0+0/resize/1280x720!/format/webp/quality/75/?url=https%3A%2F%2Fcaracol-brightspot.s3.us-west-2.amazonaws.com%2Fdb%2Fbf%2Fd522df31495dafce6495f6e543d4%2Fnicaragua.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iJ0NnNXJURVpsVFVKRGRsTnZkVlp3VFJDZkF4ampCU2dLTWdNQkZSZw",
+      "date": "06/26/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-26T07:00:00Z"
+    },
+    {
+      "position": 65,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 21 de mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-21-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/Plantilla-Youtube-TN8-1-2.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNWxTazlYYmtnMFkyeG1jMFUyVFJDZkF4ampCU2dLTWdB",
+      "date": "05/21/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-21T07:00:00Z"
+    },
+    {
+      "position": 66,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 27 de mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-27-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/4-267.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNXFOa3BsTTJFd1JsaFBaMmhyVFJDZkF4ampCU2dLTWdB",
+      "date": "05/27/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-27T07:00:00Z"
+    },
+    {
+      "position": 67,
+      "title": "Las noticias más destacadas de Nicaragua esta semana (5 al 10 de abril)",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/04/11/nacionales/3672036-noticias-destacadas-nicaragua-abril",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2018/10/03121445/ROTONDA-GRUAS-FSLN-9.jpeg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNWxRM2gzWVVobFJHeHRYMjl4VFJEQ0F4aXBCU2dLTWdZSlVKQUhNUVk",
+      "date": "04/11/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-11T07:00:00Z"
+    },
+    {
+      "position": 68,
+      "title": "Estas son las noticias más importantes de Nicaragua este Martes 07 de abril de 2026",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua-este-martes-07-de-abril-de-2026/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/04/4-61.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNDRObkJsVDAwd01WaFdPRGd0VFJDZkF4ampCU2dLTWdZQllJUkcyUUk",
+      "date": "04/08/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-08T07:00:00Z"
+    },
+    {
+      "position": 69,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 02 de Junio",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-02-de-junio/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/06/4-12.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUJTVkU1TTE5MFlYa3dRVTFSVFJDZkF4ampCU2dLTWdZQmNJYUgwQU0",
+      "date": "06/02/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-02T07:00:00Z"
+    },
+    {
+      "position": 70,
+      "title": "Estas son las noticias más importantes de Nicaragua",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/04/4-80.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNURUa0Z1ZW1aUE0xSXplV0V4VFJDZkF4ampCU2dLTWdB",
+      "date": "04/10/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-10T07:00:00Z"
+    },
+    {
+      "position": 71,
+      "title": "Resumen de las noticias principales del 26 de Febrero",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/resumen-de-las-noticias-principales-del-26-de-febrero/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/02/3-425.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNHRVSHBuU0d0YU4xbEpWVjlJVFJDZkF4ampCU2dLTWdB",
+      "date": "02/26/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-02-26T08:00:00Z"
+    },
+    {
+      "position": 72,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 15 de mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-15-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/1-372.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNUhSbkJvT1RFd1ptMUVkVGxwVFJDZkF4ampCU2dLTWdB",
+      "date": "05/15/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-15T07:00:00Z"
+    },
+    {
+      "position": 73,
+      "title": "Avance autoritario en Nicaragua alerta a Latinoamérica",
+      "source": {
+        "name": "Expreso",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.expreso.com.pe&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.expreso.com.pe/mundo/avance-autoritario-en-nicaragua-alerta-a-latinoamerica-daniel-ortega-noticia/1304230/",
+      "thumbnail": "https://www.expreso.com.pe/wp-content/uploads/2026/07/Avance-autoritario-en-Nicaragua-alerta-a-Latinoamerica.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUNibXBLVFRRNVUwRnJVa1JZVFJDUUF4allCQ2dLTWdZcGNvNE90UVk",
+      "date": "07/27/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-27T07:00:00Z"
+    },
+    {
+      "position": 74,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 19 de mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-19-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/4-177.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNUNSVUpKVVhSNGF6VlJSakJhVFJDZkF4ampCU2dLTWdB",
+      "date": "05/19/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-19T07:00:00Z"
+    },
+    {
+      "position": 75,
+      "title": "Te presentamos las noticias más relevantes de Nicaragua hoy, 20 de febrero",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/te-presentamos-las-noticias-mas-relevantes-de-nicaragua-hoy-20-de-febrero/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/02/1-683.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNUlPRTlHV2tWNk1UVnVVWGhLVFJDZkF4ampCU2dLTWdB",
+      "date": "02/20/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-02-20T08:00:00Z"
+    },
+    {
+      "position": 76,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 20 de mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-20-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/4-194.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNXBlblpmU2xoTlVuTktkVEpzVFJDZkF4ampCU2dLTWdrSmNZUWtXU0pEQ2dJ",
+      "date": "05/20/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-20T07:00:00Z"
+    },
+    {
+      "position": 77,
+      "title": "Resumen de las noticias principales del 16 de Marzo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/resumen-de-las-noticias-principales-del-16-de-marzo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/03/651240180_1394055102765221_5299902972495690161_n.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNWlaRGxTYm5OcWVUUk5iMVpsVFJDZkF4ampCU2dLTWdZQjBZYlZPQU0",
+      "date": "03/16/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-03-16T07:00:00Z"
+    },
+    {
+      "position": 78,
+      "title": "Nicaragua ratificó hermandad y solidaridad con Venezuela",
+      "source": {
+        "name": "Prensa Latina",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.prensa-latina.cu&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.prensa-latina.cu/2025/12/11/nicaragua-ratifico-hermandad-y-solidaridad-con-venezuela/",
+      "thumbnail": "https://www.prensa-latina.cu/wp-content/uploads/2025/12/Venezuela-Nicaragua-Banderas-1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNXBNVGRKVmxsNVdWbG5MWE51VFJEZ0F4aUFCU2dLTWdZQmNJN0d3Z1k",
+      "date": "12/11/2025, 08:00 AM, +0000 UTC",
+      "iso_date": "2025-12-11T08:00:00Z"
+    },
+    {
+      "position": 79,
+      "title": "Nicaragua autoritaria: el modelo que alarma al mundo hoy - La Verdad Noticias",
+      "source": {
+        "name": "laverdadnoticias.com",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://laverdadnoticias.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://laverdadnoticias.com/ultimas-noticias/mundo/nicaragua-autoritaria",
+      "thumbnail": "https://i0.wp.com/laverdadnoticias.com/wp-content/uploads/2026/04/Nicaragua-autoritaria-el-modelo-que-alarma-al-mundo-hoy.webp?fit=1200%2C900&ssl=1",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNWFMVVpMYUdGc1ZITkxhekZ1VFJEZ0F4aUFCU2dLTWdrRlFaN2xJdWtsWndJ",
+      "date": "04/11/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-11T07:00:00Z"
+    },
+    {
+      "position": 80,
+      "title": "Suspensión arbitraria de miles de abogados afecta juicios y escrituras en Nicaragua",
+      "source": {
+        "name": "Confidencial Nicaragua",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://confidencial.digital&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://confidencial.digital/noticias/suspension-arbitraria-de-miles-de-abogados-afecta-juicios-y-escrituras-en-nicaragua/",
+      "thumbnail": "https://confidencial.digital/wp-content/uploads/2026/07/Fachada-de-la-Corte-Suprema-de-Justicia-1024x683.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNXFlVGxFVkdaMVFqUlVWRmd4VFJERUF4aW1CU2dLTWdZTjRJYU9WUU0",
+      "date": "07/10/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-10T07:00:00Z"
+    },
+    {
+      "position": 81,
+      "title": "Estas son las noticias más importantes de Nicaragua para este 29 de abril",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua-para-este-29-de-abril/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/04/1-704.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNXRabTF0ZUdwNWVIQXlkV3cxVFJDZkF4ampCU2dLTWdB",
+      "date": "04/29/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-29T07:00:00Z"
+    },
+    {
+      "position": 82,
+      "title": "Canales TV para mirar juego de Venezuela vs. Nicaragua EN VIVO GRATIS por el Clásico Mundial de Béisbol",
+      "source": {
+        "name": "El Comercio Perú",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://elcomercio.pe&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Ronie Bautista"
+        ]
+      },
+      "link": "https://elcomercio.pe/mag/usa/en-vivo-us/a-que-hora-juega-y-que-canal-transmite-venezuela-vs-nicaragua-en-vivo-hoy-por-el-clasico-mundial-de-beisbol-2026-en-eeuu-canales-tv-nnda-nnrt-noticia/",
+      "thumbnail": "https://i.ytimg.com/vi/gzULR5XZJr8/hqdefault.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNHhiblIxZFdkc2NFODNOa3hHVFJEb0FoamdBeWdLTWdrQmNaYmtyaWM5S1FJ",
+      "date": "03/09/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-03-09T07:00:00Z"
+    },
+    {
+      "position": 83,
+      "title": "Estas son las noticias más importantes de Nicaragua para este 30 de abril",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua-para-este-30-de-abril/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/04/1-737.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNUVaWGxqTVRkclFrczNaME5uVFJDZkF4ampCU2dLTWdB",
+      "date": "04/30/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-30T07:00:00Z"
+    },
+    {
+      "position": 84,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 13 de mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-13-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/4-111.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNDNUMHRoYlRkd1NtMVViRlZEVFJDZkF4ampCU2dLTWdB",
+      "date": "05/13/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-13T07:00:00Z"
+    },
+    {
+      "position": 85,
+      "title": "Estas son las noticias más importantes de Nicaragua este Miércoles 08 de abril de 2026",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua-este-miercoles-08-de-abril-de-2026/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/04/4-71.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNXFVRVpxZW5CRFJHSjRSVkp5VFJDZkF4ampCU2dLTWdZQkk0U25sZ3M",
+      "date": "04/09/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-09T07:00:00Z"
+    },
+    {
+      "position": 86,
+      "title": "Dólar hoy en Nicaragua: precio y cotización de la divisa este domingo 19 de julio de 2026",
+      "source": {
+        "name": "Clarin.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.clarin.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.clarin.com/economia/dolar-hoy-en-nicaragua-precio-y-cotizacion-de-la-divisa-este-domingo-19-de-julio-de-2026_0_N8zuK1PXjC.html",
+      "thumbnail": "https://www.clarin.com/img/2020/03/04/XTskgx7L_1200x630__1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iMkNnNXJielJ0Um5wdlltczBRV05CVFJDUkF4ajhCU2dLTWd1QkVZekFIS2MwY2lsd3lR",
+      "date": "07/19/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-19T07:00:00Z"
+    },
+    {
+      "position": 87,
+      "title": "Nicaragua: Resaltan logros en salud a 19 años del Gobierno Sandinista",
+      "source": {
+        "name": "Prensa Latina",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.prensa-latina.cu&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.prensa-latina.cu/2026/01/07/nicaragua-resaltan-logros-en-salud-a-19-anos-del-gobierno-sandinista/",
+      "thumbnail": "https://www.prensa-latina.cu/wp-content/uploads/2026/01/Meyling-Brenes-1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNHhZa1paZDFsTlZYRkliVzVJVFJDdkF4aklCU2dLTWdaQmM0NHpMUWM",
+      "date": "01/07/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-01-07T08:00:00Z"
+    },
+    {
+      "position": 88,
+      "title": "Estas son las noticias más importantes de Nicaragua para este 04 de Mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua-para-este-04-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/1-52.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNU5lakYxUzFsZk5YSmZkRGhHVFJDZkF4ampCU2dLTWdB",
+      "date": "05/04/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-04T07:00:00Z"
+    },
+    {
+      "position": 89,
+      "title": "Daniel Ortega anunció que no habrá más elecciones en Nicaragua y profundiza su control sobre el poder",
+      "source": {
+        "name": "Diario de Cuyo",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.diariodecuyo.com.ar&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.diariodecuyo.com.ar/mundo/daniel-ortega-anuncio-que-no-habra-mas-elecciones-nicaragua-y-profundiza-su-control-el-poder-n6578052",
+      "thumbnail": "https://media.diariodecuyo.com.ar/p/4f94bc9686cc774f4ebf35f7fd31006e/adjuntos/380/imagenes/100/326/0100326547/1200x675/smart/image.png",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNWtaMnBVZVVWQ05uY3dWVzVmVFJDZkF4ampCU2dLTWdhWlFwWXlvUWc",
+      "date": "07/21/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-21T07:00:00Z"
+    },
+    {
+      "position": 90,
+      "title": "Panamá rompió el empate en el cierre de la séptima entrada para dejar en el terreno a Nicaragua",
+      "source": {
+        "name": "Diario Libre",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.diariolibre.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.diariolibre.com/deportes/olimpismo/2026/08/01/jcc-2026-panama-vencio-a-nicaragua/3617282",
+      "thumbnail": "https://resources.diariolibre.com/images/2026/08/02/jcc-2026-panama-vencio-a-nicaragua-01236b27-focus-min0.04-0.3-1200-675.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNTJTa1pLVTIxc1NGRlpSR05JVFJDZkF4ampCU2dLTWdZVlE1QkhJUWs",
+      "date": "08/01/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-08-01T07:00:00Z"
+    },
+    {
+      "position": 91,
+      "title": "Estas son las noticias más importantes de Nicaragua para este 17 de abril",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua-para-este-17de-abril/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/04/4-155.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNTVWVGh3V2pCSk5FRnhaV2gwVFJDZkF4ampCU2dLTWdB",
+      "date": "04/17/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-17T07:00:00Z"
+    },
+    {
+      "position": 92,
+      "title": "Estas son las noticias más importantes de Nicaragua para este 11 de Mayo",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua-para-este-11-de-mayo/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/05/3-125.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNDRZemhPU0ZKVE5rcHZlbEExVFJDZkF4ampCU2dLTWdB",
+      "date": "05/11/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-11T07:00:00Z"
+    },
+    {
+      "position": 93,
+      "title": "Estas son las noticias más importantes de Nicaragua para este 16 de abril",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua-para-este-16-de-abril/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/04/1-374.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNTVOa1JKUmxCMVZuTlZlRWxpVFJDZkF4ampCU2dLTWdB",
+      "date": "04/16/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-16T07:00:00Z"
+    },
+    {
+      "position": 94,
+      "title": "EE. UU. destaca el testimonio de LA PRENSA y todo su equipo para informar a Nicaragua",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/03/02/politica/3641696-ee-uu-destaca-el-testimonio-de-la-prensa-y-todo-su-equipo-para-informar-a-nicaragua",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2026/03/100-Anos-de-LA-PRENSA.jpeg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNU1PVzFrYUZGeVdVSkRUemx3VFJDdEF4akxCU2dLTWdrQkFJQ0owYUt3aEFJ",
+      "date": "03/02/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-03-02T08:00:00Z"
+    },
+    {
+      "position": 95,
+      "title": "Nicaragua libera presos políticos por presión de Estados Unidos",
+      "source": {
+        "name": "abcnoticias.mx",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://abcnoticias.mx&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://abcnoticias.mx/global/2026/1/10/nicaragua-libera-presos-politicos-por-presion-de-estados-unidos-267332.html",
+      "thumbnail": "https://img.abcnoticias.mx/yTPc1xzTAK_4WnVRIrXrykVS6ax1cuVulNoIFBeCmj8/rs:fill:1200:630:0/g:fp:0.5:0.5/f:jpg/aHR0cHM6Ly9hc3NldHMuYWJjbm90aWNpYXMubXgvZm90b2dyYWZpYXMvMjAyNi8xLzEwLzMzMTE1Mi5qcGc",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNU9NV2QxT1RKaGNUWjBRMVV4VFJDMkFSaVZBaWdCTWdrQk1KZ2tIdWxUYVFJ",
+      "date": "01/10/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-01-10T08:00:00Z"
+    },
+    {
+      "position": 96,
+      "title": "Estas son las noticias más importantes de Nicaragua para este 23 de abril",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua-para-este-23-de-abril/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/04/1-570.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNUhSbk5aYm5scGNVMTJiMkpzVFJDZkF4ampCU2dLTWdB",
+      "date": "04/23/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-23T07:00:00Z"
+    },
+    {
+      "position": 97,
+      "title": "Nicaragua silenciada por “apagón informativo”",
+      "source": {
+        "name": "IPS Agencia de Noticias",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://ipsnoticias.net&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://ipsnoticias.net/2025/10/nicaragua-silenciada-por-apagon-informativo/",
+      "thumbnail": "https://ipsnoticias.net/wp-content/uploads/2025/10/Periodistas-silenciados-en-Nicaragua-1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNWtXbUo1ZVdFd1RYUjJMV1J5VFJEZ0F4aUFCU2dLTWdZQkFJeXNNQVk",
+      "date": "10/14/2025, 07:00 AM, +0000 UTC",
+      "iso_date": "2025-10-14T07:00:00Z"
+    },
+    {
+      "position": 98,
+      "title": "Estas son las noticias más importantes de Nicaragua para este 27 de abril",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-mas-importantes-de-nicaragua-para-este-27-de-abril/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/04/4-240.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNVRMV0ZTWDJWblpucEJjbDlFVFJDZkF4ampCU2dLTWdrQklJaENsS3FRaXdJ",
+      "date": "04/27/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-27T07:00:00Z"
+    },
+    {
+      "position": 99,
+      "title": "Estas con las noticias más importantes de Nicaragua",
+      "source": {
+        "name": "tn8.ni",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-con-las-noticias-mas-importantes-de-nicaragua/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/04/4-95.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNU5MV1l5U0c0MllXY3pNRFZJVFJDZkF4ampCU2dLTWdB",
+      "date": "04/13/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-13T07:00:00Z"
+    },
+    {
+      "position": 100,
+      "title": "Nicaragua cambia política de visado para ciudadanos cubanos a partir de hoy",
+      "source": {
+        "name": "Diario Libre",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.diariolibre.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.diariolibre.com/mundo/america-latina/2026/02/08/nicaragua-cambia-politica-de-visado-para-ciudadanos-cubanos/3430817",
+      "thumbnail": "https://resources.diariolibre.com/images/2026/02/09/nicaragua-cambia-politica-de-visado-para-ciudadanos-cubanos-c7b53d4a-focus-0-0-1200-675.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNWlUM3BWU25Gc1pGOW5WSFZyVFJDZkF4ampCU2dLTWdB",
+      "date": "02/08/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-02-08T08:00:00Z"
+    }
+  ],
+  "menu_links": [
+    {
+      "title": "EE.UU.",
+      "topic_token": "CAAqKAgKIiJDQkFTRXdvSkwyMHZNRGxqTjNjd0VnWmxjeTAwTVRrb0FBUAE",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqKAgKIiJDQkFTRXdvSkwyMHZNRGxqTjNjd0VnWmxjeTAwTVRrb0FBUAE"
+    },
+    {
+      "title": "Internacional",
+      "topic_token": "CAAqLAgKIiZDQkFTRmdvSUwyMHZNRGx1YlY4U0JtVnpMVFF4T1JvQ1ZWTW9BQVAB",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqLAgKIiZDQkFTRmdvSUwyMHZNRGx1YlY4U0JtVnpMVFF4T1JvQ1ZWTW9BQVAB"
+    },
+    {
+      "title": "Tus noticias locales",
+      "topic_token": "CAAqHAgKIhZDQklTQ2pvSWJHOWpZV3hmZGpJb0FBUAE",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqHAgKIhZDQklTQ2pvSWJHOWpZV3hmZGpJb0FBUAE"
+    },
+    {
+      "title": "Negocios",
+      "topic_token": "CAAqLAgKIiZDQkFTRmdvSUwyMHZNRGx6TVdZU0JtVnpMVFF4T1JvQ1ZWTW9BQVAB",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqLAgKIiZDQkFTRmdvSUwyMHZNRGx6TVdZU0JtVnpMVFF4T1JvQ1ZWTW9BQVAB"
+    },
+    {
+      "title": "Ciencia y tecnología",
+      "topic_token": "CAAqLQgKIidDQkFTRndvSkwyMHZNR1ptZHpWbUVnWmxjeTAwTVRrYUFsVlRLQUFQAQ",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqLQgKIidDQkFTRndvSkwyMHZNR1ptZHpWbUVnWmxjeTAwTVRrYUFsVlRLQUFQAQ"
+    },
+    {
+      "title": "Entretenimiento",
+      "topic_token": "CAAqLAgKIiZDQkFTRmdvSUwyMHZNREpxYW5RU0JtVnpMVFF4T1JvQ1ZWTW9BQVAB",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqLAgKIiZDQkFTRmdvSUwyMHZNREpxYW5RU0JtVnpMVFF4T1JvQ1ZWTW9BQVAB"
+    },
+    {
+      "title": "Deportes",
+      "topic_token": "CAAqLAgKIiZDQkFTRmdvSUwyMHZNRFp1ZEdvU0JtVnpMVFF4T1JvQ1ZWTW9BQVAB",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqLAgKIiZDQkFTRmdvSUwyMHZNRFp1ZEdvU0JtVnpMVFF4T1JvQ1ZWTW9BQVAB"
+    },
+    {
+      "title": "Salud",
+      "topic_token": "CAAqJggKIiBDQkFTRWdvSUwyMHZNR3QwTlRFU0JtVnpMVFF4T1NnQVAB",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqJggKIiBDQkFTRWdvSUwyMHZNR3QwTlRFU0JtVnpMVFF4T1NnQVAB"
+    }
+  ]
+}

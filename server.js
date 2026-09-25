@@ -662,15 +662,20 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
     sendStatus(res, 'thinking', 'Analizando mensaje...');
 
     // Memoria persistente del usuario
-    let bloqueMemorias = '';
-    if (userId) {
-      try {
-        sendStatus(res, 'working', 'Consultando historial y memoria...');
-        bloqueMemorias = await memory.buildMemoryContext(userId);
-      } catch (e) {
-        console.error('Error cargando memorias del usuario:', e.message);
+      let bloqueMemorias = '';
+      if (userId) {
+        try {
+          const necesita = await memory.evaluarNecesidadMemoria(mensaje, historial);
+          if (necesita) {
+            sendStatus(res, 'working', 'Leyendo memoria...');
+            bloqueMemorias = await memory.buildMemoryContext(userId);
+          } else {
+            console.log('[Memoria] Consulta omitida (mensaje genérico)');
+          }
+        } catch (e) {
+          console.error('Error evaluando/cargando memorias del usuario:', e.message);
+        }
       }
-    }
 
 
     // ==========================================================
@@ -743,12 +748,10 @@ ${datosWeb.texto || ''}
     // Inyección de instrucciones de moderación (insulto detectado pero no bloqueado)
     let instruccionModeracion = '';
     if (req.moderation && req.moderation.insertarAdvertencia) {
-      const conteo = req.moderation.contadorActual || 0;
-      const restantes = req.moderation.strikesRestantes || 0;
       instruccionModeracion = `\n\n[ALERTA SISTEMA MODERACION - OBLIGATORIA]:
-El usuario usó lenguaje ofensivo. Strike ${conteo}/5.
-DEBES incluir en tu respuesta el siguiente aviso textual:
-"⚠️ Aviso ${conteo}/5: Detecté lenguaje inapropiado. ${restantes > 0 ? `Te quedan ${restantes} aviso(s) antes de que esta conversación se cierre.` : 'Esta es tu ÚLTIMA advertencia antes del bloqueo.'}"`;
+El usuario está usando lenguaje ofensivo de forma repetida/agresiva.
+DEBES incluir en tu respuesta la siguiente advertencia textual:
+"No voy a seguir la conversación en estos términos. Si en algún momento quieres retomarla con respeto, sigo dispuesto a ayudarte."`;
     }
 
     // Inyección de instrucción de empatía (usuario en angustia)

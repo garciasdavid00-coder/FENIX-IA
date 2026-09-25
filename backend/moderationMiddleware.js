@@ -81,20 +81,25 @@ function detectarInsultoRegex(texto) {
   return false;
 }
 
-async function clasificarContexto(mensaje) {
-  // Pre-filtro rápido con Regex para no gastar llamadas LLM en mensajes normales
+async function clasificarContexto(mensaje, historial = []) {
   if (!detectarInsultoRegex(mensaje)) {
     return 'SAFE';
   }
 
-  const prompt = `Analiza el siguiente mensaje de un usuario en un chat y clasifícalo en UNA de las siguientes tres categorías:
+  // Extraer los últimos mensajes para contexto
+  const ultimosMensajes = historial.slice(-4).map(m => `${m.role === 'user' ? 'Usuario' : 'Bot'}: ${m.content}`).join('\n');
+  const contexto = ultimosMensajes ? `\nHistorial reciente:\n${ultimosMensajes}\n` : '';
+
+  const prompt = `Analiza el siguiente mensaje de un usuario en un chat y clasifícalo en UNA de las siguientes cuatro categorías:
 1. "SAFE": El mensaje no es un insulto (falsa alarma) o es jerga inofensiva.
 2. "SELF_DISTRESS": El usuario usa lenguaje fuerte, groserías o insultos dirigidos HACIA SÍ MISMO (ej. "soy una mierda", "soy un idiota", "me odio") o expresa angustia emocional profunda.
-3. "INSULT_TO_OTHERS": El usuario usa lenguaje ofensivo, groserías o insultos dirigidos hacia el bot, hacia otra persona, o de forma maliciosa/agresiva en general.
+3. "MILD_INSULT": El usuario usa alguna grosería de forma leve, dispersa o es una sola palabra malsonante sin hostilidad extrema o repetida.
+4. "AGGRESSIVE_INSULT": El usuario usa insultos claros, hostiles directamente contra ti (el bot), o de forma repetida/sostenida (basándote en el historial).
 
-Mensaje del usuario: "${mensaje}"
+${contexto}
+Mensaje actual del usuario: "${mensaje}"
 
-Responde ÚNICAMENTE con la palabra clave exacta (SAFE, SELF_DISTRESS o INSULT_TO_OTHERS), sin puntos ni explicaciones.`;
+Responde ÚNICAMENTE con la palabra clave exacta (SAFE, SELF_DISTRESS, MILD_INSULT o AGGRESSIVE_INSULT), sin puntos ni explicaciones.`;
 
   try {
     const result = await solicitarTextoCompleto({
@@ -106,12 +111,12 @@ Responde ÚNICAMENTE con la palabra clave exacta (SAFE, SELF_DISTRESS o INSULT_T
     });
     
     const texto = result.texto.trim().toUpperCase();
-    if (texto.includes('INSULT_TO_OTHERS')) return 'INSULT_TO_OTHERS';
+    if (texto.includes('AGGRESSIVE_INSULT')) return 'AGGRESSIVE_INSULT';
+    if (texto.includes('MILD_INSULT')) return 'MILD_INSULT';
     if (texto.includes('SELF_DISTRESS')) return 'SELF_DISTRESS';
     return 'SAFE';
   } catch (error) {
-    // Si falla el clasificador, asumimos insulto real por precaución ya que pasó el regex
-    return 'INSULT_TO_OTHERS';
+    return 'AGGRESSIVE_INSULT';
   }
 }
 
@@ -145,7 +150,8 @@ function moderationMiddleware() {
       }
 
       // 2) Detectar contexto usando LLM
-      const clasificacion = await clasificarContexto(mensaje);
+      const historial = Array.isArray(req.body.historial) ? req.body.historial : [];
+      const clasificacion = await clasificarContexto(mensaje, historial);
 
       if (clasificacion === 'SELF_DISTRESS') {
         // Angustia: no contamos, no bloqueamos, el bot responde con empatía
@@ -153,12 +159,17 @@ function moderationMiddleware() {
         return next();
       }
 
-      if (clasificacion === 'INSULT_TO_OTHERS') {
+      if (clasificacion === 'MILD_INSULT') {
+        // Insulto leve: no contamos, no bloqueamos, sigue normal
+        req.moderation = { chatBloqueado: false, contadorActual: 0, identificador: googleId || 'sesion', selfDistress: false };
+        return next();
+      }
+
+      if (clasificacion === 'AGGRESSIVE_INSULT') {
         let isBlocked = false;
         let currentCount = 0;
 
         if (puedeContarBD) {
-          // FIX CLAVE: 3er argumento es el TÍTULO del chat, no el mensaje
           const result = await db.registrarInsulto(googleId, chatIdNumerico, 'chat');
           if (result) {
             isBlocked = result.is_blocked;
@@ -169,7 +180,7 @@ function moderationMiddleware() {
           const claveSession = chatId || 'global';
           req.session.insultCounts[claveSession] = (req.session.insultCounts[claveSession] || 0) + 1;
           currentCount = req.session.insultCounts[claveSession];
-          if (currentCount >= 5) {
+          if (currentCount >= 2) {
             isBlocked = true;
             if (!req.session.chatsBloqueados.includes(claveSession)) {
               req.session.chatsBloqueados.push(claveSession);
@@ -178,18 +189,17 @@ function moderationMiddleware() {
         }
 
         if (isBlocked) {
-          console.warn(`[Moderación] BLOQUEADO — chat ${chatId || 'sin-id'} alcanzó 5 strikes.`);
+          console.warn(`[Moderación] BLOQUEADO — chat ${chatId || 'sin-id'} alcanzó 2 strikes.`);
           req.moderation = { chatBloqueado: true, contadorActual: currentCount, identificador: googleId || 'sesion' };
           return res.status(403).json({ error: 'CHAT_BLOQUEADO', mensaje: MENSAJE_BLOQUEADO });
         }
 
-        const remaining = 5 - currentCount;
-        console.warn(`[Moderación] Strike ${currentCount}/5 en chat ${chatId || 'sin-id'}. Quedan ${remaining}.`);
+        console.warn(`[Moderación] ADVERTENCIA en chat ${chatId || 'sin-id'} (strike ${currentCount}).`);
 
         req.moderation = {
           chatBloqueado: false,
           contadorActual: currentCount,
-          strikesRestantes: remaining,
+          strikesRestantes: 1, // Ya no se usa realmente, pero por si acaso
           identificador: googleId || 'sesion',
           insertarAdvertencia: true
         };

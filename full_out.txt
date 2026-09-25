@@ -1,0 +1,279 @@
+event: status
+data: {"phase":"thinking","label":"Analizando mensaje..."}
+
+event: status
+data: {"phase":"searching","label":"Buscando en la web: noticias de hoy en Nicaragua"}
+
+data: {"tipo":"buscando_web","query":"noticias de hoy en Nicaragua"}
+
+event: status
+data: {"phase":"reading","label":"Leyendo 5 fuentes"}
+
+data: {"tipo":"fuentes","fuentes":[{"titulo":"Clima hoy en Managua, Nicaragua: el pronóstico del tiempo para este jueves 24 septiembre de 2026","url":"https://www.clarin.com/informacion-general/clima-hoy-managua-nicaragua-pronostico-tiempo-jueves-24-septiembre-2026_0_zGaHXzdioi.html"},{"titulo":"Liberan decenas de presos políticos en Nicaragua, en aparente respuesta a solicitud de EE.UU.","url":"https://www.bbc.com/mundo/articles/cd0y2yj8l0no"},{"titulo":"Estrecho de Ormuz, lluvia negra, Nicaragua, satélites... Las noticias del martes","url":"https://news.un.org/es/story/2026/03/1541225"},{"titulo":"Nicaragua: el oro que sostiene al régimen y lo aísla del mundo","url":"https://ipsnoticias.net/2026/08/nicaragua-el-oro-que-sostiene-al-regimen-y-lo-aisla-del-mundo/"},{"titulo":"#EEUU reacciona al anuncio de #DanielOrtega de que no habrá más elecciones en #Nicaragua, mediante un llamado de #MarcoRubio a la comunidad internacional. LEE MÁS en #DiarioDeCuba LINK en el primer comentario 👇","url":"https://www.facebook.com/DIARIODECUBA/posts/eeuu-reacciona-al-anuncio-de-danielortega-de-que-no-habr%C3%A1-m%C3%A1s-elecciones-en-nica/1603031787845533/"}]}
+
+data: {"texto":"La"}
+
+data: {"texto":" noticia"}
+
+data: {"texto":" más"}
+
+data: {"texto":" reciente"}
+
+data: {"texto":" sobre"}
+
+data: {"texto":" Nicaragua"}
+
+data: {"texto":" que"}
+
+data: {"texto":" se"}
+
+data: {"texto":" ha"}
+
+data: {"texto":" ver"}
+
+data: {"texto":"ificado"}
+
+data: {"texto":" en"}
+
+data: {"texto":" las"}
+
+data: {"texto":" fuentes"}
+
+data: {"texto":" es"}
+
+data: {"texto":" de"}
+
+data: {"texto":" julio"}
+
+data: {"texto":" de"}
+
+data: {"texto":" "}
+
+data: {"texto":"2"}
+
+data: {"texto":"0"}
+
+data: {"texto":"2"}
+
+data: {"texto":"6"}
+
+data: {"texto":","}
+
+data: {"texto":" cuando"}
+
+data: {"texto":" el"}
+
+data: {"texto":" gobierno"}
+
+data: {"texto":" de"}
+
+data: {"texto":" Estados"}
+
+data: {"texto":" Unidos"}
+
+data: {"texto":" re"}
+
+data: {"texto":"accion"}
+
+data: {"texto":"ó"}
+
+data: {"texto":" al"}
+
+data: {"texto":" anuncio"}
+
+data: {"texto":" del"}
+
+data: {"texto":" presidente"}
+
+data: {"texto":" Daniel"}
+
+data: {"texto":" Ortega"}
+
+data: {"texto":" de"}
+
+data: {"texto":" que"}
+
+data: {"texto":" no"}
+
+data: {"texto":" habrá"}
+
+data: {"texto":" más"}
+
+data: {"texto":" elecciones"}
+
+data: {"texto":" en"}
+
+data: {"texto":" el"}
+
+data: {"texto":" país"}
+
+data: {"texto":"."}
+
+data: {"texto":" En"}
+
+data: {"texto":" respuesta"}
+
+data: {"texto":","}
+
+data: {"texto":" el"}
+
+data: {"texto":" Secretario"}
+
+data: {"texto":" de"}
+
+data: {"texto":" Estado"}
+
+data: {"texto":","}
+
+data: {"texto":" Marco"}
+
+data: {"texto":" Rubio"}
+
+data: {"texto":","}
+
+data: {"texto":" hizo"}
+
+data: {"texto":" un"}
+
+data: {"texto":" llamado"}
+
+data: {"texto":" a"}
+
+data: {"texto":" la"}
+
+data: {"texto":" comunidad"}
+
+data: {"texto":" internacional"}
+
+data: {"texto":"."}
+
+data: {"texto":"\n\n"}
+
+data: {"texto":"O"}
+
+data: {"texto":"tras"}
+
+data: {"texto":" inform"}
+
+data: {"texto":"aciones"}
+
+data: {"texto":" disponibles"}
+
+data: {"texto":","}
+
+data: {"texto":" aunque"}
+
+data: {"texto":" con"}
+
+data: {"texto":" fechas"}
+
+data: {"texto":" anteriores"}
+
+data: {"texto":","}
+
+data: {"texto":" indican"}
+
+data: {"texto":" que"}
+
+data: {"texto":" en"}
+
+data: {"texto":" agosto"}
+
+data: {"texto":" de"}
+
+data: {"texto":" "}
+
+data: {"texto":"2"}
+
+data: {"texto":"0"}
+
+data: {"texto":"2"}
+
+data: {"texto":"6"}
+
+data: {"texto":" se"}
+
+data: {"texto":" report"}
+
+data: {"texto":"ó"}
+
+data: {"texto":" que"}
+
+data: {"texto":" la"}
+
+data: {"texto":" extr"}
+
+data: {"texto":"acción"}
+
+data: {"texto":" de"}
+
+data: {"texto":" oro"}
+
+data: {"texto":" ha"}
+
+data: {"texto":" sido"}
+
+data: {"texto":" un"}
+
+data: {"texto":" factor"}
+
+data: {"texto":" clave"}
+
+data: {"texto":" para"}
+
+data: {"texto":" sost"}
+
+data: {"texto":"ener"}
+
+data: {"texto":" econ"}
+
+data: {"texto":"ó"}
+
+data: {"texto":"mic"}
+
+data: {"texto":"amente"}
+
+data: {"texto":" al"}
+
+data: {"texto":" régimen"}
+
+data: {"texto":" nic"}
+
+data: {"texto":"ar"}
+
+data: {"texto":"ag"}
+
+data: {"texto":"ü"}
+
+data: {"texto":"ense"}
+
+data: {"texto":" y"}
+
+data: {"texto":","}
+
+data: {"texto":" simult"}
+
+data: {"texto":"áne"}
+
+data: {"texto":"amente"}
+
+data: {"texto":","}
+
+data: {"texto":" para"}
+
+data: {"texto":" a"}
+
+data: {"texto":"cent"}
+
+data: {"texto":"uar"}
+
+data: {"texto":" su"}
+
+data: {"texto":" aislamiento"}
+
+data: {"texto":" internacional"}
+
+data: {"texto":"."}
+
+data: [DONE]
+

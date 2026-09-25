@@ -192,7 +192,7 @@ async function registrarInsulto(googleId, clienteId, titulo = 'Nuevo chat') {
      VALUES ($1, $2, $3, '[]'::jsonb, 1, FALSE)
      ON CONFLICT (google_id, cliente_id) DO UPDATE SET
        insult_count = chats.insult_count + 1,
-       is_blocked   = (chats.insult_count + 1) >= 5,
+       is_blocked   = (chats.insult_count + 1) >= 2,
        actualizado_en = NOW()
      RETURNING insult_count, is_blocked`,
     [googleId, clienteId, String(titulo || '').slice(0, 200) || 'Nuevo chat']

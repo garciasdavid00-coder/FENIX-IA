@@ -327,6 +327,72 @@ Reglas:
   return guardadas;
 }
 
+/**
+ * Evalúa si el mensaje actual necesita consultar la memoria del usuario.
+ * @param {string} mensaje El mensaje actual del usuario.
+ * @param {Array} historial El historial reciente de mensajes.
+ * @returns {Promise<boolean>} true si necesita memoria, false de lo contrario.
+ */
+async function evaluarNecesidadMemoria(mensaje, historial = []) {
+  const texto = String(mensaje || '').trim();
+  if (!texto) return false;
+
+  // Filtro rápido: si es un saludo corto, un gracias, etc., no necesita memoria (al menos de base de datos)
+  if (/^(hola|hey|buenos d[ií]as|buenas tardes|buenas noches|gracias|ok|vale)$/i.test(texto)) return false;
+
+  // Regex rápido de pronombres o preguntas personales
+  const regexPersonal = /\b(yo|mi|mío|mía|mis|me llamo|recuerdas|sabes|recomiéndame|según tú|para mí|acerca de mí|mi proyecto)\b/i;
+  if (regexPersonal.test(texto)) return true;
+
+  // Clasificador por LLM
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) return true; // Ante la duda, leemos memoria por si acaso
+
+  try {
+    const ultimos = historial.slice(-3).map(m => m.role + ': ' + m.content).join('\n');
+    const systemPrompt = `Analiza si el siguiente mensaje requiere consultar la base de datos de memoria a largo plazo del usuario (ej: para saber sus datos personales, preferencias, en qué trabaja, si pide recomendaciones personales basadas en sus gustos, o si menciona "como te dije antes", etc).
+Responde SOLO con un JSON estricto con el formato: {"necesita_memoria": true} o {"necesita_memoria": false}.
+Si la pregunta es de cultura general, código abstracto, ayuda técnica genérica, matemáticas, clima, o cualquier tema que no dependa de los datos o preferencias pasadas del usuario, devuelve false.
+Ante la duda, devuelve true.`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 1500);
+
+    const startMs = Date.now();
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+      body: JSON.stringify({
+        model: MODELO_EXTRACCION, // Usa el mismo modelo ligero
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `Historial reciente:\n${ultimos}\n\nMensaje actual:\n${texto}` }
+        ],
+        temperature: 0,
+        max_tokens: 150,
+        response_format: { type: 'json_object' }
+      }),
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeout);
+    
+    if (res.ok) {
+      const data = await res.json();
+      const contenido = data.choices?.[0]?.message?.content?.trim();
+      if (contenido) {
+        const jsonParsed = JSON.parse(contenido);
+        console.log(`[Memoria] Evaluador de necesidad: ${jsonParsed.necesita_memoria} (tomó ${Date.now() - startMs}ms)`);
+        return !!jsonParsed.necesita_memoria;
+      }
+    }
+  } catch(e) {
+    console.warn('[Memoria] Error en el clasificador de memoria, se usará por defecto:', e.message);
+  }
+  
+  return true; // Por defecto
+}
+
 module.exports = {
   MEMORY_EXTRACTION_INTERVAL,
   getUserMemories,
@@ -334,5 +400,6 @@ module.exports = {
   buildMemoryContext,
   deleteMemory,
   notificarMensaje,
-  extractMemoriesFromConversation
+  extractMemoriesFromConversation,
+  evaluarNecesidadMemoria
 };

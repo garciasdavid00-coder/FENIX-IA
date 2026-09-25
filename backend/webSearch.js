@@ -495,12 +495,29 @@ async function buscarEnWeb({ consulta, apiKey, lang = 'español', timeZone = 'Am
       const respSerpApi = await fetch(urlSerpApi);
       if (respSerpApi.ok) {
         const dataSerpApi = await respSerpApi.json();
-        const items = esNoticia ? (dataSerpApi.news_results || []) : (dataSerpApi.organic_results || []);
+        let items = esNoticia ? (dataSerpApi.news_results || []) : (dataSerpApi.organic_results || []);
+        
+        // LIMIT TO MAX 5 RESULTS to avoid breaking the LLM token limits (Groq has 7000 token limit)
+        items = items.slice(0, 5);
         
         if (items.length) {
           const fuentes = items.map(o => ({ titulo: o.title, url: o.link }));
           const texto = items.map((o, i) => {
-            const dateStr = o.date ? ` [${o.date}]` : '';
+            let dateStr = '';
+            if (o.iso_date) {
+              const d = new Date(o.iso_date);
+              if (!isNaN(d.getTime())) {
+                const day = d.getUTCDate();
+                const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+                const monthName = months[d.getUTCMonth()];
+                const year = d.getUTCFullYear();
+                dateStr = ` [Fecha exacta de publicación: ${day} de ${monthName} de ${year}]`;
+              }
+            } else if (o.date) {
+              // If it's a relative date like "3 days ago" or unambiguous string, keep it, but clarify it's literal
+              dateStr = ` [Fecha reportada: ${o.date} (lee textualmente y no asumas meses futuros)]`;
+            }
+            
             const sourceStr = o.source ? ` (Fuente: ${typeof o.source === 'object' ? o.source.name : o.source})` : '';
             return `${i + 1}. ${o.title}${dateStr}${sourceStr} — ${o.snippet || ''}`;
           }).join('\n');

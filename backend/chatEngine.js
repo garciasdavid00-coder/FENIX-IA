@@ -98,6 +98,7 @@ function armarSistema({ lang = 'español', instruccion, memoriaContexto = '', ca
 Reglas de la consulta:
 - Usa palabras clave cortas y precisas (ej: "Nicaragua noticias", "Real Madrid resultado").
 - PROHIBIDO usar adjetivos subjetivos, frases largas o conversacionales ("eventos hot", "noticias importantes de hoy", "cosas relevantes"). Si buscas con adjetivos o frases largas, el buscador fallará y no encontrará nada. Busca el tema general y filtra tú mismo la información al leerla.
+- [REGLA ESTRICTA]: Nunca inventes marcadores, cifras, resultados o datos específicos que no vengan literalmente en los resultados de búsqueda web. Si el dato exacto no está disponible, dilo claramente en vez de completarlo con un número inventado.
 
 3) Fotos reales de personajes y hechos históricos: en biografías, historia o artículos relevantes, inserta en línea separada el marcador:
 [FOTO_REAL: Nombre del personaje o evento histórico]`;
