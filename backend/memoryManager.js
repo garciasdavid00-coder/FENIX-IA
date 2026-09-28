@@ -5,6 +5,7 @@
 // ============================================================================
 
 const { pool } = require('../db');
+const {fetchWithTimeout: fetch} = require('../utils/fetchWithTimeout');
 
 // Cada cuántos mensajes del usuario intentamos extraer memorias nuevas.
 const MEMORY_EXTRACTION_INTERVAL = 1; // Revisar en CADA mensaje para aprendizaje en tiempo real
@@ -17,7 +18,7 @@ const MAX_MEMORIAS = 30;
 const CATEGORIAS = ['personal', 'preferencia', 'proyecto', 'tecnico', 'temas'];
 
 // Contador de mensajes por usuario para saber cuándo toca extraer.
-const contadorMensajes = new Map();
+const pendientes = new Map();
 
 // Modelo de Groq usado para extraer memorias (rápido y barato).
 const MODELO_EXTRACCION = 'openai/gpt-oss-20b';
@@ -63,38 +64,12 @@ function normalizarTexto(texto) {
     .trim();
 }
 
-// Calcula la similitud aproximada entre dos textos (token overlap + contención).
-// Devuelve un número entre 0 y 1; a partir de 0.75 se considera duplicado obvio.
-function similitud(a, b) {
-  const ta = normalizarTexto(a).split(' ');
-  const tb = normalizarTexto(b).split(' ');
-  if (!ta.length || !tb.length) return 0;
-
-  const setA = new Set(ta);
-  const setB = new Set(tb);
-  let comunes = 0;
-  for (const palabra of setA) {
-    if (setB.has(palabra)) comunes++;
-  }
-  const union = new Set([...setA, ...setB]).size;
-  const jaccard = union ? comunes / union : 0;
-
-  // Además, si un texto es prácticamente subconjunto del otro, cuenta como
-  // duplicado — pero con menos peso para no fusionar hechos parecidos pero
-  // distintos (p. ej. "vive en el piso 3" vs "vive en el piso 4").
-  const corto = Math.min(setA.size, setB.size);
-  const contenida = corto > 0 ? comunes / corto : 0;
-
-  return Math.max(jaccard, contenida * 0.85);
-}
-
 // ----------------------------------------------------------------------------
 // Funciones públicas
 // ----------------------------------------------------------------------------
 
 // Devuelve las memorias del usuario, las más recientes primero.
 async function getUserMemories(userId) {
-  console.log('[MemoryManager] Consultando memorias para userId:', userId);
   if (!pool || !userId) return [];
   const { rows } = await pool.query(
     `SELECT id, memory_text, category, updated_at
@@ -103,7 +78,6 @@ async function getUserMemories(userId) {
      ORDER BY updated_at DESC`,
     [userId]
   );
-  console.log('[MemoryManager] Memorias recuperadas:', rows.length);
   return rows;
 }
 
@@ -111,55 +85,32 @@ async function getUserMemories(userId) {
 // la actualiza (texto nuevo + updated_at) en lugar de insertar otra. Si el
 // usuario ya tiene MAX_MEMORIAS, borra la más antigua antes de insertar.
 async function addMemory(userId, memoryText, category) {
-  console.log('[MemoryManager] Intentando guardar memoria:', { userId, memoryText, category });
   if (!pool || !userId) return null;
-
-  const texto = String(memoryText || '').trim().slice(0, 1000);
-  if (!texto) return null;
-  const cat = CATEGORIAS.includes(category) ? category : 'personal';
-
-  // Cargamos las existentes (más antiguas primero) para detectar duplicados.
-  const existentes = await pool.query(
-    'SELECT id, memory_text FROM user_memories WHERE user_id = $1 ORDER BY updated_at ASC',
-    [userId]
-  );
-
-  for (const fila of existentes.rows) {
-    if (similitud(fila.memory_text, texto) >= 0.75) {
-      const actualizado = await pool.query(
-        `UPDATE user_memories
-         SET memory_text = $2, category = $3, updated_at = NOW()
-         WHERE id = $1
-         RETURNING id, memory_text, category`,
-        [fila.id, texto, cat]
-      );
-      return actualizado.rows[0] || null;
+  const texto=String(memoryText || '').trim().slice(0,1000);
+  if(!texto)return null;
+  const cat=CATEGORIAS.includes(category)?category:'personal';
+  const client=await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query('SELECT pg_advisory_xact_lock(hashtext($1))',['memory:'+userId]);
+    const existing=await client.query('SELECT id,memory_text FROM user_memories WHERE user_id=$1 ORDER BY updated_at ASC',[userId]);
+    const duplicate=existing.rows.find(row=>normalizarTexto(row.memory_text)===normalizarTexto(texto));
+    let result;
+    if(duplicate) result=await client.query('UPDATE user_memories SET updated_at=NOW() WHERE id=$1 AND user_id=$2 RETURNING id,memory_text,category',[duplicate.id,userId]);
+    else {
+      const remove=existing.rows.slice(0,Math.max(0,existing.rows.length-MAX_MEMORIAS+1)).map(row=>row.id);
+      if(remove.length)await client.query('DELETE FROM user_memories WHERE user_id=$1 AND id=ANY($2::int[])',[userId,remove]);
+      result=await client.query('INSERT INTO user_memories (user_id,memory_text,category) VALUES ($1,$2,$3) RETURNING id,memory_text,category',[userId,texto,cat]);
     }
-  }
-
-  // Límite lógico: si ya llegamos al máximo, borramos las memorias más
-  // antiguas necesarias para dejar hueco (el total debe quedar en MAX_MEMORIAS
-  // después de insertar la nueva).
-  const excedente = existentes.rows.length - (MAX_MEMORIAS - 1);
-  if (excedente > 0) {
-    const idsQueSobran = existentes.rows.slice(0, excedente).map(r => r.id);
-    await pool.query('DELETE FROM user_memories WHERE id = ANY($1::int[])', [idsQueSobran]);
-  }
-
-  const insertado = await pool.query(
-    `INSERT INTO user_memories (user_id, memory_text, category)
-     VALUES ($1, $2, $3)
-     RETURNING id, memory_text, category`,
-    [userId, texto, cat]
-  );
-  console.log('[MemoryManager] Memoria guardada exitosamente en user_memories:', insertado.rows[0]);
-  return insertado.rows[0] || null;
+    await client.query('COMMIT');return result.rows[0] || null;
+  }catch(e){await client.query('ROLLBACK');throw e}finally{client.release()}
 }
 
 // Arma el bloque que se inyecta al inicio del system prompt.
 // Separa los datos personales de los temas importantes. Devuelve un string
 // vacío si el usuario no tiene memorias.
 async function buildMemoryContext(userId) {
+  await pendientes.get(userId);
   const memorias = await getUserMemories(userId);
   if (!memorias.length) return '';
 
@@ -197,19 +148,12 @@ async function deleteMemory(memoryId, userId) {
 // Cuenta mensajes por usuario y, cada MEMORY_EXTRACTION_INTERVAL, lanza la
 // extracción de memorias en segundo plano (sin bloquear la respuesta).
 function notificarMensaje(userId, mensajesConversacion) {
-  console.log('[MemoryManager] notificarMensaje llamado para userId:', userId, 'mensajes:', mensajesConversacion.length);
-  if (!pool || !userId || !Array.isArray(mensajesConversacion) || !mensajesConversacion.length) return;
-
-  const contador = (contadorMensajes.get(userId) || 0) + 1;
-  contadorMensajes.set(userId, contador);
-
-  console.log('[MemoryManager] Contador actual:', contador, 'Umbral:', MEMORY_EXTRACTION_INTERVAL);
-  if (contador >= MEMORY_EXTRACTION_INTERVAL) {
-    console.log('[MemoryManager] Disparando extractMemoriesFromConversation...');
-    contadorMensajes.set(userId, 0);
-    extractMemoriesFromConversation(userId, mensajesConversacion)
-      .catch(e => console.error('Error extrayendo memorias:', e.message));
-  }
+  if(!pool || !userId || !Array.isArray(mensajesConversacion) || !mensajesConversacion.length) return Promise.resolve([]);
+  const task=(pendientes.get(userId) || Promise.resolve()).catch(()=>{}).then(()=>extractMemoriesFromConversation(userId,mensajesConversacion));
+  const safe=task.catch(e=>{console.error('No se pudo guardar memoria:',e.message);return []});
+  pendientes.set(userId,safe);
+  safe.finally(()=>{if(pendientes.get(userId)===safe)pendientes.delete(userId)});
+  return safe;
 }
 
 // Pide a Groq que extraiga hechos y preferencias del usuario desde el historial
@@ -224,12 +168,12 @@ async function extractMemoriesFromConversation(userId, mensajesConversacion) {
   }
 
   // Solo miramos las últimas 40 líneas para acotar tamaño y costo.
-  const ultimoTramo = mensajesConversacion.slice(-20);
+  const ultimoTramo = mensajesConversacion.filter(m=>m.role === 'user').slice(-2);
 
   const peticion = {
     model: MODELO_EXTRACCION,
     temperature: 0.2,
-    max_tokens: 400,
+    max_tokens: 1000,
     response_format: { type: 'json_object' },
     messages: [
       {
@@ -237,6 +181,7 @@ async function extractMemoriesFromConversation(userId, mensajesConversacion) {
         content: `Eres un extractor de datos personales. A partir de una conversación, saca los hechos y preferencias DURADEROS sobre el usuario: nombres, edades, profesión, idiomas, gustos, preferencias, proyectos en curso, herramientas o información técnica relevante, y los TEMAS IMPORTANTES que le interesan (aquellos temas que repite, sobre los que pide consejo o quiere aprender).
 
 Reglas:
+- Extrae TODOS los hechos explícitos de cada mensaje, incluyendo profesión, nombre y preferencias. No inventes ni atribuyas al usuario datos de terceros.
 - NO extraigas saludos, frases sueltas, estados momentáneos ni información trivial.
 - Si la conversación no aporta datos nuevos y relevantes, devuelve [].
 - Solo responde con un objeto JSON válido con la propiedad "memorias" que contenga el array, del formato:
@@ -250,7 +195,6 @@ Reglas:
     ]
   };
 
-  console.log('[MemoryManager] Payload enviado a la IA para extraccin:', JSON.stringify(peticion, null, 2));
   let respuestaIA;
   try {
     respuestaIA = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -333,64 +277,9 @@ Reglas:
  * @param {Array} historial El historial reciente de mensajes.
  * @returns {Promise<boolean>} true si necesita memoria, false de lo contrario.
  */
-async function evaluarNecesidadMemoria(mensaje, historial = []) {
-  const texto = String(mensaje || '').trim();
-  if (!texto) return false;
-
-  // Filtro rápido: si es un saludo corto, un gracias, etc., no necesita memoria (al menos de base de datos)
-  if (/^(hola|hey|buenos d[ií]as|buenas tardes|buenas noches|gracias|ok|vale)$/i.test(texto)) return false;
-
-  // Regex rápido de pronombres o preguntas personales
-  const regexPersonal = /\b(yo|mi|mío|mía|mis|me llamo|recuerdas|sabes|recomiéndame|según tú|para mí|acerca de mí|mi proyecto)\b/i;
-  if (regexPersonal.test(texto)) return true;
-
-  // Clasificador por LLM
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) return true; // Ante la duda, leemos memoria por si acaso
-
-  try {
-    const ultimos = historial.slice(-3).map(m => m.role + ': ' + m.content).join('\n');
-    const systemPrompt = `Analiza si el siguiente mensaje requiere consultar la base de datos de memoria a largo plazo del usuario (ej: para saber sus datos personales, preferencias, en qué trabaja, si pide recomendaciones personales basadas en sus gustos, o si menciona "como te dije antes", etc).
-Responde SOLO con un JSON estricto con el formato: {"necesita_memoria": true} o {"necesita_memoria": false}.
-Si la pregunta es de cultura general, código abstracto, ayuda técnica genérica, matemáticas, clima, o cualquier tema que no dependa de los datos o preferencias pasadas del usuario, devuelve false.
-Ante la duda, devuelve true.`;
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 1500);
-
-    const startMs = Date.now();
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-      body: JSON.stringify({
-        model: MODELO_EXTRACCION, // Usa el mismo modelo ligero
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Historial reciente:\n${ultimos}\n\nMensaje actual:\n${texto}` }
-        ],
-        temperature: 0,
-        max_tokens: 150,
-        response_format: { type: 'json_object' }
-      }),
-      signal: controller.signal
-    });
-    
-    clearTimeout(timeout);
-    
-    if (res.ok) {
-      const data = await res.json();
-      const contenido = data.choices?.[0]?.message?.content?.trim();
-      if (contenido) {
-        const jsonParsed = JSON.parse(contenido);
-        console.log(`[Memoria] Evaluador de necesidad: ${jsonParsed.necesita_memoria} (tomó ${Date.now() - startMs}ms)`);
-        return !!jsonParsed.necesita_memoria;
-      }
-    }
-  } catch(e) {
-    console.warn('[Memoria] Error en el clasificador de memoria, se usará por defecto:', e.message);
-  }
-  
-  return true; // Por defecto
+async function evaluarNecesidadMemoria(mensaje) {
+  // At most 30 small records; reading them avoids a slower and fallible LLM gate.
+  return !!String(mensaje || '').trim();
 }
 
 module.exports = {

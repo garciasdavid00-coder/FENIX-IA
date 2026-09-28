@@ -7,14 +7,18 @@
 
 const express = require('express');
 const router  = express.Router();
+const rateLimit = require('express-rate-limit');
+const limiter=rateLimit({windowMs:60000,limit:4,standardHeaders:true,legacyHeaders:false});
 const { generarPDF } = require('../services/pdfGenerator');
 
-router.post('/api/documentos/generar', express.json({ limit: '5mb' }), async (req, res) => {
+router.post('/api/documentos/generar', limiter, express.json({ limit: '5mb' }), async (req, res) => {
   const { contenido, imagenes = [], titulo } = req.body || {};
 
   if (!contenido || typeof contenido !== 'string' || !contenido.trim()) {
     return res.status(400).json({ error: 'El campo "contenido" es obligatorio y no puede estar vacio.' });
   }
+
+  if (contenido.length > 100000 || !Array.isArray(imagenes) || imagenes.length > 12) return res.status(400).json({error:'Documento demasiado grande o imágenes inválidas.'});
 
   // Extraer titulo del markdown si no viene en el body
   const tituloFinal = (titulo && String(titulo).trim())
@@ -37,8 +41,8 @@ router.post('/api/documentos/generar', express.json({ limit: '5mb' }), async (re
 
   } catch (err) {
     console.error('[documentos] Error generando PDF:', err.message);
-    return res.status(500).json({
-      error: 'No se pudo generar el PDF. ' + (err.message || 'Error interno de Puppeteer.'),
+    return res.status(err.status || 500).json({
+      error: err.status === 429 ? err.message : 'No se pudo generar el PDF. Intenta de nuevo.',
     });
   }
 });

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import {apiFetch} from '@/lib/api';
 
 function RealImage({ query, fallbackUrl = null }) {
   const [data, setData] = useState(fallbackUrl ? { url: fallbackUrl, consulta: query } : null);
@@ -12,7 +13,7 @@ function RealImage({ query, fallbackUrl = null }) {
     let cancel = false;
     (async () => {
       try {
-        const res = await fetch(`/api/imagen-real?q=${encodeURIComponent(query)}`);
+        const res = await apiFetch(`/api/imagen-real?q=${encodeURIComponent(query)}`);
         if (!res.ok) throw new Error('Not found');
         const json = await res.json();
         if (!cancel && json?.url) {

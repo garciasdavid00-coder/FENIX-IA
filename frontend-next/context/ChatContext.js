@@ -26,15 +26,10 @@ function normalizarChat(c) {
   if (!c || typeof c !== 'object') return c;
   return {
     ...c,
+    id: String(c.id),
+    proyectoId: c.proyectoId == null ? null : String(c.proyectoId),
     mensajes: Array.isArray(c.mensajes) ? c.mensajes.map(normalizarMensaje) : [],
   };
-}
-
-// Guarda en las dos claves (vista React 'fenixHistorial' y clásica 'fenixChats')
-// para facilitar la migración sin perder datos al cambiar de frontend.
-function persistirChats(chats) {
-  localStorage.setItem('fenixHistorial', JSON.stringify(chats));
-  localStorage.setItem('fenixChats', JSON.stringify(chats));
 }
 
 export function ChatProvider({ children }) {
@@ -54,7 +49,30 @@ export function ChatProvider({ children }) {
   const [memoriaModal, setMemoriaModal] = useState(null); // null | { texto }
   const [docModal, setDocModal] = useState(null); // null | { titulo, contenido }
   const [panelDoc, setPanelDoc] = useState({ abierto: false, titulo: '', contenido: '' });
-  const [voiceModalOpen, setVoiceModalOpen] = useState(false); // Estado global para VoiceModal
+  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
+  const { autenticado, usuario, cargando: authCargando } = useAuth();
+  const owner = authCargando ? null : (autenticado ? String(usuario.id) : 'guest');
+  const [loadedOwner, setLoadedOwner] = useState(null);
+  const [syncError, setSyncError] = useState(null);
+  const chatsRef = useRef([]);
+  const proyectosRef = useRef([]);
+  const ownerRef = useRef(owner);
+  useEffect(() => { ownerRef.current = owner; }, [owner]);
+  const syncedRef = useRef(new Map());
+  const projectSnapshotRef = useRef('[]');
+  const syncQueueRef = useRef(Promise.resolve());
+  const historialHabilitado = useCallback(() => localStorage.getItem('fenixGuardarHistorial') !== 'no', []);
+  const persistirChats = useCallback((value) => {
+    if (owner && historialHabilitado()) {
+      try { localStorage.setItem('fenix:chats:' + owner, JSON.stringify(value)); }
+      catch { setSyncError('No hay espacio para guardar el historial local.'); }
+    }
+  }, [owner, historialHabilitado]);
+  const enqueueSync = useCallback((task) => {
+    const run = syncQueueRef.current.catch(() => {}).then(task);
+    syncQueueRef.current = run;
+    return run;
+  }, []); // Estado global para VoiceModal
 
   // Cargar tema guardado en localStorage + históricos locales
   useEffect(() => {
@@ -68,105 +86,65 @@ export function ChatProvider({ children }) {
     const busquedaGuardada = localStorage.getItem('fenixBusquedaWeb') || 'auto';
     setBusquedaWeb(busquedaGuardada);
 
-    // Cargar historial de chats locales (con respaldo a la clave del frontend clásico)
-    try {
-      const guardado = localStorage.getItem('fenixHistorial');
-      const historialLocal = guardado ? guardado : (localStorage.getItem('fenixChats') || '[]');
-      const arr = JSON.parse(historialLocal);
-      setChats(Array.isArray(arr) ? arr.map(normalizarChat) : []);
-    } catch (e) {
-      setChats([]);
-    }
-
-    // Cargar proyectos locales
-    try {
-      const proyectosGuardados = JSON.parse(localStorage.getItem('fenixProyectos') || '[]');
-      setProyectos(Array.isArray(proyectosGuardados) ? proyectosGuardados : []);
-    } catch (e) {
-      setProyectos([]);
-    }
   }, []);
-
-  // Persistir proyectos cuando cambian
-  useEffect(() => {
-    localStorage.setItem('fenixProyectos', JSON.stringify(proyectos));
-  }, [proyectos]);
-
-  // ========================================
-  // SINCRONIZACIÓN CON EL SERVIDOR (/api/sincronizar)
-  // - Sin sesión: se guarda solo en localStorage.
-  // - Con sesión: además se sube a la base de datos con debounce, y al iniciar
-  //   sesión se descarga el historial de ESA cuenta. Si la cuenta está vacía
-  //   pero el dispositivo tiene chats de invitado, se suben automáticamente.
-  // ========================================
-  const { autenticado, usuario } = useAuth();
-  const chatsRef = useRef(chats);
-  const proyectosRef = useRef(proyectos);
-  const timerSyncRef = useRef(null);
-  const sincronizandoRef = useRef(false);
-  const cuentaCargadaRef = useRef({});
 
   useEffect(() => { chatsRef.current = chats; }, [chats]);
   useEffect(() => { proyectosRef.current = proyectos; }, [proyectos]);
-
-  const historialHabilitado = useCallback(() => {
-    try {
-      return localStorage.getItem('fenixGuardarHistorial') !== 'no';
-    } catch (e) {
-      return true;
-    }
-  }, []);
-
-  const subirDatosAlServidor = useCallback(async () => {
-    if (!autenticado || sincronizandoRef.current) return;
-    if (!historialHabilitado()) return;
-    sincronizandoRef.current = true;
-    try {
-      await apiPost('/api/sincronizar', {
-        chats: chatsRef.current,
-        proyectos: proyectosRef.current,
-      });
-    } catch (e) {
-      console.error('[ChatContext] Error al guardar historial en el servidor:', e.message);
-    } finally {
-      sincronizandoRef.current = false;
-    }
-  }, [autenticado, historialHabilitado]);
-
-  // Sube los cambios después de una pausa (debounce) para no saturar al servidor
   useEffect(() => {
-    if (!autenticado || !historialHabilitado()) return;
-    clearTimeout(timerSyncRef.current);
-    timerSyncRef.current = setTimeout(subirDatosAlServidor, 1200);
-    return () => clearTimeout(timerSyncRef.current);
-  }, [chats, proyectos, autenticado, historialHabilitado, subirDatosAlServidor]);
-
-  // Al iniciar sesión: descarga el historial de esa cuenta desde el servidor.
-  // Si la cuenta no tiene nada pero hay chats locales de invitado, los sube.
-  useEffect(() => {
-    if (!autenticado || !usuario?.id) return;
-    if (cuentaCargadaRef.current[usuario.id]) return;
-    cuentaCargadaRef.current[usuario.id] = true;
-    if (!historialHabilitado()) return;
+    if (!owner) return;
+    let cancelled = false;
+    setLoadedOwner(null); setSyncError(null);
+    setChats([]); setProyectos([]); setChatActualId(null); setProyectoActualId(null); setVoiceModalOpen(false);
+    syncedRef.current = new Map();
     (async () => {
       try {
-        const datos = await apiGet('/api/sincronizar');
-        if (!datos || !Array.isArray(datos.chats)) return;
-        const chatsServidor = datos.chats.map(normalizarChat);
-        const proyectosServidor = Array.isArray(datos.proyectos) ? datos.proyectos : [];
-        if (chatsServidor.length === 0 && proyectosServidor.length === 0 && chatsRef.current.length > 0) {
-          subirDatosAlServidor();
-        } else if (chatsServidor.length || proyectosServidor.length) {
-          setChats(chatsServidor);
-          setProyectos(proyectosServidor);
-          persistirChats(chatsServidor);
-          try { localStorage.setItem('fenixProyectos', JSON.stringify(proyectosServidor)); } catch (e) {}
+        let data = {chats:[], proyectos:[]};
+        if (historialHabilitado()) {
+          if (autenticado) data = await apiGet('/api/sincronizar');
+          else data = {chats:JSON.parse(localStorage.getItem('fenix:chats:guest') || '[]'), proyectos:JSON.parse(localStorage.getItem('fenix:projects:guest') || '[]')};
         }
-      } catch (e) {
-        console.error('[ChatContext] Error al cargar historial del servidor:', e.message);
-      }
+        if (cancelled) return;
+        const loaded = (data.chats || []).map(normalizarChat);
+        const projects = (data.proyectos || []).map(p=>({...p,id:String(p.id)}));
+        syncedRef.current = new Map(loaded.map(c=>[c.id,JSON.stringify(c)]));
+        projectSnapshotRef.current = JSON.stringify(projects);
+        chatsRef.current=loaded; proyectosRef.current=projects;
+        setChats(loaded); setProyectos(projects); setLoadedOwner(owner);
+      } catch(e) { if (!cancelled) setSyncError('No se pudo cargar el historial. Recarga para reintentar; no se sobrescribirá la nube.'); }
     })();
-  }, [autenticado, usuario?.id, historialHabilitado, subirDatosAlServidor]);
+    return () => { cancelled = true; };
+  }, [owner, autenticado, historialHabilitado]);
+
+  useEffect(() => {
+    if (!owner || loadedOwner !== owner || !historialHabilitado()) return;
+    persistirChats(chats);
+    try { localStorage.setItem('fenix:projects:' + owner, JSON.stringify(proyectos)); } catch {}
+    if (!autenticado || syncError) return;
+    const timer=setTimeout(()=>enqueueSync(async()=>{
+      if (ownerRef.current !== owner) return;
+      const snapshot=chatsRef.current;
+      const changed=snapshot.filter(c=>syncedRef.current.get(c.id)!==JSON.stringify(c));
+      const projects=proyectosRef.current;
+      const changedProjects=JSON.stringify(projects)!==projectSnapshotRef.current;
+      if (!changed.length && !changedProjects) return;
+      try {
+        const result=await apiPost('/api/sincronizar',{chats:changed,proyectos:changedProjects?projects:[],expectedUserId:owner});
+        if (ownerRef.current !== owner) return;
+        changed.forEach(c=>syncedRef.current.set(c.id,JSON.stringify({...c,revision:result.revisions[c.id]})));
+        projectSnapshotRef.current=JSON.stringify(projects);
+        setChats(prev=>prev.map(c=>result.revisions[c.id] ? {...c,revision:result.revisions[c.id]}:c));
+      } catch(e) { if(ownerRef.current===owner) setSyncError(e.message); }
+    }),1200);
+    return ()=>clearTimeout(timer);
+  },[chats,proyectos,owner,loadedOwner,autenticado,historialHabilitado,persistirChats,enqueueSync,syncError]);
+
+  const deleteRemote = useCallback(async (chatIds, projectIds = []) => {
+    if (!autenticado) return;
+    await enqueueSync(async()=>{
+      if(ownerRef.current!==owner) throw new Error('La sesión cambió.');
+      await apiPost('/api/sincronizar',{chats:[],proyectos:[],deletedChatIds:chatIds,deletedProjectIds:projectIds,expectedUserId:owner});
+    });
+  },[autenticado,owner,enqueueSync]);
 
   const toggleTema = useCallback(() => {
     setTema((prev) => {
@@ -210,45 +188,35 @@ export function ChatProvider({ children }) {
     if (sidebarMobileOpen) setSidebarMobileOpen(false);
   }, [sidebarMobileOpen]);
 
-  const eliminarChat = useCallback((id) => {
-    setChats((prev) => {
-      const actualizados = prev.filter((c) => c.id !== id);
-      persistirChats(actualizados);
-      return actualizados;
-    });
-    if (chatActualId === id) {
-      setChatActualId(null);
-    }
-  }, [chatActualId]);
+  const eliminarChat = useCallback(async (id) => {
+    try {
+      await deleteRemote([id]);
+      setChats(prev=>prev.filter(c=>c.id!==id));
+      syncedRef.current.delete(id);
+      if (chatActualId === id) setChatActualId(null);
+    } catch(e) { setSyncError(e.message); }
+  },[chatActualId,deleteRemote]);
 
   const vaciarHistorial = useCallback(async () => {
-    if (typeof window !== 'undefined' && window.confirm('¿Estás seguro de que quieres eliminar TODOS los chats? Esta acción no se puede deshacer.')) {
-      setChats([]);
-      persistirChats([]);
-      setChatActualId(null);
-      setVistaActiva('chat');
-      
-      // Si el usuario está logueado, forzamos el borrado en la nube
-      if (autenticado) {
-        try {
-          await apiPost('/api/sincronizar', {
-            chats: [],
-            proyectos: proyectosRef.current,
-            borradoExplicito: true
-          });
-        } catch (e) {
-          console.error('Error al vaciar historial en la nube:', e);
-        }
-      }
-    }
-  }, [autenticado]);
+    if (!window.confirm('¿Eliminar todos los chats de esta cuenta?')) return;
+    try { await deleteRemote(chatsRef.current.map(c=>c.id)); setChats([]); syncedRef.current.clear(); setChatActualId(null); }
+    catch(e) { setSyncError(e.message); }
+  },[deleteRemote]);
+
+  const borrarTodo = useCallback(async () => {
+    if (!window.confirm('¿Eliminar chats, proyectos y archivos de esta cuenta?')) return;
+    try {
+      await deleteRemote(chatsRef.current.map(c=>c.id),proyectosRef.current.map(p=>p.id));
+      setChats([]); setProyectos([]); syncedRef.current.clear(); setChatActualId(null); setProyectoActualId(null);
+      setArchivosBiblioteca(prev=>{prev.forEach(f=>URL.revokeObjectURL(f.url)); return [];});
+    } catch(e) { setSyncError(e.message); }
+  },[deleteRemote]);
 
   const togglePinChat = useCallback((id) => {
     setChats((prev) => {
       const actualizados = prev.map((c) =>
         c.id === id ? { ...c, pinned: !c.pinned } : c
       );
-      persistirChats(actualizados);
       return actualizados;
     });
   }, []);
@@ -259,26 +227,23 @@ export function ChatProvider({ children }) {
   const crearProyecto = useCallback((nombre) => {
     const limpio = String(nombre || '').trim();
     if (!limpio) return null;
-    let nuevoProyecto = null;
-    setProyectos((prev) => {
-      nuevoProyecto = { id: Date.now().toString(), nombre: limpio };
-      return [nuevoProyecto, ...prev];
-    });
+    const nuevoProyecto = {id:Date.now().toString(),nombre:limpio};
+    setProyectos(prev=>[nuevoProyecto,...prev]);
     return nuevoProyecto;
   }, []);
 
-  const eliminarProyecto = useCallback((id) => {
+  const eliminarProyecto = useCallback(async (id) => {
+    try { await deleteRemote([], [id]); } catch(e) { setSyncError(e.message); return; }
     setProyectos((prev) => prev.filter((p) => p.id !== id));
     // Los chats del proyecto quedan huérfanos pero no se borran
     setChats((prev) => {
       const actualizados = prev.map((c) =>
         c.proyectoId === id ? { ...c, proyectoId: null } : c
       );
-      persistirChats(actualizados);
       return actualizados;
     });
     if (proyectoActualId === id) setProyectoActualId(null);
-  }, [proyectoActualId]);
+  }, [proyectoActualId, deleteRemote]);
 
   const abrirProyecto = useCallback((id) => {
     setProyectoActualId(id);
@@ -344,7 +309,6 @@ export function ChatProvider({ children }) {
         };
         actualizados = [nuevo, ...prev];
       }
-      persistirChats(actualizados);
       return actualizados;
     });
   }, [proyectoActualId]);
@@ -384,6 +348,10 @@ export function ChatProvider({ children }) {
   return (
     <ChatContext.Provider
       value={{
+        owner,
+        loadedOwner,
+        syncError,
+        borrarTodo,
         tema,
         toggleTema,
         sidebarCollapsed,

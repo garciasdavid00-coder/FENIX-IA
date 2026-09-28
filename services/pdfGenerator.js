@@ -5,6 +5,7 @@
 
 'use strict';
 
+const { publicFetch } = require('../utils/publicFetch');
 const EN_PRODUCCION = process.env.NODE_ENV === 'production';
 
 function esc(s) {
@@ -22,15 +23,10 @@ function inline(s) {
 
 async function urlABase64(url) {
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 8000);
-    const res = await fetch(url, { signal: controller.signal });
-    clearTimeout(timer);
-    if (!res.ok) return null;
-    const mime = (res.headers.get('content-type') || 'image/jpeg').split(';')[0];
-    if (!mime.startsWith('image/')) return null;
-    const buf = await res.arrayBuffer();
-    return `data:${mime};base64,${Buffer.from(buf).toString('base64')}`;
+    const {body,contentType}=await publicFetch(url,{maxBytes:3000000});
+    const mime=contentType.split(';')[0];
+    if (!['image/png','image/jpeg','image/webp'].includes(mime)) return null;
+    return 'data:'+mime+';base64,'+body.toString('base64');
   } catch { return null; }
 }
 
@@ -49,13 +45,14 @@ function markdownAHtmlDoc(markdown, imgMap) {
       cerrarLista();
       const q = m[1].trim();
       const dataUrl = imgMap.get(q.toLowerCase());
-      if (dataUrl) html += `<figure class="doc-figura"><img class="doc-imagen" src="${dataUrl}" alt="${esc(q)}" /><figcaption class="doc-caption">Fotografia: ${esc(q)}</figcaption></figure>`;
+      if (dataUrl) html += `<figure class="doc-figura"><img class="doc-imagen" src="${esc(dataUrl)}" alt="${esc(q)}" /><figcaption class="doc-caption">Fotografia: ${esc(q)}</figcaption></figure>`;
       continue;
     }
     if ((m = l.match(/^!\[([^\]]*)\]\(([^)]+)\)$/))) {
       cerrarLista();
-      const dataUrl = imgMap.get(m[2]) || m[2];
-      html += `<figure class="doc-figura"><img class="doc-imagen" src="${dataUrl}" alt="${esc(m[1])}" />${m[1] ? `<figcaption class="doc-caption">Fotografia: ${esc(m[1])}</figcaption>` : ''}</figure>`;
+      const dataUrl = imgMap.get(m[2]);
+      if (!dataUrl) continue;
+      html += `<figure class="doc-figura"><img class="doc-imagen" src="${esc(dataUrl)}" alt="${esc(m[1])}" />${m[1] ? `<figcaption class="doc-caption">Fotografia: ${esc(m[1])}</figcaption>` : ''}</figure>`;
       continue;
     }
     if ((m = l.match(/^###\s+(.+)/))) { cerrarLista(); html += `<h3 class="doc-h3">${inline(m[1])}</h3>`; continue; }
@@ -86,11 +83,10 @@ function buildHtml(titulo, contenido, imgMap) {
 <head>
 <meta charset="UTF-8">
 <title>${esc(titulo)}</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Lora',Georgia,'Times New Roman',serif;font-size:11pt;line-height:1.7;color:#0a0a0a;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.pagina{width:210mm;min-height:297mm;margin:0 auto;padding:20mm 22mm;background:#fff}
+.pagina{width:100%;margin:0 auto;background:#fff}
 .membrete{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:28px}
 .membrete-marca{font-family:'Playfair Display',Georgia,serif;font-size:14pt;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#000}
 .membrete-subtitulo{font-size:7pt;letter-spacing:1.5px;text-transform:uppercase;color:#555;margin-top:3px}
@@ -123,7 +119,7 @@ code{font-family:'Courier New',monospace;font-size:9pt;background:#f0f0f0;paddin
   <div class="cuerpo-doc">${cuerpo}</div>
   <footer class="pie">
     <span>Generado por Fenix IA &mdash; Documento digital</span>
-    <span>Pagina 1</span>
+
   </footer>
 </div>
 </body>
@@ -136,30 +132,25 @@ code{font-family:'Courier New',monospace;font-size:9pt;background:#f0f0f0;paddin
 // Evita Múltiples instancias de Chrome
 // ==========================================
 let pdfLock = Promise.resolve();
-
+let pending = 0;
 async function generarPDF(titulo, contenidoMarkdown, imagenes = []) {
-  // Encolar la petición para evitar que 2+ PDFs corran a la vez y crasheen la RAM
-  const release = await new Promise(resolve => {
-    const nextLock = pdfLock.then(() => resolve).catch(() => resolve);
-    pdfLock = nextLock;
-  });
-
-  try {
-    return await _generarPDF_Interno(titulo, contenidoMarkdown, imagenes);
-  } finally {
-    release(); // Liberar el candado
-  }
+  if (pending >= 4) throw Object.assign(new Error('Hay varios documentos en proceso. Intenta de nuevo.'), {status:429});
+  pending++;
+  const task=pdfLock.catch(()=>{}).then(()=>_generarPDF_Interno(titulo,contenidoMarkdown,imagenes));
+  pdfLock=task.catch(()=>{});
+  try {return await task;} finally {pending--;}
 }
 
 async function _generarPDF_Interno(titulo, contenidoMarkdown, imagenes = []) {
   const urlsPorDescargar = new Map();
 
-  for (const img of (imagenes || [])) {
+  for (const m of String(contenidoMarkdown).matchAll(/^!\[[^\]]*\]\(([^)]+)\)$/gm)) urlsPorDescargar.set(m[1],m[1]);
+  for (const img of (imagenes || []).slice(0,12)) {
     if (img?.url) urlsPorDescargar.set(img.url, img.url);
   }
 
   const fotoRealMatches = [...String(contenidoMarkdown || '').matchAll(/\[FOTO_REAL:\s*([^\]]+)\]/gi)];
-  const fotoRealQueries = [...new Set(fotoRealMatches.map(m => m[1].trim()))];
+  const fotoRealQueries = [...new Set(fotoRealMatches.map(m => m[1].trim()))].slice(0,8);
 
   let buscarImagenReal;
   try { ({ buscarImagenReal } = require('../routes/imagenesReales')); } catch { buscarImagenReal = null; }
@@ -176,12 +167,12 @@ async function _generarPDF_Interno(titulo, contenidoMarkdown, imagenes = []) {
   }
 
   const imgMap = new Map();
-  const entradas = [...urlsPorDescargar.entries()];
+  const entradas = [...urlsPorDescargar.entries()].slice(0,12);
   for (let i = 0; i < entradas.length; i += 5) {
     await Promise.allSettled(
       entradas.slice(i, i + 5).map(async ([clave, url]) => {
         const dataUrl = await urlABase64(url);
-        if (dataUrl) imgMap.set(clave.toLowerCase(), dataUrl);
+        if (dataUrl) imgMap.set(clave, dataUrl);
       })
     );
   }
@@ -193,13 +184,16 @@ async function _generarPDF_Interno(titulo, contenidoMarkdown, imagenes = []) {
     const puppeteer = require('puppeteer');
     const opciones = {
       headless: 'new',
-      args: ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage','--disable-gpu','--disable-extensions','--single-process','--no-zygote','--disable-background-networking','--disable-default-apps'],
+      args: ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage','--disable-gpu','--disable-extensions','--disable-background-networking','--disable-default-apps'],
     };
     if (EN_PRODUCCION && process.env.PUPPETEER_EXECUTABLE_PATH) {
       opciones.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
     }
     browser = await puppeteer.launch(opciones);
     const page = await browser.newPage();
+    await page.setJavaScriptEnabled(false);
+    await page.setRequestInterception(true);
+    page.on('request', req => req.url().startsWith('data:') || req.url()==='about:blank' ? req.continue() : req.abort());
     await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 });
     const pdfBuffer = await page.pdf({
       format: 'A4',
@@ -213,4 +207,4 @@ async function _generarPDF_Interno(titulo, contenidoMarkdown, imagenes = []) {
   }
 }
 
-module.exports = { generarPDF };
+module.exports = { generarPDF, markdownAHtmlDoc };

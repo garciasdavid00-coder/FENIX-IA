@@ -1,3 +1,4 @@
+import {apiPost} from './api';
 /**
  * Utilidad para procesar y extraer texto/miniaturas de archivos adjuntos en Fenix IA.
  * Soporta documentos de texto, código, markdown, JSON, CSV, PDFs, Word e imágenes.
@@ -36,12 +37,19 @@ export function obtenerIconoArchivo(tipo, nombre = '') {
 export async function procesarArchivo(file) {
   if (!file) throw new Error('No se seleccionó ningún archivo');
 
+  if (file.size > 3000000) throw new Error('El archivo supera el límite de 3 MB.');
   const nombre = file.name;
   const tipo = file.type || '';
   const tamano = formatearTamano(file.size);
   const ext = (nombre.split('.').pop() || '').toLowerCase();
   const esImagen = tipo.startsWith('image/') || ['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext);
 
+  if (['pdf','docx'].includes(ext)) {
+    const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file)});
+    const result=await apiPost('/api/archivos/texto',{extension:ext,base64:String(dataUrl).split(',')[1]});
+    return {nombre,tipo,tamano,contenidoTexto:result.text,esImagen:false};
+  }
+  if(['doc','xls','xlsx','ppt','pptx','zip'].includes(ext))throw new Error('Exporta este archivo a PDF, DOCX, CSV o texto para analizarlo.');
   // 1. Si es imagen, generar Data URL para miniatura
   if (esImagen) {
     return new Promise((resolve, reject) => {

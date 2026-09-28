@@ -1,3 +1,4 @@
+import {apiFetch} from './api';
 /**
  * Utilidades para vista previa, exportación a PDF, Word e impresión
  * de documentos generados por Fenix IA.
@@ -14,7 +15,7 @@
  * @throws {Error}                    - Si el servidor responde con error o la red falla
  */
 export async function generarPDFServidor(titulo, contenidoMarkdown, imagenes = []) {
-  const res = await fetch('/api/documentos/generar', {
+  const res = await apiFetch('/api/documentos/generar', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ titulo, contenido: contenidoMarkdown, imagenes }),
@@ -272,7 +273,7 @@ export async function descargarDocumento(titulo, contenidoMarkdown) {
       const tipo = (blob.type || 'image/jpeg').split(';')[0];
       if (!tipo.startsWith('image/')) throw new Error('no imagen');
       const nombre = 'foto' + (partesImagen.length + 1) + (tipo === 'image/png' ? '.png' : '.jpg');
-      docHtml = docHtml.replace(token, `<img class="doc-imagen" src="${nombre}" alt="">`);
+      docHtml = docHtml.replace(escapar(url), nombre);
       partesImagen.push({ nombre, tipo, b64: await blobABase64(blob) });
     } catch (e) {
       docHtml = docHtml.replace(token, '');

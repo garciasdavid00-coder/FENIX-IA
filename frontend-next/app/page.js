@@ -19,6 +19,9 @@ import { useChatStream } from '@/hooks/useChatStream';
 
 export default function HomePage() {
   const {
+    owner,
+    loadedOwner,
+    syncError,
     vistaActiva,
     chatActualId,
     setChatActualId,
@@ -40,6 +43,8 @@ export default function HomePage() {
     streamChatIdRef,
     statusIndicator,
   } = useChatStream();
+
+  useEffect(() => { detener(); setMensajes([]); }, [owner, detener, setMensajes]);
 
   // Control de cambio explícito de chat en barra lateral (evita parpadeos en blanco al enviar mensaje)
   const chatSeleccionadoAnteriorRef = useRef(chatActualId);
@@ -68,7 +73,7 @@ export default function HomePage() {
       // El usuario hizo clic explícitamente en "+ Nuevo chat": resetear mensajes
       setMensajes([]);
     }
-  }, [chatActualId, chats, setMensajes]);
+  }, [chatActualId, chats, setMensajes, detener, generando, guardarMensajesEnHistorial, mensajes, streamChatIdRef]);
 
   // Al completar la generación o haber nuevos mensajes, los guardamos en el historial
   // El ref evita que al crear un chat nuevo (chatActualId en null) se guarden como
@@ -79,7 +84,7 @@ export default function HomePage() {
       prevChatActualIdRef.current = chatActualId;
       return;
     }
-    if (mensajes.length > 0 && !generando) {
+    if (owner && owner === loadedOwner && mensajes.length > 0 && !generando) {
       // El resultado del stream se guarda en el chat al que pertenecía al
       // enviarse (streamChatIdRef), aunque el usuario haya cambiado de chat
       // mientras se generaba. Si no había chat stream, cae al chat actual.
@@ -90,13 +95,21 @@ export default function HomePage() {
       guardarMensajesEnHistorial(id, mensajes);
       streamChatIdRef.current = null;
     }
-  }, [mensajes, generando, chatActualId, setChatActualId, guardarMensajesEnHistorial]);
+  }, [mensajes, generando, chatActualId, setChatActualId, guardarMensajesEnHistorial, loadedOwner, owner, streamChatIdRef]);
 
-  const manejarEnvio = (texto) => {
-    enviarAlStream(texto, {
+  const manejarEnvio = (texto, opciones = {}) => {
+    if (!owner || loadedOwner !== owner) return;
+    const id = opciones.chatId || chatActualId || Date.now().toString();
+    if (!chatActualId) {
+      chatSeleccionadoAnteriorRef.current = id;
+      prevChatActualIdRef.current = id;
+      setChatActualId(id);
+    }
+    return enviarAlStream(texto, {
+      ...opciones,
       modelo: modeloSeleccionado,
       webSearch: busquedaWeb,
-      chatId: chatActualId,
+      chatId: id,
     });
   };
 
@@ -111,6 +124,7 @@ export default function HomePage() {
       <div className="main" style={{ display: 'flex', flexDirection: 'row', flex: 1, minWidth: 0, overflow: 'hidden' }}>
         <div className="main-chat-column" style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, height: '100%', overflow: 'hidden' }}>
           <Topbar />
+          {syncError && <p role="alert" style={{padding:12,color:"#b91c1c"}}>{syncError}</p>}
 
           {/* Vistas dinámicas */}
           {vistaActiva === 'proyectos' && <ProjectsView />}
@@ -151,6 +165,10 @@ export default function HomePage() {
       {/* Modal global de Voz */}
       <VoiceModal
         isOpen={voiceModalOpen}
+        chatId={chatActualId}
+        historial={mensajes}
+        modelo={modeloSeleccionado}
+        webSearch={busquedaWeb}
         onClose={() => setVoiceModalOpen(false)}
         onEnviarMensaje={manejarEnvio}
       />

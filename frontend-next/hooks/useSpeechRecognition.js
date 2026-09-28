@@ -14,11 +14,14 @@ export function useSpeechRecognition({ onResult, onEnd, onError, lang = 'es-MX',
   const [soportado, setSoportado] = useState(false);
 
   const recognitionInstanceRef = useRef(null);
+  const consumedIndexRef = useRef(0);
+  const lastResultsRef = useRef(0);
+  const consumir = useCallback(() => { consumedIndexRef.current = lastResultsRef.current; }, []);
   const callbackRef = useRef(onResult);
-  callbackRef.current = onResult;
+  useEffect(() => { callbackRef.current = onResult; }, [onResult]);
 
   const errorCallbackRef = useRef(onError);
-  errorCallbackRef.current = onError;
+  useEffect(() => { errorCallbackRef.current = onError; }, [onError]);
 
   const activoDeseadoRef = useRef(false);
   const isStartingOrRunningRef = useRef(false);
@@ -49,7 +52,7 @@ export function useSpeechRecognition({ onResult, onEnd, onError, lang = 'es-MX',
     isStartingOrRunningRef.current = false;
   }, []);
 
-  const arrancarInstancia = useCallback(() => {
+  const arrancarInstancia = useCallback(function arrancarInstancia() {
     if (typeof window === 'undefined') return false;
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -60,6 +63,7 @@ export function useSpeechRecognition({ onResult, onEnd, onError, lang = 'es-MX',
     limpiarInstancia();
 
     try {
+      consumedIndexRef.current = 0; lastResultsRef.current = 0;
       const recog = new SpeechRecognition();
       recog.continuous = continuo;
       recog.interimResults = true;
@@ -71,9 +75,10 @@ export function useSpeechRecognition({ onResult, onEnd, onError, lang = 'es-MX',
       };
 
       recog.onresult = (event) => {
+        lastResultsRef.current = event.results.length;
         let finalTranscript = '';
         let interimTranscript = '';
-        for (let i = 0; i < event.results.length; i++) {
+        for (let i = consumedIndexRef.current; i < event.results.length; i++) {
           const res = event.results[i];
           if (res.isFinal) {
             finalTranscript += res[0].transcript + ' ';
@@ -150,6 +155,7 @@ export function useSpeechRecognition({ onResult, onEnd, onError, lang = 'es-MX',
       }
     }
 
+    if (!activoDeseadoRef.current) return false;
     return arrancarInstancia();
   }, [arrancarInstancia]);
 
@@ -175,6 +181,7 @@ export function useSpeechRecognition({ onResult, onEnd, onError, lang = 'es-MX',
   }, [limpiarInstancia]);
 
   return {
+    consumir,
     escuchando,
     soportado,
     iniciar,

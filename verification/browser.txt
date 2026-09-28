@@ -1,0 +1,1 @@
+PASS Browser: script input renders response, one request, stable chat ID, guest history persisted, no React runtime errors.

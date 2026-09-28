@@ -1,21 +1,11 @@
-// fetch con timeout configurable y AbortController.
-// Evita que una API externa que no responde deje el endpoint
-// colgado indefinidamente: aborta la petición y lanza un Error claro.
-
-async function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const response = await fetch(url, { ...options, signal: controller.signal });
-    return response;
-  } catch (err) {
-    if (err.name === 'AbortError') {
-      throw new Error(`Timeout de ${timeoutMs}ms alcanzado al llamar a ${url}`);
-    }
-    throw err;
-  } finally {
-    clearTimeout(id);
-  }
+// Timeout covers headers AND body; callers receive a buffered, size-limited Response.
+async function fetchWithTimeout(url, options={}, timeoutMs=10000) {
+ const signal=options.signal?AbortSignal.any([options.signal,AbortSignal.timeout(timeoutMs)]):AbortSignal.timeout(timeoutMs);
+ const response=await fetch(url,{...options,signal});
+ if(!response.body)return response;
+ const reader=response.body.getReader();const chunks=[];let size=0;
+ try{while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>5000000)throw Error('Respuesta externa demasiado grande');chunks.push(Buffer.from(value))}}
+ finally{await reader.cancel().catch(()=>{});reader.releaseLock()}
+ return new Response(Buffer.concat(chunks),{status:response.status,statusText:response.statusText,headers:response.headers});
 }
-
-module.exports = { fetchWithTimeout };
+module.exports={fetchWithTimeout};

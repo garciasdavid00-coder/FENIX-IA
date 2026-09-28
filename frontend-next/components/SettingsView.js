@@ -22,9 +22,8 @@ export default function SettingsView() {
     modeloSeleccionado,
     cambiarModelo,
     chats,
-    setChats,
+    borrarTodo,
     proyectos,
-    setProyectos,
     setChatActualId,
     nuevoChat,
   } = useChat();
@@ -59,18 +58,7 @@ export default function SettingsView() {
     localStorage.setItem('fenixIdioma', e.target.value);
   };
 
-  const manejarBorrarTodo = () => {
-    if (!window.confirm('¿Seguro que quieres borrar todos los chats, proyectos y archivos?')) return;
-    chats.forEach((c) => c.id && localStorage.removeItem(`fenixChat_${c.id}`));
-    localStorage.removeItem('fenixHistorial');
-    localStorage.removeItem('fenixChats');
-    localStorage.removeItem('fenixProyectos');
-    setChats([]);
-    setProyectos([]);
-    setChatActualId(null);
-    nuevoChat();
-    window.alert('Historial eliminado');
-  };
+  const manejarBorrarTodo = borrarTodo;
 
   return (
     <div className="panel-view" id="vistaConfiguracion">

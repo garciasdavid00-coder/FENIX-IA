@@ -1,0 +1,44 @@
+✔ SSE preserves fragmented UTF-8 and final line (12.8323ms)
+✔ SSE propagates provider failures instead of empty success (18.6799ms)
+✔ Chat hook displays stream errors and releases loading state (42.9737ms)
+✔ Precomputed voice response does not call chat or image generation (3.7208ms)
+✔ Page forwards attachments and precalculated responses with a stable ID (2.0519ms)
+✔ Partial snapshot does not delete omitted chats or projects (1.0782ms)
+✔ Explicit deletion works for the last chat and is scoped to its owner (0.3811ms)
+✔ Stale revision rolls back and does not overwrite chat (0.5425ms)
+✔ A moderation placeholder can be saved on the first turn (0.4944ms)
+✔ Deleted chat cannot be resurrected by a stale revision (0.5255ms)
+✔ IDs do not strip arbitrary characters or lose integer precision (0.4261ms)
+✔ Chat rejects privileged history and invalid timezone but accepts script text (1.205ms)
+✔ Image data reaches provider message construction (5.2244ms)
+✔ Moderation warns once and then blocks the same conversation (5.3731ms)
+✔ Provider outage does not classify self distress as aggression (1.6ms)
+✔ Article extraction excludes navigation and keeps article body (223.3296ms)
+✔ Today and yesterday use publication dates in user timezone (5.5955ms)
+✔ Explicit country overrides timezone default (0.2025ms)
+✔ Public downloader blocks loopback, private and metadata addresses (6.2563ms)
+✔ PDF markup cannot inject event handlers from markdown URLs (2.1924ms)
+✔ PDF jobs start, serialize and recover after a failed job (51.7024ms)
+✔ Reasoning filter preserves script text and strips fragmented reasoning (2.215ms)
+✔ Next conversation waits for pending memory and scopes it to the same user (13.1056ms)
+✔ Voice identity response stays open and returns to listening without final punctuation (7.9196ms)
+✔ Voice moderation speaks the closure and stops accepting the conversation (3.9069ms)
+✔ Voice interruption aborts a pending response and does not save stale text (2.9241ms)
+✔ Today sends a real date constraint in Managua even after UTC midnight (46.3171ms)
+✔ Yesterday and week use calendar dates; price today is not a news query (2.1874ms)
+✔ Query cleanup preserves El Salvador and country overrides the local default (1.6096ms)
+✔ Nested news includes highlight and stories without losing direct results (1.1012ms)
+✔ Country and topic reject unrelated search results (0.8389ms)
+✔ Article extraction rejects video recommendations unrelated to the headline (231.3475ms)
+✔ Provider retries dated news search and distinguishes downloaded article from title only (38.9463ms)
+✔ Old and undated sources are not passed as fresh facts (7.4381ms)
+✔ Relative provider dates are labeled approximate rather than exact publication timestamps (4.8226ms)
+✔ Actual chat endpoint returns an honest empty-search response without calling a model (411.1982ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 36
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3454.4758

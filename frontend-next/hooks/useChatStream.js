@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { apiFetch } from '@/lib/api';
+import { readSSE } from '@/lib/sse';
 import { generarImagen, esPeticionImagen } from '@/lib/imagenes';
 
 /**
@@ -100,6 +101,13 @@ export function useChatStream() {
       }
     };
 
+    if (typeof opciones.respuestaPrecalculada === 'string') {
+      setMensajes(prev => prev.map(m => m.id === idBot ? {...m, contenido: opciones.respuestaPrecalculada, bloqueado: !!opciones.bloqueado, cargando: false} : m));
+      setGenerando(false);
+      abortControllerRef.current = null;
+      return;
+    }
+
     // El usuario pide explícitamente una imagen: va directo por /api/imagen
     if (esPeticionImagen(textoMensaje) && !opciones.archivo) {
       try {
@@ -122,16 +130,6 @@ export function useChatStream() {
         setGenerando(false);
         abortControllerRef.current = null;
       }
-      return;
-    }
-
-    if (opciones.respuestaPrecalculada) {
-      setMensajes((prev) =>
-        prev.map((m) =>
-          m.id === idBot ? { ...m, contenido: opciones.respuestaPrecalculada, cargando: false } : m
-        )
-      );
-      setGenerando(false);
       return;
     }
 
@@ -202,31 +200,7 @@ export function useChatStream() {
         throw new Error('El servidor no devolvió un flujo de datos legible.');
       }
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder('utf-8');
-      let buffer = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lineas = buffer.split('\n');
-        buffer = lineas.pop() || '';
-
-        for (const linea of lineas) {
-          const lineaLimpia = linea.trim();
-          if (!lineaLimpia || !lineaLimpia.startsWith('data:')) continue;
-
-          const dataRaw = lineaLimpia.slice(5).trim();
-          if (!dataRaw || dataRaw === '[DONE]') continue;
-
-          try {
-            const dataObj = JSON.parse(dataRaw);
-            if (dataObj.error) {
-              throw new Error(dataObj.error);
-            }
-
+      for await (const dataObj of readSSE(res.body)) {
             // Status del backend
             if (dataObj.phase && dataObj.label) {
               setStatusIndicator({ phase: dataObj.phase, label: dataObj.label });
@@ -289,24 +263,8 @@ export function useChatStream() {
                 )
               );
             }
-          } catch (jsonErr) {
-            // Ignorar errores de fragmentos JSON parciales
-          }
-        }
       }
-
-      // Procesar cualquier dato restante en el buffer
-      if (buffer.trim().startsWith('data:')) {
-        const dataRaw = buffer.trim().slice(5).trim();
-        if (dataRaw && dataRaw !== '[DONE]') {
-          try {
-            const dataObj = JSON.parse(dataRaw);
-            if (typeof dataObj.texto === 'string') {
-              acumulado += dataObj.texto;
-            }
-          } catch (e) {}
-        }
-      }
+      if (!acumulado.trim()) throw new Error("El modelo no devolvió texto. Intenta de nuevo.");
 
       await finalizarBurbuja(acumulado);
     } catch (err) {

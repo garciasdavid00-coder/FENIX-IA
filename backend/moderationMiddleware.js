@@ -1,7 +1,7 @@
 // ============================================================================
 // backend/moderationMiddleware.js — Moderación y Cierre de Conversaciones
 // ============================================================================
-// Detecta insultos y lenguaje ofensivo. Cuando se reciben 5 insultos reales,
+// Detecta insultos y lenguaje ofensivo. Cuando se reciben 2 insultos reales,
 // CIERRA y bloquea la conversación.
 // Distingue entre autocrítica/angustia y verdaderos insultos usando LLM.
 // ============================================================================
@@ -106,7 +106,8 @@ Responde ÚNICAMENTE con la palabra clave exacta (SAFE, SELF_DISTRESS, MILD_INSU
       mensaje: prompt,
       historial: [],
       proveedor: 'groq',
-      maxTokens: 10,
+      maxTokens: 40,
+      timeoutMs: 5000,
       idioma: 'es'
     });
     
@@ -116,7 +117,7 @@ Responde ÚNICAMENTE con la palabra clave exacta (SAFE, SELF_DISTRESS, MILD_INSU
     if (texto.includes('SELF_DISTRESS')) return 'SELF_DISTRESS';
     return 'SAFE';
   } catch (error) {
-    return 'AGGRESSIVE_INSULT';
+    return /\b(soy|me siento|me odio)\b/i.test(mensaje) ? 'SELF_DISTRESS' : 'SAFE';
   }
 }
 
@@ -127,7 +128,7 @@ function moderationMiddleware() {
       const chatId = req.body && req.body.chatId ? String(req.body.chatId) : null;
       const googleId = req.user ? req.user.id : null;
       const chatIdNumerico = chatId != null ? Number(chatId) : NaN;
-      const puedeContarBD = !!googleId && Number.isFinite(chatIdNumerico);
+      const puedeContarBD = !!db.pool && !!googleId && Number.isSafeInteger(chatIdNumerico) && chatIdNumerico > 0;
 
       // Sesión para invitados o chats nuevos sin ID
       if (!req.session.chatsBloqueados) req.session.chatsBloqueados = [];
@@ -211,8 +212,7 @@ function moderationMiddleware() {
       next();
     } catch (error) {
       console.error('Error en moderationMiddleware:', error.message);
-      req.moderation = { chatBloqueado: false, identificador: 'error' };
-      next();
+      return res.status(503).json({error:'No se pudo verificar el estado del chat. Intenta de nuevo.'});
     }
   };
 }
@@ -220,3 +220,5 @@ function moderationMiddleware() {
 module.exports = moderationMiddleware;
 module.exports.detectarInsulto = detectarInsultoRegex;
 module.exports.MENSAJE_BLOQUEADO = MENSAJE_BLOQUEADO;
+module.exports.clasificarContexto = clasificarContexto;
+module.exports.MENSAJE_ADVERTENCIA = "No voy a seguir la conversación en estos términos. Si vuelves a insultar, este chat se cerrará. Podemos continuar con respeto.";

@@ -2,32 +2,15 @@
 // backend/webSearch.js — Motor de Búsqueda Web en tiempo real para Fenix IA.
 // ----------------------------------------------------------------------------
 // - Detecta automáticamente si una pregunta necesita datos en tiempo real.
-// - Realiza búsquedas mediante Google News, DuckDuckGo y Gemini Grounding.
+// - Busca mediante SerpApi, Tavily o Serper; RSS/Wikipedia son fallbacks limitados.
 // - Inyecta hechos en vivo para que cualquier modelo (Groq, DeepSeek, Gemini)
 //   pueda responder con datos actualizados y fuentes reales clicables.
 // ============================================================================
 
 const chatEngine = require('./chatEngine');
+const {fetchWithTimeout:fetch}=require('../utils/fetchWithTimeout');
+const {regionFor,isFresh,searchPlan}=require('./searchPolicy');
 
-const PALABRAS_CLAVE_TIEMPO_REAL = [
-  /\b(noticias?|actualidad|hoy|ayer|esta semana|este mes|este a[ñn]o)\b/i,
-  /\b(precio(s)?|cotizaci[oó]n|cu[aá]nto\s+vale|cu[aá]nto\s+cuesta|d[oó]lar|euro|bitcoin|btc|eth|crypto|cripto|bolsa|acciones)\b/i,
-  /\b(clima|temperatura|pron[oó]stico|tiempo\s+en)\b/i,
-  /\b(partido(s)?|resultado(s)?|qui[eé]n\s+gan[oó]|qui[eé]n\s+va\s+ganando|champions|liga|mundial|f[uú]tbol|f1|f[oó]rmula\s+1|nba)\b/i,
-  /\b(2025|2026)\b/,
-  /\b(estreno(s)?|lanzamiento(s)?|nueva\s+versi[oó]n|actualizaci[oó]n|fichajes?)\b/i,
-  /\b(qui[eé]n\s+es\s+el\s+actual|presidente\s+de|ministro\s+de|alcalde\s+de)\b/i,
-  /\b(busca(r)?\s+(en\s+)?(internet|la\s+web|google)|investiga\s+(en\s+)?(internet|la\s+web)|googlea)\b/i,
-  /\b(qu[eé]\s+pas[oó]\s+con|qu[eé]\s+ha\s+pasado|qu[eé]\s+est[aá]\s+pasando)\b/i,
-  /\b(cu[aá]ndo\s+(sale|se\s+estrena|juega|ser[aá]))\b/i
-];
-
-/**
- * Determina si un mensaje del usuario amerita consultar la web en vivo.
- * @param {string} mensaje
- * @param {Array} historial
- * @returns {Promise<boolean>}
- */
 const cacheBusquedas = new Map();
 function obtenerDeCache(query) {
   const ahora = Date.now();
@@ -35,9 +18,11 @@ function obtenerDeCache(query) {
   if (cached && (ahora - cached.timestamp < 5 * 60 * 1000)) {
     return cached.resultado;
   }
+  if (cached) cacheBusquedas.delete(query);
   return null;
 }
 function guardarEnCache(query, resultado) {
+  if(cacheBusquedas.size>=100)cacheBusquedas.delete(cacheBusquedas.keys().next().value);
   cacheBusquedas.set(query, { resultado, timestamp: Date.now() });
 }
 
@@ -65,11 +50,12 @@ async function evaluarBusquedaAutomatica(mensaje, historial = []) {
   // Clasificador LLM
   try {
     const startMs = Date.now();
-    const ultimos = historial.slice(-4).map(m => m.role + ': ' + m.content).join('\n');
+    const ultimos = (Array.isArray(historial)?historial:[]).slice(-4).map(m => m.role + ': ' + m.content).join('\n');
     const promptClasificador = `Analiza si el siguiente mensaje requiere buscar en internet (eventos y noticias recientes, resultados deportivos, horarios de eventos, clima, precios y tipo de cambio, personas en cargos actuales, versiones recientes de software, negocios o lugares locales, "hoy/ahora/último/actual", y cualquier dato que pueda haber cambiado).
 Responde SOLO con un JSON estricto con este formato: {"buscar": true|false, "consulta": "consulta autocontenida en el idioma del usuario"}.
 Ante la duda, "buscar": true.
 La consulta debe incluir nombres y contexto de los mensajes anteriores.
+Conserva exactamente las restricciones de fecha (hoy, ayer, esta semana), país y tema indicadas por el usuario.
 No uses markdown en tu respuesta, SOLO el JSON puro.
 
 Mensajes anteriores:
@@ -85,7 +71,7 @@ ${texto}
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` },
       body: JSON.stringify({
-        model: 'qwen/qwen3.8-27b',
+        model: process.env.GROQ_MODEL || 'qwen/qwen3.8-27b',
         messages: [{ role: 'user', content: promptClasificador }],
         temperature: 0,
         max_tokens: 150,
@@ -100,14 +86,17 @@ ${texto}
       const parsed = JSON.parse(contenido);
       const elapsed = Date.now() - startMs;
       console.log(`[busqueda-auto] via=clasificador, buscar=${parsed.buscar}, consulta="${parsed.consulta}", ms=${elapsed}`);
-      return { buscar: forzarBusqueda ? true : !!parsed.buscar, consulta: parsed.consulta || extraerQueryBusqueda(texto), via: 'clasificador' };
+      let consulta=typeof parsed.consulta==='string' && parsed.consulta.trim()?parsed.consulta:extraerQueryBusqueda(texto);
+      const periodo=texto.match(/\b(hoy|ayer|esta semana|today|yesterday|this week)\b/i)?.[0];
+      if(periodo && !consulta.toLowerCase().includes(periodo.toLowerCase()))consulta+=' '+periodo;
+      return { buscar: forzarBusqueda ? true : !!parsed.buscar, consulta, via: 'clasificador' };
     }
   } catch (e) {
     console.warn('[busqueda-auto] Error o timeout en clasificador:', e.name === 'AbortError' ? 'Timeout 2s' : e.message);
   }
-  
+
   if (forzarBusqueda) {
-    return { buscar: true, consulta: extraerQueryBusqueda(texto), via: 'filtro_fallback' };
+    return { buscar: true, consulta: extraerQueryBusqueda((historial || []).filter(m=>m.role==='user').slice(-1).map(m=>m.content).join(' ') + ' ' + texto), via: 'filtro_fallback' };
   }
   return { buscar: false };
 }
@@ -119,11 +108,11 @@ ${texto}
  */
 function extraerQueryBusqueda(mensaje) {
   let q = String(mensaje || '').trim();
-  
+
   // Limpiar prefijos de instrucciones
   const prefijos = [
-    "por favor busca", "por favor investiga", "busca en internet", "busca en la web", 
-    "busca", "investiga", "googlea", "averigua", "dime", "cual es", "cuál es", "que es", "qué es", "qué pasó", "que paso"
+    "por favor busca", "por favor investiga", "busca en internet", "busca en la web",
+    "busca", "investiga", "googlea", "averigua", "dime", "resume", "resúmeme", "resumeme", "muéstrame", "muestrame", "cuéntame", "cuentame", "dame", "cual es", "cuál es", "que es", "qué es", "qué pasó", "que paso"
   ];
   let lowerQ = q.toLowerCase();
   for (const p of prefijos) {
@@ -134,6 +123,8 @@ function extraerQueryBusqueda(mensaje) {
   }
 
   q = q.replace(/^(sobre|acerca de|en)\s+/i, '').trim();
+  // Formatting instructions are not search keywords; keep the requested subject.
+  q = q.replace(/[,.;]\s*(?:con (?:fecha|enlaces|fuentes)|cita |incluye (?:enlaces|fuentes)|distingue (?:artículos|titulares))[\s\S]*$/i,'').trim();
 
   // Limpiar basura conversacional pero MANTENER palabras clave (noticias, hoy, etc.)
   q = q.replace(/\blas\s+noticias\b/gi, 'noticias');
@@ -143,12 +134,12 @@ function extraerQueryBusqueda(mensaje) {
   q = q.replace(/\beventos\s+hot\b/gi, '');
   q = q.replace(/\bcosas\s+relevantes\b/gi, '');
   q = q.replace(/\beventos\s+relevantes\b/gi, '');
-  
+
   // Si quedaron preposiciones sueltas
-  q = q.replace(/\b(de|en|sobre|las|los|la|el)\b/gi, '').replace(/\s+/g, ' ').trim();
-  
+  q = q.replace(/\s+/g, ' ').trim();
+
   q = q.replace(/^[¿¡'"“”\s]+|[?！!'"“”\s]+$/g, '').trim();
-  
+
   if (q.length < 3) return mensaje;
   return q.slice(0, 150);
 }
@@ -158,29 +149,34 @@ function extraerQueryBusqueda(mensaje) {
  * @param {string} query
  * @returns {Promise<{hechos: Array<string>, fuentes: Array<{titulo: string, url: string}>}>}
  */
-async function buscarWebMultiFuente(query) {
+async function buscarWebMultiFuente(query, {lang='español',timeZone='America/Managua'} = {}) {
+  const region=regionFor(query,timeZone).toUpperCase();
+  const language=lang === 'inglés' ? 'en' : 'es';
   const fuentes = [];
   const hechos = [];
 
   // 1. Google News RSS en tiempo real
   try {
-    const url = 'https://news.google.com/rss/search?q=' + encodeURIComponent(query) + '&hl=es-419&gl=MX&ceid=MX:es-419';
+    const url = 'https://news.google.com/rss/search?q=' + encodeURIComponent(searchPlan(query,timeZone).providerQuery) + '&hl='+language+'&gl='+region+'&ceid='+region+':'+language;
     const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' } });
     const xml = await res.text();
     const itemMatches = [...xml.matchAll(/<item>[\s\S]*?<title>([\s\S]*?)<\/title>[\s\S]*?<link>([\s\S]*?)<\/link>[\s\S]*?<pubDate>([\s\S]*?)<\/pubDate>[\s\S]*?<\/item>/gi)];
-    for (const m of itemMatches.slice(0, 6)) {
+    for (const m of itemMatches) {
       const rawTitle = m[1].replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').trim();
       const rawUrl = m[2].trim();
       const fecha = m[3].trim();
-      if (rawTitle && rawUrl) {
-        fuentes.push({ titulo: rawTitle, url: rawUrl });
+      if (rawTitle && rawUrl && isFresh({date:fecha},query,timeZone)) {
+        fuentes.push({ titulo: rawTitle, url: rawUrl, fecha: new Date(fecha).toISOString(), contenido: 'titular' });
         hechos.push(`- Noticia/Hecho web: "${rawTitle}" (Fecha: ${fecha})`);
+        if(fuentes.length>=5)break;
       }
     }
   } catch (e) {
     console.error('[WebSearch] Error Google News:', e.message);
   }
 
+  // Wikipedia is background context, never evidence of current news.
+  if (!/noticia|news|hoy|ayer|today|yesterday/i.test(query)) {
   // 2. Wikipedia Search API
   try {
     const wikiUrl = 'https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(query) + '&format=json&utf8=1&srlimit=2';
@@ -198,7 +194,8 @@ async function buscarWebMultiFuente(query) {
     console.error('[WebSearch] Error Wikipedia:', e.message);
   }
 
-  return { hechos, fuentes: fuentes.slice(0, 5) };
+  }
+  return { hechos, fuentes };
 }
 
 /**
@@ -284,154 +281,11 @@ async function obtenerHistoricoDivisas(from = 'USD', to = 'MXN', dias = 30) {
  * Ejecuta la búsqueda web y redacta la respuesta usando el modelo configurado.
  * Con soporte especializado para tipo de cambio (Timestamp exacto, tendencia 30 días, mini gráfico y fuentes reducidas).
  */
-async function ejecutarBusquedaWebCompleta({
-  mensaje,
-  historial = [],
-  lang = 'español',
-  apiKey,
-  instruccionExtra = '',
-  memoriaContexto = '',
-  timeZone
-}) {
-  const query = extraerQueryBusqueda(mensaje);
-  if (!query || !String(query).trim()) {
-    return {
-      texto: 'No pude extraer una consulta válida para buscar en la web.',
-      fuentes: []
-    };
-  }
-
-  // ¿Es una consulta sobre divisas / tipo de cambio?
-  const esTipoCambio = detectarConsultaTipoCambio(mensaje);
-
-  
-
-  // Para consultas de divisas limitamos las fuentes a 2-3 para no saturar
-  const fuentesFinales = esTipoCambio
-    ? (busqueda.fuentes || []).slice(0, 3)
-    : (busqueda.fuentes || []).slice(0, 6);
-
-  // 2) Si es tipo de cambio, consultamos histórico de 30 días para calcular tendencia exacta y gráfico
-  let historico = null;
-  if (esTipoCambio) {
-    historico = await obtenerHistoricoDivisas('USD', 'MXN', 30);
-  }
-
-  // 3) TIMESTAMP: hora y fecha exactas del servidor (hora de México)
-  const ahora = new Date();
-  const horaExacta = ahora.toLocaleTimeString('es-MX', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-    timeZone: 'America/Mexico_City'
-  });
-  const fechaHoy = ahora.toLocaleDateString('es-ES', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'America/Mexico_City'
-  });
-
-  let instruccionesEspeciales = '';
-  if (esTipoCambio) {
-    instruccionesEspeciales = `
-
-INSTRUCCIONES CLAVE PARA TIPO DE CAMBIO (RESPUESTA SIMPLE, ELEGANTE Y DIRECTA):
-- SÉ BREVE Y DIRECTO: Responde en 2 o 3 oraciones concisas y fluidas. NO uses títulos ni encabezados largos (prohibido "Variación según la fuente", "Tendencia en los últimos 30 días", etc.) ni listas de viñetas.
-- Da el valor actual de inmediato en la primera frase indicando la hora (ej: "El dólar cotiza actualmente en torno a los **$17.14 MXN** (a las ${horaExacta} de hoy).").
-- Explica brevemente en una sola frase si varía en bancos (ej: "En ventanillas bancarias se ubica cerca de **$17.50 MXN** por el diferencial comercial.").
-- Menciona la tendencia mensual en una frase corta (ej: "${historico ? historico.tendenciaTexto : 'ha mostrado estabilidad este mes'}").
-- La aplicación dibuja automáticamente el gráfico interactivo con el rango mensual, por lo que NO debes listar mínimos ni máximos en texto.`;
-  }
-
-  const sistemaConHechos = `Eres Fenix IA, un asistente financiero y de información útil, veraz y actualizado. Responde siempre en ${lang}. Tu creador es Joshua Blandon Gonzales.
-
-INFORMACIÓN EN TIEMPO REAL EXTRAÍDA DE LA WEB (Google Search - ${fechaHoy} a las ${horaExacta}):
-${busqueda.texto || 'No se encontraron resultados directos.'}
-${historico ? `\nDATOS HISTÓRICOS OFICIALES (Últimos 30 días):\n- Cotización hace 30 días: $${historico.inicial} MXN\n- Cotización reciente: $${historico.final} MXN\n- Mínimo del mes: $${historico.minimo} MXN\n- Máximo del mes: $${historico.maximo} MXN\n- Variación: ${historico.tendenciaTexto}` : ''}
-
-INSTRUCCIONES GENERALES:
-1) Basa tu respuesta en los datos reales mostrados arriba. Usa negritas en las cifras clave y formato limpio.
-2) Cita los hechos concretos, precios y nombres de fuentes reales (ej. Banxico, DOF, Investing, Wise).
-3) NUNCA digas "no tengo acceso a internet" ya que se te proporcionan los datos en vivo arriba.${instruccionesEspeciales}${memoriaContexto ? '\n\n' + memoriaContexto : ''}${instruccionExtra ? '\n\n' + instruccionExtra : ''}`;
-
-  const mensajes = [
-    { role: 'system', content: sistemaConHechos },
-    ...(Array.isArray(historial) ? historial.slice(-6) : []),
-    { role: 'user', content: mensaje }
-  ];
-
-  // 4) Redacción elegante con Gemini o Groq
-  let rawText = '';
-  const geminiKey = apiKey || process.env.GEMINI_API_KEY;
-  if (geminiKey) {
-    try {
-      const resp = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${geminiKey}`
-        },
-        body: JSON.stringify({
-          model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
-          messages: mensajes,
-          temperature: 0.3,
-          max_tokens: 2048
-        })
-      });
-      if (resp.ok) {
-        const d = await resp.json();
-        rawText = d.choices?.[0]?.message?.content || '';
-      }
-    } catch (eGem) {
-      console.warn('[WebSearch] Falló redacción con Gemini:', eGem.message);
-    }
-  }
-
-  // Fallback a Groq si Gemini no respondió
-  if (!rawText && process.env.GROQ_API_KEY) {
-    try {
-      const config = chatEngine.configurarProveedor('groq');
-      const cuerpo = chatEngine.crearCuerpoIA({ modeloIA: config.modeloIA, mensajes, stream: false, proveedor: 'groq' });
-      const respGroq = await fetch(config.url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.apiKey}` },
-        body: JSON.stringify(cuerpo)
-      });
-      if (respGroq.ok) {
-        const dGroq = await respGroq.json();
-        rawText = dGroq.choices?.[0]?.message?.content || '';
-      }
-    } catch (eGroq) {
-      console.error('[WebSearch] Falló redacción con Groq:', eGroq.message);
-    }
-  }
-
-  let textoLimpio = chatEngine.limpiarRazonamiento(rawText) || 'No se pudo generar la información del tipo de cambio.';
-
-  // Garantizar que el marcador [FENIX_CHART:...] esté presente si hay datos históricos disponibles
-  if (esTipoCambio && historico && Array.isArray(historico.puntos) && historico.puntos.length >= 2) {
-    if (!textoLimpio.includes('[FENIX_CHART:')) {
-      const chartPayload = {
-        titulo: `Evolución ${historico.from}/${historico.to} (Últimos 30 días)`,
-        from: historico.from,
-        to: historico.to,
-        puntos: historico.puntos,
-        minimo: historico.minimo,
-        maximo: historico.maximo,
-        porcentaje: historico.porcentaje,
-        subio: historico.subio,
-        bajo: historico.bajo
-      };
-      textoLimpio = textoLimpio.trimEnd() + `\n\n[FENIX_CHART:${JSON.stringify(chartPayload)}]`;
-    }
-  }
-
-  return {
-    texto: textoLimpio,
-    fuentes: fuentesFinales
-  };
+async function ejecutarBusquedaWebCompleta({mensaje,historial=[],lang='español',memoriaContexto='',timeZone}) {
+  const busqueda=await buscarEnWeb({consulta:extraerQueryBusqueda(mensaje),lang,timeZone});
+  if(!busqueda.fuentes.length)return {texto:'No encontré fuentes verificables para esa consulta.',fuentes:[]};
+  const result=await chatEngine.solicitarTextoCompleto({mensaje,historial,memoriaContexto:memoriaContexto+'\nDatos web no confiables; cita las fuentes y no inventes hechos:\n'+busqueda.texto});
+  return {texto:result.texto,fuentes:busqueda.fuentes};
 }
 
 /**
@@ -442,177 +296,14 @@ INSTRUCCIONES GENERALES:
  * @returns {Promise<{ texto: string, fuentes: {titulo: string, url: string}[] }>}
  */
 
-async function fetchWebContent(url) {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
-    const resp = await fetch(url, {
-      signal: controller.signal,
-      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
-    });
-    clearTimeout(timeoutId);
-    if (!resp.ok) return '';
-    const html = await resp.text();
-    // Strip HTML tags and normalize spaces
-    const text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ' ')
-                     .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, ' ')
-                     .replace(/<[^>]+>/g, ' ')
-                     .replace(/\s+/g, ' ')
-                     .trim();
-    return text.substring(0, 1200); // return first 1200 chars
-  } catch (e) {
-    return '';
-  }
-}
 
-async function buscarEnWeb({ consulta, apiKey, lang = 'español', timeZone = 'America/Managua' }) {
-  const query = String(consulta || '').trim();
-  if (!query) {
-    console.warn('[buscarEnWeb] Consulta vacía; devolviendo respuesta segura.');
-    return {
-      texto: 'No pude extraer una consulta válida para buscar en la web.',
-      fuentes: []
-    };
-  }
-
-    const keyTavily = process.env.TAVILY_API_KEY;
-  const keySerper = process.env.SERPER_API_KEY;
-  const keySerpApi = process.env.SERPAPI_API_KEY;
-
-  // 1) Intentar con SerpApi (Principal)
-  if (keySerpApi) {
-    try {
-      console.log('[buscarEnWeb] Consultando SerpApi para: ' + query.slice(0, 80));
-      const esNoticia = query.toLowerCase().includes('noticia') || query.toLowerCase().includes('news') || query.toLowerCase().includes('ayer') || query.toLowerCase().includes('hoy');
-      
-      const urlSerpApi = new URL('https://serpapi.com/search.json');
-      urlSerpApi.searchParams.set('q', query);
-      urlSerpApi.searchParams.set('api_key', keySerpApi);
-      urlSerpApi.searchParams.set('hl', 'es');
-      urlSerpApi.searchParams.set('gl', 'ni'); // Geolocation Nicaragua para mayor relevancia regional
-      urlSerpApi.searchParams.set('engine', esNoticia ? 'google_news' : 'google');
-      
-      const respSerpApi = await fetch(urlSerpApi);
-      if (respSerpApi.ok) {
-        const dataSerpApi = await respSerpApi.json();
-        let items = esNoticia ? (dataSerpApi.news_results || []) : (dataSerpApi.organic_results || []);
-        
-        // LIMIT TO MAX 5 RESULTS to avoid breaking the LLM token limits (Groq has 7000 token limit)
-        items = items.slice(0, 5);
-        
-        if (items.length) {
-          const fuentes = items.map(o => ({ titulo: o.title, url: o.link }));
-          const texto = items.map((o, i) => {
-            let dateStr = '';
-            if (o.iso_date) {
-              const d = new Date(o.iso_date);
-              if (!isNaN(d.getTime())) {
-                const day = d.getUTCDate();
-                const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-                const monthName = months[d.getUTCMonth()];
-                const year = d.getUTCFullYear();
-                dateStr = ` [Fecha exacta de publicación: ${day} de ${monthName} de ${year}]`;
-              }
-            } else if (o.date) {
-              // If it's a relative date like "3 days ago" or unambiguous string, keep it, but clarify it's literal
-              dateStr = ` [Fecha reportada: ${o.date} (lee textualmente y no asumas meses futuros)]`;
-            }
-            
-            const sourceStr = o.source ? ` (Fuente: ${typeof o.source === 'object' ? o.source.name : o.source})` : '';
-            return `${i + 1}. ${o.title}${dateStr}${sourceStr} — ${o.snippet || ''}`;
-          }).join('\n');
-          console.log(`[buscarEnWeb] Búsqueda SerpApi exitosa (${esNoticia ? 'google_news' : 'google'}).`);
-          return { texto, fuentes };
-        } else {
-          console.warn(`[buscarEnWeb] SerpApi no trajo resultados para ${esNoticia ? 'google_news' : 'google'}.`);
-        }
-      } else {
-        console.warn('[buscarEnWeb] Error de SerpApi status:', respSerpApi.status);
-      }
-    } catch (eSerpApi) {
-      console.warn('[buscarEnWeb] Excepción en SerpApi:', eSerpApi.message);
-    }
-  }
-
-  
-
-  // 2) Intentar con Tavily API (si está configurada)
-  if (keyTavily) {
-    try {
-      console.log('[buscarEnWeb] Consultando Tavily Search para: ' + query.slice(0, 80));
-      const respTav = await fetch('https://api.tavily.com/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          api_key: keyTavily,
-          query: query.slice(0, 400),
-          search_depth: 'basic',
-          max_results: 6,
-          include_answer: true
-        })
-      });
-      if (respTav.ok) {
-        const dataTav = await respTav.json();
-        const results = dataTav.results || [];
-        if (results.length) {
-          const fuentes = results.map(r => ({ titulo: r.title, url: r.url }));
-          const texto = (dataTav.answer ? `Resumen general: ${dataTav.answer}\n\n` : '') +
-            results.map((r, i) => `${i + 1}. ${r.title} — ${r.content || ''}`).join('\n');
-          console.log('[buscarEnWeb] Búsqueda Tavily exitosa.');
-          return { texto, fuentes };
-        }
-      }
-    } catch (eTav) {
-      console.warn('[buscarEnWeb] Excepción en Tavily:', eTav.message);
-    }
-  }
-
-  // 3) Intentar con Serper API (Google Search oficial si está configurada)
-  if (keySerper) {
-    try {
-      console.log('[buscarEnWeb] Consultando Serper (Google) para: ' + query.slice(0, 80));
-      const respSerp = await fetch('https://google.serper.dev/search', {
-        method: 'POST',
-        headers: {
-          'X-API-KEY': keySerper,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ q: query, gl: 'es', hl: 'es', num: 6 })
-      });
-      if (respSerp.ok) {
-        const dataSerp = await respSerp.json();
-        const organics = dataSerp.organic || [];
-        if (organics.length) {
-          const fuentes = organics.map(o => ({ titulo: o.title, url: o.link }));
-          const texto = organics.map((o, i) => `${i + 1}. ${o.title} — ${o.snippet || ''}`).join('\n');
-          console.log('[buscarEnWeb] Búsqueda Serper exitosa.');
-          return { texto, fuentes };
-        }
-      }
-    } catch (eSerp) {
-      console.warn('[buscarEnWeb] Excepción en Serper:', eSerp.message);
-    }
-  }
-
-  // Fallback universal multi-fuente (Google News RSS + Wikipedia)
-  console.log('[buscarEnWeb] Usando buscador multi-fuente gratuito para: ' + query.slice(0, 80));
-  try {
-    const resMulti = await buscarWebMultiFuente(query);
-    const hechos = Array.isArray(resMulti.hechos) ? resMulti.hechos : [];
-    const fuentes = Array.isArray(resMulti.fuentes) ? resMulti.fuentes : [];
-
-    const texto = hechos.length
-      ? hechos.join('\n')
-      : 'No se encontraron titulares directos para esta consulta.';
-
-    return { texto, fuentes: fuentes.slice(0, 6) };
-  } catch (eMulti) {
-    console.error('[buscarEnWeb] Error en fallback multi-fuente:', eMulti.message);
-    return {
-      texto: 'No se pudieron recuperar resultados actualizados de la web en este momento.',
-      fuentes: []
-    };
-  }
+async function buscarEnWeb(options){
+ const result=await require('./webSearchProviders').searchProviders(options);
+ if(!result)return {texto:'No pude extraer una consulta válida para buscar en la web.',fuentes:[]};
+ if(result.fuentes.length)return result;
+ const fallback=await buscarWebMultiFuente(options.consulta,options);
+ if(fallback.fuentes.length)return {texto:fallback.hechos.join('\n')+'\nSolo titulares/extractos: no se pudo leer el cuerpo de estos artículos.',fuentes:fallback.fuentes,proveedor:'rss-wikipedia',diagnostico:result.diagnostico};
+ return result;
 }
 
 module.exports = {

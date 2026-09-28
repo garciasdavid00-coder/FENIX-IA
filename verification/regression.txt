@@ -1,0 +1,34 @@
+✔ SSE preserves fragmented UTF-8 and final line (13.4305ms)
+✔ SSE propagates provider failures instead of empty success (33.1075ms)
+✔ Chat hook displays stream errors and releases loading state (101.4158ms)
+✔ Precomputed voice response does not call chat or image generation (2.644ms)
+✔ Page forwards attachments and precalculated responses with a stable ID (2.3087ms)
+✔ Partial snapshot does not delete omitted chats or projects (1.656ms)
+✔ Explicit deletion works for the last chat and is scoped to its owner (0.5322ms)
+✔ Stale revision rolls back and does not overwrite chat (0.7838ms)
+✔ A moderation placeholder can be saved on the first turn (0.5659ms)
+✔ Deleted chat cannot be resurrected by a stale revision (0.6228ms)
+✔ IDs do not strip arbitrary characters or lose integer precision (0.5043ms)
+✔ Chat rejects privileged history and invalid timezone but accepts script text (4.4964ms)
+✔ Image data reaches provider message construction (6.4767ms)
+✔ Moderation warns once and then blocks the same conversation (5.3432ms)
+✔ Provider outage does not classify self distress as aggression (5.5034ms)
+✔ Article extraction excludes navigation and keeps article body (399.688ms)
+✔ Today and yesterday use publication dates in user timezone (4.7014ms)
+✔ Explicit country overrides timezone default (0.6132ms)
+✔ Public downloader blocks loopback, private and metadata addresses (20.3799ms)
+✔ PDF markup cannot inject event handlers from markdown URLs (2.2515ms)
+✔ PDF jobs start, serialize and recover after a failed job (74.9944ms)
+✔ Reasoning filter preserves script text and strips fragmented reasoning (2.1538ms)
+✔ Next conversation waits for pending memory and scopes it to the same user (47.7705ms)
+✔ Voice identity response stays open and returns to listening without final punctuation (6.4952ms)
+✔ Voice moderation speaks the closure and stops accepting the conversation (8.269ms)
+✔ Voice interruption aborts a pending response and does not save stale text (3.3153ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3100.3492

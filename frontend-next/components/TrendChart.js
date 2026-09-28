@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 
 /**
  * Componente TrendChart: Mini gráfico de línea SVG interactivo para tipo de cambio (30 días).
@@ -23,13 +23,13 @@ export default function TrendChart({ datos }) {
   const padLeft = 14;
   const padRight = 14;
 
-  const valores = useMemo(() => puntos.map(p => p.valor), [puntos]);
-  const minVal = useMemo(() => (minimo ? Number(minimo) : Math.min(...valores)), [minimo, valores]);
-  const maxVal = useMemo(() => (maximo ? Number(maximo) : Math.max(...valores)), [maximo, valores]);
+  const valores = puntos.map(p => p.valor);
+  const minVal = (minimo != null ? Number(minimo) : Math.min(...valores));
+  const maxVal = (maximo != null ? Number(maximo) : Math.max(...valores));
   const valSpan = (maxVal - minVal) || 0.001;
 
   // Mapeo a coordenadas SVG
-  const coords = useMemo(() => {
+  const coords = (() => {
     const chartW = width - padLeft - padRight;
     const chartH = height - padTop - padBottom;
     const step = chartW / (puntos.length - 1);
@@ -40,10 +40,10 @@ export default function TrendChart({ datos }) {
       const y = padTop + chartH - ratio * chartH;
       return { x, y, fecha: p.fecha, valor: p.valor };
     });
-  }, [puntos, minVal, valSpan, width, height, padLeft, padRight, padTop, padBottom]);
+  })();
 
   // Generar path de línea suave y área cerrada para gradiente
-  const { linePath, areaPath } = useMemo(() => {
+  const { linePath, areaPath } = (() => {
     if (!coords.length) return { linePath: '', areaPath: '' };
 
     const first = coords[0];
@@ -63,7 +63,7 @@ export default function TrendChart({ datos }) {
     const area = `${d} L ${last.x.toFixed(1)} ${bottomY} L ${first.x.toFixed(1)} ${bottomY} Z`;
 
     return { linePath: d, areaPath: area };
-  }, [coords, height, padBottom]);
+  })();
 
   const formatearFecha = (strFecha) => {
     if (!strFecha) return '';

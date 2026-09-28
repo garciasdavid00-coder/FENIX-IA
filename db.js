@@ -4,8 +4,7 @@ const { Pool } = require('pg');
 
 const pool = process.env.DATABASE_URL
   ? new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false }
+      ...require('./config/database').databaseOptions()
     })
   : null;
 
@@ -124,6 +123,7 @@ async function inicializar() {
     console.log('Base de datos conectada y lista.');
   } catch (e) {
     console.error('ERROR al conectar la base de datos:', e.message);
+    throw e;
   }
 }
 
@@ -192,8 +192,7 @@ async function registrarInsulto(googleId, clienteId, titulo = 'Nuevo chat') {
      VALUES ($1, $2, $3, '[]'::jsonb, 1, FALSE)
      ON CONFLICT (google_id, cliente_id) DO UPDATE SET
        insult_count = chats.insult_count + 1,
-       is_blocked   = (chats.insult_count + 1) >= 2,
-       actualizado_en = NOW()
+       is_blocked   = (chats.insult_count + 1) >= 2
      RETURNING insult_count, is_blocked`,
     [googleId, clienteId, String(titulo || '').slice(0, 200) || 'Nuevo chat']
   );
@@ -210,111 +209,15 @@ function parsearClienteId(id) {
 // Sincroniza los chats y proyectos del usuario de forma segura (Upsert + reconciliación).
 // Protege el historial contra sobreescrituras vacías accidentales si el cliente
 // aún no había cargado su localStorage.
-async function sincronizarDatos(googleId, { chats, proyectos, borradoExplicito }) {
-  if (!pool || !googleId) return null;
-  const cliente = await pool.connect();
-  try {
-    await cliente.query('BEGIN');
-
-    const listaChats = Array.isArray(chats) ? chats : [];
-    const listaProyectos = Array.isArray(proyectos) ? proyectos : [];
-
-    // Verificamos si el usuario ya tenía datos en la base de datos
-    const { rows: conteoActual } = await cliente.query(
-      'SELECT COUNT(*) AS total FROM chats WHERE google_id = $1',
-      [googleId]
-    );
-    const totalExistente = parseInt(conteoActual[0]?.total || '0', 10);
-
-    // PROTECCIÓN ANTI-PÉRDIDA: Si el cliente envía 0 chats pero la BD ya tiene
-    // chats guardados, no ejecutamos borrado masivo (evita que una pestaña nueva
-    // o un fallo de lectura local borre el historial de la cuenta en Neon).
-    // Si borradoExplicito es true, permitimos el borrado.
-    if (listaChats.length === 0 && totalExistente > 0 && !borradoExplicito) {
-      console.warn(`[sincronizarDatos] Petición vacía ignorada para google_id ${googleId} para evitar pérdida de ${totalExistente} chats.`);
-      await cliente.query('COMMIT');
-      return { ok: true, omitidoPorProteccion: true };
-    }
-
-    // 1) Upsert de chats válidos enviados por el cliente
-    const idsChatsEnviados = [];
-    for (const c of listaChats) {
-      const cid = parsearClienteId(c.id);
-      if (!cid) continue;
-      idsChatsEnviados.push(cid);
-
-      const pid = parsearClienteId(c.proyectoId);
-      await cliente.query(
-        `INSERT INTO chats (google_id, cliente_id, titulo, mensajes, pinned, proyecto_id)
-         VALUES ($1, $2, $3, $4, $5, $6)
-         ON CONFLICT (google_id, cliente_id) DO UPDATE SET
-           titulo = EXCLUDED.titulo,
-           mensajes = EXCLUDED.mensajes,
-           pinned = EXCLUDED.pinned,
-           proyecto_id = EXCLUDED.proyecto_id,
-           actualizado_en = NOW()`,
-        [googleId, cid, String(c.titulo || '').slice(0, 300), JSON.stringify(c.mensajes || []), !!c.pinned, pid]
-      );
-    }
-
-    // 2) Eliminación deliberada: si se enviaron chats, solo eliminamos los que
-    // el usuario explícitamente borró (no están en idsChatsEnviados).
-    // Si borradoExplicito es true y enviaron un array vacío, eliminamos TODOS.
-    if (idsChatsEnviados.length > 0) {
-      await cliente.query(
-        `DELETE FROM chats
-         WHERE google_id = $1 AND cliente_id != ALL($2::bigint[])`,
-        [googleId, idsChatsEnviados]
-      );
-    } else if (borradoExplicito) {
-      await cliente.query(
-        `DELETE FROM chats WHERE google_id = $1`,
-        [googleId]
-      );
-    }
-
-    // 3) Reconciliación de proyectos
-    const idsProyectosEnviados = [];
-    for (const p of listaProyectos) {
-      const pid = parsearClienteId(p.id);
-      if (!pid) continue;
-      idsProyectosEnviados.push(pid);
-
-      await cliente.query(
-        `INSERT INTO proyectos (google_id, cliente_id, nombre)
-         VALUES ($1, $2, $3)
-         ON CONFLICT (google_id, cliente_id) DO UPDATE SET
-           nombre = EXCLUDED.nombre`,
-        [googleId, pid, String(p.nombre || '').slice(0, 300)]
-      );
-    }
-
-    if (idsProyectosEnviados.length > 0) {
-      await cliente.query(
-        `DELETE FROM proyectos
-         WHERE google_id = $1 AND cliente_id != ALL($2::bigint[])`,
-        [googleId, idsProyectosEnviados]
-      );
-    } else if (listaProyectos.length === 0 && listaChats.length > 0) {
-      // Si el cliente envió chats pero explícitamente vació sus proyectos
-      await cliente.query('DELETE FROM proyectos WHERE google_id = $1', [googleId]);
-    }
-
-    await cliente.query('COMMIT');
-    return { ok: true };
-  } catch (e) {
-    await cliente.query('ROLLBACK');
-    throw e;
-  } finally {
-    cliente.release();
-  }
+async function sincronizarDatos(googleId, data) {
+  return require('./backend/historyStore').sync(pool, googleId, data);
 }
 
 // Devuelve todos los chats y proyectos de una cuenta, listos para el navegador.
 async function obtenerDatos(googleId) {
   if (!pool) return null;
   const chatsRes = await pool.query(
-    'SELECT cliente_id, titulo, mensajes, pinned, proyecto_id FROM chats WHERE google_id = $1 ORDER BY id',
+    'SELECT cliente_id, titulo, mensajes, pinned, proyecto_id, is_blocked, actualizado_en FROM chats WHERE google_id = $1 ORDER BY id',
     [googleId]
   );
   const proyectosRes = await pool.query(
@@ -323,13 +226,15 @@ async function obtenerDatos(googleId) {
   );
   return {
     chats: chatsRes.rows.map(r => ({
-      id: Number(r.cliente_id),
+      id: String(r.cliente_id),
+      revision: r.actualizado_en,
+      bloqueado: !!r.is_blocked,
       titulo: r.titulo,
       mensajes: r.mensajes || [],
       pinned: !!r.pinned,
-      proyectoId: r.proyecto_id != null ? Number(r.proyecto_id) : null
+      proyectoId: r.proyecto_id != null ? String(r.proyecto_id) : null
     })),
-    proyectos: proyectosRes.rows.map(r => ({ id: Number(r.cliente_id), nombre: r.nombre }))
+    proyectos: proyectosRes.rows.map(r => ({ id: String(r.cliente_id), nombre: r.nombre }))
   };
 }
 

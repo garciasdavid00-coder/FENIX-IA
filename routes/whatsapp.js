@@ -20,7 +20,8 @@ const crypto = require('crypto');
 const db = require('../db');
 const memory = require('../backend/memoryManager');
 const chatEngine = require('../backend/chatEngine');
-const { detectarInsulto } = require('../backend/moderationMiddleware');
+const moderation = require('../backend/moderationMiddleware');
+const moderationSessions = new Map();
 const { fetchWithTimeout } = require('../utils/fetchWithTimeout');
 
 const router = express.Router();
@@ -135,9 +136,12 @@ async function permiteEnviar(numero) {
     //
     // OPCIÓN B (recomendada): fallback en memoria con tope corto por MINUTO,
     // para que el bot siga vivo pero sin gasto descontrolado de IA. Activa.
+    const now=Date.now();
+    for(const [k,v] of CONTADOR_EN_MEMORIA)if(v.expires<now)CONTADOR_EN_MEMORIA.delete(k);
+    if(CONTADOR_EN_MEMORIA.size>=2000)return false;
     const clave = numero + ':' + Math.floor(Date.now() / 60000);
-    const usosMemoria = (CONTADOR_EN_MEMORIA.get(clave) || 0) + 1;
-    CONTADOR_EN_MEMORIA.set(clave, usosMemoria);
+    const usosMemoria = (CONTADOR_EN_MEMORIA.get(clave)?.count || 0) + 1;
+    CONTADOR_EN_MEMORIA.set(clave, {count:usosMemoria,expires:now+60000});
     return usosMemoria <= LIMITE_MEMORIA_POR_MINUTO;
   }
 }
@@ -232,12 +236,14 @@ async function procesarMensajeEntrante(message, value) {
       console.error('[WhatsApp] Error cargando memorias:', e.message);
     }
 
-    // 5) Moderación: Cerrar la conversación si se detectan insultos
-    if (detectarInsulto(texto)) {
-      console.warn(`[WhatsApp] Insulto recibido de ${numero}. Cerrando conversación.`);
-      await enviarMensajeWhatsApp(numero, '🚫 Esta conversación ha sido finalizada y cerrada debido al uso de lenguaje ofensivo o insultos.');
-      return;
-    }
+    // Same warning/closure policy as text and voice. The phone owns this conversation.
+    let session=moderationSessions.get(numero);
+    if(!session){if(moderationSessions.size>=2000)moderationSessions.delete(moderationSessions.keys().next().value);session={};moderationSessions.set(numero,session)}
+    const req={body:{mensaje:texto,chatId:1,historial},user:{id:userId},session};
+    let rejected;
+    await moderation()(req,{status(){return this},json(data){rejected=data}},()=>{});
+    if(rejected){await enviarMensajeWhatsApp(numero,rejected.mensaje || rejected.error);return}
+    if(req.moderation?.insertarAdvertencia){await enviarMensajeWhatsApp(numero,moderation.MENSAJE_ADVERTENCIA);return}
 
     // 6) Respuesta del modelo (mismo motor que la web, non-streaming, versión reducida para WhatsApp).
     const resultado = await chatEngine.solicitarTextoCompleto({
