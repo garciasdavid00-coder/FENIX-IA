@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------
 // - Detecta automáticamente si una pregunta necesita datos en tiempo real.
 // - Busca mediante SerpApi, Tavily o Serper; RSS/Wikipedia son fallbacks limitados.
-// - Inyecta hechos en vivo para que cualquier modelo (Groq, DeepSeek, Gemini)
+// - Inyecta hechos en vivo para que cualquier modelo (Gemini, DeepSeek, Gemini)
 //   pueda responder con datos actualizados y fuentes reales clicables.
 // ============================================================================
 
@@ -34,6 +34,8 @@ async function evaluarBusquedaAutomatica(mensaje, historial = []) {
   if (process.env.BUSQUEDA_AUTO === 'off') return { buscar: false };
   const texto = String(mensaje || '').trim();
   if (!texto) return { buscar: false };
+  // Explicit news requests retain the user's country and date without an LLM rewrite.
+  if (/\b(noticias?|news|titulares)\b/i.test(texto)) return {buscar:true,consulta:extraerQueryBusqueda(texto),via:'noticias_explicitas'};
 
   // Filtro rápido para saltar (código o saludos muy cortos)
   if (/^hola$/i.test(texto) || texto.includes('```')) {
@@ -66,19 +68,19 @@ ${texto}
 `;
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2000);
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const timeout = setTimeout(() => controller.abort(), 30000);
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.GEMINI_API_KEY}` },
       body: JSON.stringify({
-        model: process.env.GROQ_MODEL || 'qwen/qwen3.8-27b',
+        model: process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite',
         messages: [{ role: 'user', content: promptClasificador }],
         temperature: 0,
         max_tokens: 150,
         response_format: { type: 'json_object' }
       }),
       signal: controller.signal
-    });
+    },32000);
     clearTimeout(timeout);
     const data = await res.json();
     const contenido = data.choices?.[0]?.message?.content?.trim();
@@ -92,7 +94,7 @@ ${texto}
       return { buscar: forzarBusqueda ? true : !!parsed.buscar, consulta, via: 'clasificador' };
     }
   } catch (e) {
-    console.warn('[busqueda-auto] Error o timeout en clasificador:', e.name === 'AbortError' ? 'Timeout 2s' : e.message);
+    console.warn('[busqueda-auto] Error o timeout en clasificador:', e.name === 'AbortError' ? 'Timeout 30s' : e.message);
   }
 
   if (forzarBusqueda) {
@@ -201,7 +203,7 @@ async function buscarWebMultiFuente(query, {lang='español',timeZone='America/Ma
 /**
  * Ejecuta la búsqueda web y redacta la respuesta usando el modelo configurado.
  * Si Gemini Grounding no está disponible (ej. 429 quota), usa el motor de búsqueda
- * multi-fuente con Groq / DeepSeek garantizando que SIEMPRE responda con datos reales.
+ * multi-fuente con Gemini / DeepSeek garantizando que SIEMPRE responda con datos reales.
  */
 /**
  * Determina si el mensaje del usuario pregunta sobre tipo de cambio o divisas.
@@ -284,6 +286,7 @@ async function obtenerHistoricoDivisas(from = 'USD', to = 'MXN', dias = 30) {
 async function ejecutarBusquedaWebCompleta({mensaje,historial=[],lang='español',memoriaContexto='',timeZone}) {
   const busqueda=await buscarEnWeb({consulta:extraerQueryBusqueda(mensaje),lang,timeZone});
   if(!busqueda.fuentes.length)return {texto:'No encontré fuentes verificables para esa consulta.',fuentes:[]};
+  if(require('./datedNews').isDatedNews(mensaje,timeZone))return require('./datedNews').answerDatedNews({result:busqueda,query:mensaje,timeZone});
   const result=await chatEngine.solicitarTextoCompleto({mensaje,historial,memoriaContexto:memoriaContexto+'\nDatos web no confiables; cita las fuentes y no inventes hechos:\n'+busqueda.texto});
   return {texto:result.texto,fuentes:busqueda.fuentes};
 }
@@ -302,11 +305,21 @@ async function buscarEnWeb(options){
  if(!result)return {texto:'No pude extraer una consulta válida para buscar en la web.',fuentes:[]};
  if(result.fuentes.length)return result;
  const fallback=await buscarWebMultiFuente(options.consulta,options);
- if(fallback.fuentes.length)return {texto:fallback.hechos.join('\n')+'\nSolo titulares/extractos: no se pudo leer el cuerpo de estos artículos.',fuentes:fallback.fuentes,proveedor:'rss-wikipedia',diagnostico:result.diagnostico};
+ if(fallback.fuentes.length){
+  const rows=fallback.fuentes.map(f=>({title:f.titulo,link:f.url,date:f.fecha}));
+  const checked=await require('./webSearchProviders').buildSearchResult(rows,{query:options.consulta,timeZone:options.timeZone||'America/Managua',now:Date.now(),provider:'rss-wikipedia',diagnostics:result.diagnostico});
+  if(checked)return checked;
+ }
  return result;
 }
 
+function respuestaSoloTitulares(result){
+ const escape=s=>String(s).replace(/[\\\[\]<>*_`]/g,'');
+ return 'Encontré estos titulares, pero no pude leer los artículos completos. No puedo confirmar detalles ni que los hechos ocurrieran ese día; las fechas indicadas son de publicación en la zona horaria local.\n\n'+result.fuentes.map(f=>`- ${escape(f.titulo)} — ${f.fechaLocal||'fecha no disponible'}${f.fechaAproximada?' (aproximada)':''}. [Fuente](<${f.url}>)`).join('\n');
+}
+
 module.exports = {
+  respuestaSoloTitulares,
   evaluarBusquedaAutomatica,
   obtenerDeCache,
   guardarEnCache,

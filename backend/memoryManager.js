@@ -20,9 +20,9 @@ const CATEGORIAS = ['personal', 'preferencia', 'proyecto', 'tecnico', 'temas'];
 // Contador de mensajes por usuario para saber cuándo toca extraer.
 const pendientes = new Map();
 
-// Modelo de Groq usado para extraer memorias (rápido y barato).
-const MODELO_EXTRACCION = 'openai/gpt-oss-20b';
-const MODELO_FALLBACK = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
+// Modelo de Gemini usado para extraer memorias (rápido y barato).
+const MODELO_EXTRACCION = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
+const MODELO_FALLBACK = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
 
 // ----------------------------------------------------------------------------
 // Utilidades
@@ -156,14 +156,14 @@ function notificarMensaje(userId, mensajesConversacion) {
   return safe;
 }
 
-// Pide a Groq que extraiga hechos y preferencias del usuario desde el historial
+// Pide a Gemini que extraiga hechos y preferencias del usuario desde el historial
 // y los guarda (cada uno pasa por addMemory, que ya evita duplicados).
 async function extractMemoriesFromConversation(userId, mensajesConversacion) {
   if (!pool || !userId || !Array.isArray(mensajesConversacion) || !mensajesConversacion.length) return [];
 
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    console.warn('AVISO: No hay GROQ_API_KEY, no se extraen memorias.');
+    console.warn('AVISO: No hay GEMINI_API_KEY, no se extraen memorias.');
     return [];
   }
 
@@ -197,14 +197,14 @@ Reglas:
 
   let respuestaIA;
   try {
-    respuestaIA = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    respuestaIA = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify(peticion)
-    });
+    },30000);
   } catch (e) {
     console.error('Error de red al extraer memorias:', e.message);
     return [];
@@ -216,7 +216,7 @@ Reglas:
       console.warn(`Modelo de extracción (${peticion.model}) no disponible (${respuestaIA.status}); reintentando con ${MODELO_FALLBACK}.`);
       peticion.model = MODELO_FALLBACK;
       try {
-        respuestaIA = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        respuestaIA = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -229,11 +229,11 @@ Reglas:
         return [];
       }
       if (!respuestaIA.ok) {
-        console.error('Error de Groq al extraer memorias:', await respuestaIA.text());
+        console.error('Error de Gemini al extraer memorias:', await respuestaIA.text());
         return [];
       }
     } else {
-      console.error('Error de Groq al extraer memorias:', await respuestaIA.text());
+      console.error('Error de Gemini al extraer memorias:', await respuestaIA.text());
       return [];
     }
   }

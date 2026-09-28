@@ -1,0 +1,610 @@
+{
+  "started": "2026-09-28T23:26:55.514Z",
+  "httpStatus": 200,
+  "bytes": 83108,
+  "sha256": "e0698bf2173d2fb4b8e5e65eb039509951d2ab0086c0996229040d2c624627c2",
+  "results": 100,
+  "withDate": 100,
+  "dates": [
+    {
+      "path": "$.news_results.0",
+      "title": "Curazao vs Nicaragua: resumen, goles y resultado del partido de la Concacaf Nations League 2026",
+      "date": "09/28/2026, 01:53 AM, +0000 UTC",
+      "iso_date": "2026-09-28T01:53:04Z"
+    },
+    {
+      "path": "$.news_results.1",
+      "title": "Nicaragua: Muerte de Brooklyn Rivera bajo custodia estatal debe ser investigada con prontitud y de manera efectiva e independiente",
+      "date": "06/01/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-01T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.2",
+      "title": "EE.UU. advierte a Daniel Ortega que no se quedará \"de brazos cruzados\" ante el anuncio de que no habrá más elecciones en Nicaragua",
+      "date": "07/21/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-21T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.3",
+      "title": "Curazao destrozó a Nicaragua y la deja agonizando en la Nations League",
+      "date": "09/28/2026, 01:50 AM, +0000 UTC",
+      "iso_date": "2026-09-28T01:50:57Z"
+    },
+    {
+      "path": "$.news_results.4",
+      "title": "Clima hoy en Managua, Nicaragua: el pronóstico del tiempo para este lunes 28 septiembre de 2026",
+      "date": "09/28/2026, 03:35 AM, +0000 UTC",
+      "iso_date": "2026-09-28T03:35:25Z"
+    },
+    {
+      "path": "$.news_results.5",
+      "title": "Estadísticas de Curazao vs Nicaragua: remates, posesión y goles esperados",
+      "date": "09/28/2026, 05:14 AM, +0000 UTC",
+      "iso_date": "2026-09-28T05:14:14Z"
+    },
+    {
+      "path": "$.news_results.6",
+      "title": "Estrecho de Ormuz, lluvia negra, Nicaragua, satélites... Las noticias del martes",
+      "date": "03/10/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-03-10T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.7",
+      "title": "Nicaragua: el oro que sostiene al régimen y lo aísla del mundo",
+      "date": "08/25/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-08-25T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.8",
+      "title": "Cómo funciona la red trasnacional de espionaje y acoso a opositores del gobierno de Ortega y Murillo en Nicaragua, según la ONU",
+      "date": "03/20/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-03-20T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.9",
+      "title": "Nicaragua celebra 47 años de la Revolución Sandinista",
+      "date": "07/19/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-19T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.10",
+      "title": "Dólar hoy en Nicaragua: precio y cotización de la divisa este domingo 27 de septiembre de 2026",
+      "date": "09/27/2026, 10:40 AM, +0000 UTC",
+      "iso_date": "2026-09-27T10:40:10Z"
+    },
+    {
+      "path": "$.news_results.11",
+      "title": "La mala noticia que le dio EE. UU. a Daniel Ortega tras anunciar que eliminará las elecciones en Nicaragua",
+      "date": "07/21/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-21T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.12",
+      "title": "Las noticias más relevantes de Nicaragua (17 al 23 de mayo)",
+      "date": "05/23/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-23T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.13",
+      "title": "Qué queda de la oposición dentro de Nicaragua y por qué Daniel Ortega quiere abolir las elecciones",
+      "date": "07/24/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-24T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.14",
+      "title": "Nicaragua expresa solidaridad a pueblo colombiano tras fuerte sismo",
+      "date": "08/10/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-08-10T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.15",
+      "title": "Huracán Melissa, Nicaragua, Sudán, Gaza… Las noticias del jueves",
+      "date": "10/30/2025, 07:00 AM, +0000 UTC",
+      "iso_date": "2025-10-30T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.16",
+      "title": "Euro hoy en Nicaragua: precio y cotización de la divisa este domingo 27 de septiembre de 2026",
+      "date": "09/27/2026, 10:45 AM, +0000 UTC",
+      "iso_date": "2026-09-27T10:45:10Z"
+    },
+    {
+      "path": "$.news_results.17",
+      "title": "Liberan decenas de presos políticos en Nicaragua, en aparente respuesta a solicitud de EE.UU.",
+      "date": "01/10/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-01-10T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.18",
+      "title": "Cubanos residentes en Nicaragua condenan ataque de EE.UU. a Venezuela",
+      "date": "01/03/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-01-03T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.19",
+      "title": "\"Ha entrado en una fase de paranoia\": cuál está siendo la reacción del gobierno de Ortega y Murillo en Nicaragua a la captura de Maduro",
+      "date": "01/19/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-01-19T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.20",
+      "title": "Nicaragua condena todas formas de guerra y clama por la paz",
+      "date": "03/01/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-03-01T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.21",
+      "title": "Nicaragua: Expertos de la ONU instan a la comunidad internacional a pasar de la observación a la acción",
+      "date": "10/30/2025, 07:00 AM, +0000 UTC",
+      "iso_date": "2025-10-30T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.22",
+      "title": "Conmemoran en Nicaragua aniversario 73 del asalto al Moncada",
+      "date": "07/26/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-07-26T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.23",
+      "title": "El Arzobispo de Miami y el subsecretario de Estado de EE.UU., preocupados por la Iglesia en Nicaragua en Semana Santa",
+      "date": "03/31/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-03-31T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.24",
+      "title": "Copresidentes de Nicaragua condenan agresión militar contra Venezuela",
+      "date": "01/03/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-01-03T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.25",
+      "title": "Obispo Báez de Nicaragua: Los “ladrones y bandidos” de hoy son los poderosos que roban la libertad",
+      "date": "04/27/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-27T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.26",
+      "title": "Estas son las noticias más importantes de Nicaragua para este 22 de abril",
+      "date": "04/22/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-22T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.27",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 22 de mayo",
+      "date": "05/22/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-22T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.28",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 18 de mayo",
+      "date": "05/18/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-18T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.29",
+      "title": "Daniel Ortega no dijo que estaba destruyendo la prensa libre, dijo que estaba combatiendo la desinformación",
+      "date": "08/12/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-08-12T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.30",
+      "title": "Diario La Prensa de Nicaragua cumple 100 años con su redacción en el exilio",
+      "date": "03/02/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-03-02T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.31",
+      "title": "La dictadura de Daniel Ortega consolida a Nicaragua como “la Corea del Norte” de las Américas",
+      "date": "04/11/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-11T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.32",
+      "title": "Hoy las reinas del Caribe se enfrentan a Nicaragua",
+      "date": "09/11/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-09-11T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.33",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 03 de Junio",
+      "date": "06/03/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-03T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.34",
+      "title": "Nicaragua aprueba ingreso y salida de tropas para cooperación",
+      "date": "05/29/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-29T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.35",
+      "title": "Senado ruso ratifica acuerdo de cooperación militar con Nicaragua",
+      "date": "04/29/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-29T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.36",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 25 de mayo",
+      "date": "05/25/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-25T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.37",
+      "title": "Nicaragua libera presos políticos en el 19 aniversario del Gobierno en medio de la presión de EE.UU.",
+      "date": "01/11/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-01-11T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.38",
+      "title": "Cubanos en Nicaragua instan a redoblar solidaridad con la isla",
+      "date": "02/05/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-02-05T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.39",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 14 de mayo",
+      "date": "05/14/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-14T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.40",
+      "title": "Resumen de las noticias principales del 17 de Marzo",
+      "date": "03/17/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-03-17T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.41",
+      "title": "Partidos de hoy, lunes 15 de junio, en la Copa Mundial 2026: ¿a qué hora son y dónde verlos en Nicaragua?",
+      "date": "06/15/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-15T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.42",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 05 de Junio",
+      "date": "06/05/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-05T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.43",
+      "title": "Leones en vilo: Nicaragua espera su milagro en Caracas",
+      "date": "02/11/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-02-11T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.44",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 04 de Junio",
+      "date": "06/04/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-04T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.45",
+      "title": "Estas son las noticias más importantes de Nicaragua para este 21de abril",
+      "date": "04/21/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-21T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.46",
+      "title": "Gobierno habría facilitado residencia en Nicaragua a Carlos Ramón González, hoy prófugo; Petro lo niega",
+      "date": "08/14/2025, 07:00 AM, +0000 UTC",
+      "iso_date": "2025-08-14T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.47",
+      "title": "Nicaragua libera “decenas” de presos tras presión de EE.UU.: Lo de Venezuela desató “el temor en la tiranía”",
+      "date": "01/10/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-01-10T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.48",
+      "title": "Diputados destacan avances de Nicaragua en importantes sectores",
+      "date": "01/13/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-01-13T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.49",
+      "title": "Fuerte temblor de magnitud 5,2 sacudió Nicaragua en la mañana de este 26 de junio",
+      "date": "06/26/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-26T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.50",
+      "title": "Estas son las noticias más importantes de Nicaragua para este 05 de Mayo",
+      "date": "05/05/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-05T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.51",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 01 de Junio",
+      "date": "06/01/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-01T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.52",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 28 de mayo",
+      "date": "05/28/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-28T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.53",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 27 de mayo",
+      "date": "05/27/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-27T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.54",
+      "title": "Estas son las noticias más importantes de Nicaragua",
+      "date": "04/10/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-10T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.55",
+      "title": "Estas son las noticias más importantes de Nicaragua para este 08 de Mayo",
+      "date": "05/08/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-08T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.56",
+      "title": "Estas son las noticias más importantes de Nicaragua para este 29 de abril",
+      "date": "04/29/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-29T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.57",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 20 de mayo",
+      "date": "05/20/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-20T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.58",
+      "title": "Te presentamos las noticias más relevantes de Nicaragua hoy, 20 de febrero",
+      "date": "02/20/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-02-20T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.59",
+      "title": "Estas son las noticias más importantes de Nicaragua para este 06 de Mayo",
+      "date": "05/06/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-06T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.60",
+      "title": "Estas son las noticias más importantes de Nicaragua este Martes 07 de abril de 2026",
+      "date": "04/08/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-08T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.61",
+      "title": "Resumen de las noticias principales del 26 de Febrero",
+      "date": "02/26/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-02-26T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.62",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 21 de mayo",
+      "date": "05/21/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-21T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.63",
+      "title": "Nicaragua ratificó hermandad y solidaridad con Venezuela",
+      "date": "12/11/2025, 08:00 AM, +0000 UTC",
+      "iso_date": "2025-12-11T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.64",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 02 de Junio",
+      "date": "06/02/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-02T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.65",
+      "title": "Las noticias más destacadas de Nicaragua esta semana (5 al 10 de abril)",
+      "date": "04/11/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-11T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.66",
+      "title": "Resumen de las noticias principales del 16 de Marzo",
+      "date": "03/16/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-03-16T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.67",
+      "title": "Estas son las noticias más importantes de Nicaragua este Miércoles 08 de abril de 2026",
+      "date": "04/09/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-09T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.68",
+      "title": "Estas son las noticias más importantes de Nicaragua para este 11 de Mayo",
+      "date": "05/11/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-11T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.69",
+      "title": "Estas son las noticias más importantes de Nicaragua para este 30 de abril",
+      "date": "04/30/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-30T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.70",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 15 de mayo",
+      "date": "05/15/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-15T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.71",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 13 de mayo",
+      "date": "05/13/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-13T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.72",
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 19 de mayo",
+      "date": "05/19/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-19T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.73",
+      "title": "Se registra sismo de 5.9 en Nicaragua",
+      "date": "08/12/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-08-12T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.74",
+      "title": "Estas son las noticias más importantes de Nicaragua para este 04 de Mayo",
+      "date": "05/04/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-04T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.75",
+      "title": "Estas son las noticias más importantes de Nicaragua para este 17 de abril",
+      "date": "04/17/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-17T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.76",
+      "title": "Estas son las noticias más importantes de Nicaragua para este 23 de abril",
+      "date": "04/23/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-23T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.77",
+      "title": "Nicaragua abandona la Unesco en protesta por el premio al diario 'La Prensa'",
+      "date": "05/04/2025, 07:00 AM, +0000 UTC",
+      "iso_date": "2025-05-04T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.78",
+      "title": "EE. UU. destaca el testimonio de LA PRENSA y todo su equipo para informar a Nicaragua",
+      "date": "03/02/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-03-02T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.79",
+      "title": "Estas son las noticias más importantes de Nicaragua para este 16 de abril",
+      "date": "04/16/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-16T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.80",
+      "title": "Clima en Nicaragua: pronóstico del tiempo para este miércoles 5 de agosto",
+      "date": "08/05/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-08-05T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.81",
+      "title": "Estas con las noticias más importantes de Nicaragua",
+      "date": "04/13/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-13T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.82",
+      "title": "Estas son las noticias más importantes de Nicaragua para este 27 de abril",
+      "date": "04/27/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-27T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.83",
+      "title": "Nicaragua autoritaria: el modelo que alarma al mundo hoy - La Verdad Noticias",
+      "date": "04/11/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-04-11T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.84",
+      "title": "Estas son las noticias más importantes de Nicaragua para este 07 de Mayo",
+      "date": "05/07/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-05-07T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.85",
+      "title": "Nicaragua proyecta más de 300 megavatios con energía renovable",
+      "date": "02/03/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-02-03T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.86",
+      "title": "Canales TV para mirar juego de Venezuela vs. Nicaragua EN VIVO GRATIS por el Clásico Mundial de Béisbol",
+      "date": "03/09/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-03-09T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.87",
+      "title": "Hoy por hoy: No olvidemos a Nicaragua del 25 de junio de 2026",
+      "date": "06/25/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-25T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.88",
+      "title": "Nicaragua cierra 2025 con avance récord en infraestructura vial",
+      "date": "12/26/2025, 08:00 AM, +0000 UTC",
+      "iso_date": "2025-12-26T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.89",
+      "title": "Nicaragua: ‘Si la libertad de prensa se apaga, quedamos todos a oscuras’, dice director de La Prensa",
+      "date": "05/03/2025, 07:00 AM, +0000 UTC",
+      "iso_date": "2025-05-03T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.90",
+      "title": "Sismo de magnitud 5,5 sacude El Salvador, Honduras y Nicaragua sin provocar daños",
+      "date": "08/12/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-08-12T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.91",
+      "title": "La Prensa (Nicaragua) gana el Premio Mundial a la Libertad de Prensa",
+      "date": "05/04/2025, 07:00 AM, +0000 UTC",
+      "iso_date": "2025-05-04T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.92",
+      "title": "Visas consultadas para Nicaragua podrán solicitarse en línea",
+      "date": "02/08/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-02-08T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.93",
+      "title": "Ascenso y caída de Bayardo Arce, el antiguo amigo hoy prisionero de Rosario Murillo",
+      "date": "11/16/2025, 08:00 AM, +0000 UTC",
+      "iso_date": "2025-11-16T08:00:00Z"
+    },
+    {
+      "path": "$.news_results.94",
+      "title": "Clima en Nicaragua: pronóstico del tiempo para este martes 4 de agosto",
+      "date": "08/04/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-08-04T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.95",
+      "title": "Clima en Nicaragua: semana calurosa con hasta 38 grados",
+      "date": "06/29/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-29T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.96",
+      "title": "Euro: cotización de apertura hoy 14 de octubre en Nicaragua",
+      "date": "10/14/2025, 07:00 AM, +0000 UTC",
+      "iso_date": "2025-10-14T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.97",
+      "title": "Nicaragua, el país del silencio",
+      "date": "06/24/2024, 07:00 AM, +0000 UTC",
+      "iso_date": "2024-06-24T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.98",
+      "title": "Dos ondas tropicales ingresarán al país y traerán lluvias esta semana",
+      "date": "06/01/2026, 07:00 AM, +0000 UTC",
+      "iso_date": "2026-06-01T07:00:00Z"
+    },
+    {
+      "path": "$.news_results.99",
+      "title": "Gaza, Siria, trata de personas, Nicaragua... Las noticias del miércoles",
+      "date": "12/11/2024, 08:00 AM, +0000 UTC",
+      "iso_date": "2024-12-11T08:00:00Z"
+    }
+  ]
+}

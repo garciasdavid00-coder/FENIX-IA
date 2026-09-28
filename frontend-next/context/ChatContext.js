@@ -80,7 +80,9 @@ export function ChatProvider({ children }) {
     setTema(temaGuardado);
     document.documentElement.setAttribute('data-theme', temaGuardado);
 
-    const modeloGuardado = localStorage.getItem('fenixModelo') || 'auto';
+    const almacenado = localStorage.getItem('fenixModelo');
+    const modeloGuardado = ['auto','gemini','deepseek'].includes(almacenado) ? almacenado : 'auto';
+    localStorage.setItem('fenixModelo',modeloGuardado);
     setModeloSeleccionado(modeloGuardado);
 
     const busquedaGuardada = localStorage.getItem('fenixBusquedaWeb') || 'auto';

@@ -1,0 +1,291 @@
+[
+  {
+    "file": "AGENTS.md",
+    "lines": [
+      23
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "AGENTS.md.txt",
+    "lines": [
+      23
+    ],
+    "kind": "log/documento"
+  },
+  {
+    "file": "backend/chatEngine.js",
+    "lines": [
+      115,
+      160,
+      168,
+      169,
+      173,
+      174,
+      175,
+      182
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "backend/memoryManager.js",
+    "lines": [
+      23,
+      25,
+      159,
+      164,
+      166,
+      200,
+      219,
+      232,
+      236
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "backend/moderationMiddleware.js",
+    "lines": [
+      108
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "backend/webSearch.js",
+    "lines": [
+      6,
+      72,
+      74,
+      76,
+      206
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "BUSQUEDA_WEB_VERIFICACION.md",
+    "lines": [
+      22
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "frontend-next/components/SettingsView.js",
+    "lines": [
+      136
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "frontend-next/components/Topbar.js",
+    "lines": [
+      10
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "legacy/index.html",
+    "lines": [
+      282
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "legacy/script.js",
+    "lines": [
+      2769,
+      2772,
+      2792
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "modelRouter.js",
+    "lines": [
+      30,
+      51,
+      53,
+      54,
+      64,
+      70,
+      88
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "package-lock.json",
+    "lines": [
+      1529
+    ],
+    "kind": "coincidencia en hash"
+  },
+  {
+    "file": "render.yaml",
+    "lines": [
+      13
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "REPARACION_FENIX.md",
+    "lines": [
+      14
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "routerRules.js",
+    "lines": [
+      6,
+      8
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "server.js",
+    "lines": [
+      37,
+      65,
+      66,
+      67,
+      479,
+      725,
+      770,
+      772,
+      774,
+      775,
+      1017,
+      1021,
+      1024
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "server_err_final.txt",
+    "lines": [
+      1
+    ],
+    "kind": "log/documento"
+  },
+  {
+    "file": "server_out.txt",
+    "lines": [
+      6,
+      10
+    ],
+    "kind": "log/documento"
+  },
+  {
+    "file": "server_out_bugs.txt",
+    "lines": [
+      8,
+      14
+    ],
+    "kind": "log/documento"
+  },
+  {
+    "file": "server_out_context.txt",
+    "lines": [
+      7
+    ],
+    "kind": "log/documento"
+  },
+  {
+    "file": "server_out_final.txt",
+    "lines": [
+      8
+    ],
+    "kind": "log/documento"
+  },
+  {
+    "file": "server_out_mem.txt",
+    "lines": [
+      12
+    ],
+    "kind": "log/documento"
+  },
+  {
+    "file": "server_out_mem2.txt",
+    "lines": [
+      12
+    ],
+    "kind": "log/documento"
+  },
+  {
+    "file": "server_out_serpapi.txt",
+    "lines": [
+      8
+    ],
+    "kind": "log/documento"
+  },
+  {
+    "file": "tests/capture-date-evidence.cjs",
+    "lines": [
+      11
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "tests/regression.test.js",
+    "lines": [
+      76
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "tests/web-live-check.cjs",
+    "lines": [
+      1,
+      14,
+      22
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "tests/web-search.test.js",
+    "lines": [
+      70
+    ],
+    "kind": "código/configuración/documento"
+  },
+  {
+    "file": "verification/dates/final/03-model-raw.json",
+    "lines": [
+      1
+    ],
+    "kind": "evidencia histórica"
+  },
+  {
+    "file": "temp_webSearch.js",
+    "lines": [
+      6,
+      88,
+      90,
+      211,
+      375,
+      402,
+      403,
+      405,
+      406,
+      407,
+      412,
+      413,
+      414,
+      416,
+      417
+    ],
+    "kind": "copia temporal, no se encontraron imports"
+  },
+  {
+    "file": ".env",
+    "lines": [
+      2
+    ],
+    "kind": "GROQ_API_KEY, valor oculto"
+  },
+  {
+    "file": ".env.example",
+    "lines": [
+      11
+    ],
+    "kind": "ejemplo GROQ_API_KEY"
+  }
+]

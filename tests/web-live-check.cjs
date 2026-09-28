@@ -1,4 +1,4 @@
-// Opt-in integration: real search and Groq, isolated authentication/database.
+// Opt-in integration: real search and Gemini, isolated authentication/database.
 require('dotenv').config({quiet:true});
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const assert=require('node:assert/strict');
@@ -11,7 +11,7 @@ const root=path.resolve(__dirname,'..'),req=createRequire(path.join(root,'server
  vm.runInNewContext(fs.readFileSync(path.join(root,'server.js'),'utf8'),c);
  const server=c.module.exports.app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));
  try{
-  const r=await fetch('http://127.0.0.1:'+server.address().port+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(90000),body:JSON.stringify({mensaje:'Resume las noticias de Nicaragua hoy, con fecha y enlaces a las fuentes. Distingue artículos leídos de titulares.',webSearch:'on',modelo:'groq',chatId:'123',timeZone:'America/Managua'})});
+  const r=await fetch('http://127.0.0.1:'+server.address().port+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(90000),body:JSON.stringify({mensaje:'Resume las noticias de Nicaragua hoy, con fecha y enlaces a las fuentes. Distingue artículos leídos de titulares.',webSearch:'on',modelo:'gemini',chatId:'123',timeZone:'America/Managua'})});
   const raw=await r.text();const events=raw.split('\n').filter(l=>l.startsWith('data: ')&&!l.includes('[DONE]')).map(l=>JSON.parse(l.slice(6)));
   const sources=events.find(e=>e.tipo==='fuentes')?.fuentes||[];
   const text=events.map(e=>e.texto||'').join('');
@@ -19,6 +19,6 @@ const root=path.resolve(__dirname,'..'),req=createRequire(path.join(root,'server
   fs.mkdirSync(path.join(root,'verification'),{recursive:true});fs.writeFileSync(path.join(root,'verification/web-live-chat.json'),JSON.stringify(evidence,null,2));
   console.log(JSON.stringify(evidence,null,2));
   assert.equal(r.status,200);assert.equal(evidence.errors.length,0);assert.ok(sources.length>0);assert.ok(sources.some(s=>s.contenido==='articulo'));assert.ok(text.length>100);assert.ok(sources.some(s=>text.includes(s.url)),'Response must cite a retrieved source');
-  console.log('PASS real /api/chat search + Groq SSE: dated sources, downloaded article text and linked answer. Auth/DB isolated; no production writes.');
+  console.log('PASS real /api/chat search + Gemini SSE: dated sources, downloaded article text and linked answer. Auth/DB isolated; no production writes.');
  }finally{await new Promise(r=>server.close(r))}
 })().catch(e=>{console.error(e.message);process.exitCode=1});

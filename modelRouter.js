@@ -27,7 +27,7 @@ function esRazonamientoLargo(texto, palabras){
  * Elige qué modelo debe responder.
  * @param {string} userMessage - mensaje actual del usuario
  * @param {Array} conversationHistory - historial previo (opcional)
- * @returns {'groq'|'gemini'|'deepseek'}
+ * @returns {'gemini'|'deepseek'}
  */
 function selectModel(userMessage, conversationHistory){
   const msg = (userMessage || '').trim();
@@ -48,10 +48,10 @@ function selectModel(userMessage, conversationHistory){
     return 'gemini';
   }
 
-  // Regla 2: corto y casual → Groq (baja latencia)
+  // Regla 2: corto y casual → Gemini (baja latencia)
   if (palabras <= reglas.shortMaxWords){
-    console.log(`[Router] → groq (regla 2: mensaje corto)`);
-    return 'groq';
+    console.log(`[Router] → gemini (regla 2: mensaje corto)`);
+    return 'gemini';
   }
 
   // Regla 4: default configurable
@@ -61,13 +61,13 @@ function selectModel(userMessage, conversationHistory){
 
 /**
  * Formatea el system prompt y la conversación según los requerimientos de cada proveedor:
- * - Groq y DeepSeek (compatibles con OpenAI): como mensaje con role: "system" al inicio de messages.
+ * - Gemini y DeepSeek (compatibles con OpenAI): como mensaje con role: "system" al inicio de messages.
  * - Gemini:
  *     - Para API compatible con OpenAI: role: "system" al inicio de messages.
  *     - Para API nativa / Gemini Live: systemInstruction separado de contents (sin role "system" dentro de contents).
  *
  * @param {Object} params
- * @param {'groq'|'gemini'|'deepseek'|string} params.proveedor
+ * @param {'gemini'|'deepseek'|string} params.proveedor
  * @param {string} params.sistemaFinal - prompt de sistema ya ensamblado
  * @param {Array} [params.historial=[]]
  * @param {string} params.mensaje
@@ -85,7 +85,7 @@ function formatearMensajesParaProveedor({ proveedor, sistemaFinal, historial = [
     ];
   }
 
-  // Formato OpenAI (Groq, DeepSeek y Google OpenAI-compatible endpoint):
+  // Formato OpenAI (DeepSeek y Google OpenAI-compatible endpoint):
   const messagesOpenAI = [
     { role: 'system', content: sistemaFinal },
     ...base,

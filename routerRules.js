@@ -3,9 +3,9 @@
 
 module.exports = {
   // Regla 4: modelo por defecto si ninguna regla aplica
-  defaultModel: 'groq',
+  defaultModel: 'gemini',
 
-  // Regla 2: palabras máximas para considerar "mensaje corto/casual" → groq
+  // Regla 2: palabras máximas para considerar "mensaje corto/casual" → gemini
   shortMaxWords: 30,
 
   // Regla 3: palabras mínimas para considerar "texto extenso" → gemini

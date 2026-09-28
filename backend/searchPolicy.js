@@ -12,7 +12,7 @@ function searchPlan(query,timeZone='America/Managua',now=Date.now()){
  const news=/\b(noticias?|news|actualidad|titulares)\b/i.test(q);
  // Relative words are date constraints, not keywords. Preserve names such as El Salvador.
  let terms=q.replace(/\b(hoy|today|ayer|yesterday|esta semana|this week|[uú]ltimos 7 d[ií]as)\b/gi,'').trim();
- if(news)terms=terms.replace(/\b(noticias?|news|titulares)\b/gi,'').replace(/^\s*(de|sobre|en|from|about)\s+/i,'').trim();
+ if(news)terms=terms.replace(/\b(?:dime|dame|resume|busca|cuéntame|noticias?|news|titulares|que pasaron|que ocurrieron|el d[ií]a de|del d[ií]a|las)\b/gi,' ').replace(/\s+/g,' ').replace(/^\s*(?:(?:de|sobre|en|from|about)\s+)+/i,'').trim();
  if(!terms)terms=regionFor(q,timeZone)==='ni'?'Nicaragua':q;
  const dated=start?`${terms} after:${shiftDay(start,-1)} before:${shiftDay(end,1)}`:terms;
  const american=d=>{const [y,m,day]=d.split('-');return `${Number(m)}/${Number(day)}/${y}`};
@@ -38,6 +38,15 @@ function isFresh(item,query,timeZone='America/Managua',now=Date.now()){
  const plan=searchPlan(query,timeZone,now);
  if(!plan.start)return true;
  if(!date)return false;
+ // Relative ages are estimates, not exact publication dates for a daily bulletin.
+ if(temporalMetadata(item,timeZone,now).fecha_aproximada)return false;
+ // Prefer excluding contradictory evidence to treating relative provider times as proof.
+ const urlDay=String(item.link||item.url||'').match(/\/(20\d{2})\/(\d{2})\/(\d{2})(?:\/|\b)/);
+ const titleDay=String(item.title||'').match(/\b(\d{1,2})\s+(?:de\s+)?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+(?:de\s+)?(20\d{2})\b/i);
+ const months=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+ const numericDay=String(item.title||'').match(/\b(\d{2})[./-](\d{2})[./-](20\d{2})\b/);
+ const explicitDays=[numericDay?`${numericDay[3]}-${numericDay[2]}-${numericDay[1]}`:null,urlDay?`${urlDay[1]}-${urlDay[2]}-${urlDay[3]}`:null,titleDay?`${titleDay[3]}-${String(months.indexOf(titleDay[2].toLowerCase())+1).padStart(2,'0')}-${titleDay[1].padStart(2,'0')}`:null].filter(Boolean);
+ if(explicitDays.some(day=>day<plan.start||day>plan.end))return false;
  // A date without a clock is a calendar date, not midnight UTC in the user's zone.
  const raw=item.iso_date || item.published_date || item.publishedDate || item.date;
  const day=/^\d{4}-\d{2}-\d{2}$/.test(String(raw))?String(raw):dayInZone(date,timeZone);
@@ -58,4 +67,17 @@ function articleText(html,url,expectedTitle=''){
   return text.slice(0,6000);
  }finally{dom.window.close()}
 }
-module.exports={regionFor,publicationDate,isFresh,articleText,searchPlan};
+function localPublicationDay(item,timeZone='America/Managua',now=Date.now()){
+ const raw=item.iso_date || item.published_date || item.publishedDate || item.date;
+ const date=publicationDate(item,now);
+ return /^\d{4}-\d{2}-\d{2}$/.test(String(raw))?String(raw):date?dayInZone(date,timeZone):null;
+}
+function temporalMetadata(item,timeZone='America/Managua',now=Date.now()){
+ const raw=item.iso_date||item.published_date||item.publishedDate||item.date||null;
+ const date=publicationDate(item,now);
+ const approximate=!!raw&&/\d+\s*(minute|minuto|hour|hora|day|dia|día|week|semana)/i.test(String(raw));
+ const age=date?(now-date.getTime())/3600000:null;
+ return {fecha_original:raw,fecha_publicacion:date?.toISOString()||null,fecha_local:localPublicationDay(item,timeZone,now),zona_horaria:timeZone,fecha_aproximada:approximate,fecha_desconocida:!date,no_reciente:age===null?null:age>48,antiguedad_horas:age,fecha_evento:null,fecha_evento_verificada:false};
+}
+const TEMPORAL_RULE='REGLA DURA DE FECHAS: Nunca digas que algo pasó hoy o ayer a menos que el campo de fecha del resultado lo confirme exactamente. Si no_reciente es true, DEBES decir su fecha real explícitamente, nunca omitirla ni presentarlo como actual. fecha_publicacion confirma solamente la publicación: NO confirma cuándo ocurrió ni cuándo ocurrirá el evento. Si fecha_evento_verificada es false, no atribuyas el evento a hoy o ayer ni conviertas votaciones pasadas o anuncios en actos de hoy. Una fecha desconocida o aproximada no confirma un día exacto.';
+module.exports={regionFor,publicationDate,isFresh,articleText,searchPlan,localPublicationDay,temporalMetadata,TEMPORAL_RULE};

@@ -81,7 +81,9 @@ function armarSistema({ lang = 'español', instruccion, memoriaContexto = '', ca
   const offsetString = formatterOffset.formatToParts(ahora).find(p => p.type === 'timeZoneName').value; // ej: "GMT-6"
   const utcString = ahora.toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
 
-  sistemaBase += `\n\n-----\n## Contexto temporal\nLa fecha y hora actual del usuario es: ${fechaHoraActual}. (Zona horaria: ${timeZone}, Desfase: ${offsetString}).\nLa hora global actual es: ${utcString}.\nÚsalo como referencia temporal absoluta. NO derives fechas futuras para noticias. Los eventos que coinciden con las noticias provistas ya ocurrieron o están ocurriendo.`;
+  sistemaBase += `\n\n-----\n## Contexto temporal\nLa fecha y hora actual del usuario es: ${fechaHoraActual}. (Zona horaria: ${timeZone}, Desfase: ${offsetString}).\nLa hora global actual es: ${utcString}.\nÚsalo como referencia temporal absoluta. No deduzcas fechas de eventos a partir de la fecha de publicación de una noticia.`;
+
+  sistemaBase += '\n\n' + require('./searchPolicy').TEMPORAL_RULE;
 
   // 4. CAPACIDADES OPERATIVAS DEL CANAL
   const canalNorm = String(canal || '').toLowerCase();
@@ -110,7 +112,7 @@ Reglas de la consulta:
 // ------------------------------------------------------------
 // Armado del array de mensajes para la API del proveedor
 // ------------------------------------------------------------
-function construirMensajes({ mensaje, historial, sistemaFinal, proveedor = 'groq', imagenBase64 }) {
+function construirMensajes({ mensaje, historial, sistemaFinal, proveedor = 'gemini', imagenBase64 }) {
   const base = Array.isArray(historial) ? historial : [];
   const formateado = formatearMensajesParaProveedor({
     proveedor,
@@ -155,7 +157,7 @@ function configurarProveedor(proveedor) {
       throw Object.assign(new Error('Gemini no está configurado en el servidor todavía.'), { claveError: true, status: 400 });
     }
     // Google ofrece un endpoint compatible con el formato de OpenAI, así que
-    // funciona con la misma estructura de petición que Groq y DeepSeek.
+    // funciona con la misma estructura de petición que otros proveedores compatibles.
     return {
       url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
       apiKey: process.env.GEMINI_API_KEY,
@@ -163,21 +165,13 @@ function configurarProveedor(proveedor) {
     };
   }
 
-  if (!process.env.GROQ_API_KEY) {
-    throw Object.assign(new Error('Groq no está configurado en el servidor (falta GROQ_API_KEY en variables de entorno).'), { claveError: true, status: 400 });
-  }
-
-  return {
-    url: 'https://api.groq.com/openai/v1/chat/completions',
-    apiKey: process.env.GROQ_API_KEY,
-    modeloIA: process.env.GROQ_MODEL || 'qwen/qwen3.8-27b'
-  };
+  throw Object.assign(new Error('Proveedor no compatible: '+proveedor),{status:400});
 }
 
 // Cuerpo de la petición al proveedor. stream=true para el navegador
 // (con respuestas parciales) y stream=false para WhatsApp (texto completo).
 function crearCuerpoIA({ modeloIA, mensajes, stream, proveedor, maxTokens = 4096 }) {
-  const limiteTokens = proveedor === 'groq' ? Math.min(maxTokens, 800) : maxTokens;
+  const limiteTokens = maxTokens;
   const cuerpo = {
     model: modeloIA,
     messages: mensajes,

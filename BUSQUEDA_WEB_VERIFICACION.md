@@ -35,3 +35,13 @@ Verificado el 26 de septiembre de 2026, zona America/Managua. Cambios locales, s
 - [SerpApi Google News](https://serpapi.com/google-news-api): consulta y estructura highlight/stories.
 - [SerpApi Search API](https://serpapi.com/search-api): filtros avanzados tbs.
 - [Tavily Search](https://docs.tavily.com/documentation/api-reference/endpoint/search): fechas, autenticación y metadatos.
+
+## Calidad de búsqueda — 28 septiembre 2026
+
+Se separaron frases conversacionales del tema, se conserva la consulta explícita de noticias sin reescritura del modelo y se presenta la fecha local de publicación junto al período solicitado. Se excluyen contradicciones de fecha en URL/titular, patrones de spam, títulos repetidos y exceso de deportes en noticias generales. La detección de spam y similitud es heurística, no una garantía universal.
+
+Se prueban fuentes alternativas cuando solo hay titulares. El chat devuelve una lista limitada sin generación adicional cuando no pudo leer más que titulares. El fallback RSS pasa por los mismos filtros y extracción.
+
+Verificación: 47 tests aprobados, 0 fallidos, ejecutando node --test --test-isolation=none tests/web-search.test.js tests/regression.test.js tests/session-store.test.js. La prueba real tests/search-quality-live.cjs recuperó, en su última ejecución, un artículo y un extracto con fecha local 2026-09-27. También se observó un timeout intermitente del proveedor alternativo en una ejecución anterior. Las fechas relativas del proveedor siguen siendo aproximadas y las fechas de publicación no prueban las fechas de los hechos. DeepSeek no se modificó.
+
+Comprobación final: el endpoint local devolvió HTTP 200 con fuentes y enlaces, pero el modelo mezclaba titulares no leídos con el artículo disponible. Se restringió por código el contexto a artículos/extractos cuando existen; los titulares quedan únicamente para la respuesta limitada sin generación. Las 17 pruebas de búsqueda pasaron de nuevo tras ese ajuste. Queda registrado un fallo intermitente HTTP 500 por timeout de PostgreSQL en la comprobación con cookie: no se considera resuelto por los cambios de búsqueda. La generación no ofrece garantía absoluta sobre cada afirmación o enlace; los enlaces originales se conservan en la lista de fuentes.

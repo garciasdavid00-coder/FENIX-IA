@@ -2766,10 +2766,10 @@ function filtrarRecientes(){
 /* ======================
    SELECTOR DE MODELO DE IA
 ====================== */
-let modeloSeleccionado = 'groq';
+let modeloSeleccionado = 'gemini';
 
 function nombreModelo(m){
-  const map = { groq: 'Fenix 2.0', deepseek: 'DeepSeek', gemini: 'Gemini', auto: t('modelo.auto') };
+  const map = { deepseek: 'DeepSeek', gemini: 'Gemini', auto: t('modelo.auto') };
   return map[m] || m;
 }
 
@@ -2789,7 +2789,6 @@ function toggleMenuModelo(e){
 
   menu.innerHTML = `
     <div class="dropdown-item" data-modelo="auto">${t('modelo.auto')}</div>
-    <div class="dropdown-item" data-modelo="groq">Fenix 2.0</div>
     <div class="dropdown-item" data-modelo="gemini">Gemini</div>
     <div class="dropdown-item" data-modelo="deepseek">DeepSeek</div>
   `;

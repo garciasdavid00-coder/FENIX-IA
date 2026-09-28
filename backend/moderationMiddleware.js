@@ -105,9 +105,9 @@ Responde ÚNICAMENTE con la palabra clave exacta (SAFE, SELF_DISTRESS, MILD_INSU
     const result = await solicitarTextoCompleto({
       mensaje: prompt,
       historial: [],
-      proveedor: 'groq',
-      maxTokens: 40,
-      timeoutMs: 5000,
+      proveedor: 'gemini',
+      maxTokens: 128,
+      timeoutMs: 30000,
       idioma: 'es'
     });
     

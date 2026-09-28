@@ -73,7 +73,7 @@ test('Next conversation waits for pending memory and scopes it to the same user'
  const rows=[];let release;const gate=new Promise(r=>release=r);
  const query=async(sql,args)=>{if(sql.startsWith('SELECT'))return{rows:rows.filter(r=>r.user===args[0])};if(sql.startsWith('INSERT')){const row={id:rows.length+1,user:args[0],memory_text:args[1],category:args[2]};rows.push(row);return{rows:[row]}}return{rows:[]}};
  const pool={query,connect:async()=>({query,release(){}})};
- const c=load('backend/memoryManager.js',{process:{env:{GROQ_API_KEY:'test'}},require:p=>p==='../db'?{pool}:{fetchWithTimeout:async()=>{await gate;return{ok:true,json:async()=>({choices:[{message:{content:JSON.stringify({memorias:[{text:'Prefiere respuestas breves',category:'preferencia'}]})}}]})}}}});
+ const c=load('backend/memoryManager.js',{process:{env:{GEMINI_API_KEY:'test'}},require:p=>p==='../db'?{pool}:{fetchWithTimeout:async()=>{await gate;return{ok:true,json:async()=>({choices:[{message:{content:JSON.stringify({memorias:[{text:'Prefiere respuestas breves',category:'preferencia'}]})}}]})}}}});
  c.module.exports.notificarMensaje('same-user',[{role:'user',content:'Prefiero respuestas breves'}]);let finished=false;const next=c.module.exports.buildMemoryContext('same-user').then(t=>{finished=true;return t});await new Promise(r=>setTimeout(r,5));assert.equal(finished,false);release();assert.match(await next,/Prefiere respuestas breves/);assert.equal(await c.module.exports.buildMemoryContext('another-user'),'');
 });
 

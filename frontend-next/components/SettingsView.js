@@ -133,8 +133,7 @@ export default function SettingsView() {
                 onChange={(e) => cambiarModelo(e.target.value)}
               >
                 <option value="auto">Fenix 2.0 (Automático)</option>
-                <option value="groq">Groq (Llama 3.3 70B)</option>
-                <option value="gemini">Gemini 2.5 Flash</option>
+                <option value="gemini">Gemini</option>
                 <option value="deepseek">DeepSeek V3</option>
               </select>
             </div>

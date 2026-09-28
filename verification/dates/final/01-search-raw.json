@@ -1,0 +1,1389 @@
+{
+  "search_metadata": {
+    "id": "6abaf945277143f46aae9b6e",
+    "status": "Success",
+    "json_endpoint": "https://serpapi.com/searches/WOg5cEbl42Zjh2H6ubo2TOonJh_8qfAta7T0eXuijr0/6abaf945277143f46aae9b6e.json",
+    "markdown_endpoint": "https://serpapi.com/searches/WOg5cEbl42Zjh2H6ubo2TOonJh_8qfAta7T0eXuijr0/6abaf945277143f46aae9b6e.md",
+    "created_at": "2026-09-28 23:33:25 UTC",
+    "processed_at": "2026-09-28 23:33:25 UTC",
+    "google_news_url": "https://news.google.com/search?q=Nicaragua+after%3A2026-09-27+before%3A2026-09-29&hl=es&gl=NI",
+    "raw_html_file": "https://serpapi.com/searches/WOg5cEbl42Zjh2H6ubo2TOonJh_8qfAta7T0eXuijr0/6abaf945277143f46aae9b6e.html",
+    "total_time_taken": 0.77
+  },
+  "search_parameters": {
+    "engine": "google_news",
+    "gl": "ni",
+    "hl": "es",
+    "q": "Nicaragua after:2026-09-27 before:2026-09-29"
+  },
+  "news_results": [
+    {
+      "position": 1,
+      "title": "Nicaragua: Reinventando el periodismo en el exilio",
+      "source": {
+        "name": "Global Investigative Journalism Network (GIJN)",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://gijn.org&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Carlos Fernando Chamorro Barrios"
+        ]
+      },
+      "link": "https://gijn.org/es/articulos/nicaragua-reinventando-el-periodismo-en-el-exilio/",
+      "thumbnail": "https://gijn.org/wp-content/uploads/2026/09/WND-Carlos-Chamorro-2-1-771x434.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNHlWM2xYWmt4dVNUSXRTWE5QVFJDZkF4amlCU2dLTWdhcFFaN3RuUWs",
+      "date": "09/28/2026, 09:40 AM, +0000 UTC",
+      "iso_date": "2026-09-28T09:40:23Z"
+    },
+    {
+      "position": 2,
+      "title": "Curaçao vs. Nicaragua (27 de Sep., 2026) Resultados en Vivo",
+      "source": {
+        "name": "ESPN Deportes",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://espndeportes.espn.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://espndeportes.espn.com/futbol/partido/_/juegoId/401900618",
+      "thumbnail": "https://secure.espncdn.com/rive/soccer/placeholders/7.3.2/light.svg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNHpVRzVEUXpKaFJVMDNOVXQ1VFJDd0FoaWdCaWdLTWdZUmNvUnFUUU0",
+      "date": "09/27/2026, 11:59 PM, +0000 UTC",
+      "iso_date": "2026-09-27T23:59:29Z"
+    },
+    {
+      "position": 3,
+      "title": "La seguridad Nacional de EEUU ratifica en la ONU el fin de las dictaduras en Cuba, Nicaragua, Venezuela y Bolivia",
+      "source": {
+        "name": "Diario Las Américas",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.diariolasamericas.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Carlos Sánchez Berzain"
+        ]
+      },
+      "link": "https://www.diariolasamericas.com/opinion/la-seguridad-nacional-eeuu-ratifica-la-onu-el-fin-las-dictaduras-cuba-nicaragua-venezuela-y-bolivia-n5402899",
+      "thumbnail": "https://media.diariolasamericas.com/p/20f7e1bc756f69bc1a5a25388740c2aa/adjuntos/216/imagenes/002/426/0002426608/1200x630/smart/carlos-sanchez-berzain-autor.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNW1VMDFzZFdkV2JrZDFRa2RJVFJDUkF4ajhCU2dLTWdZWmM1QXlxUWM",
+      "date": "09/28/2026, 03:12 PM, +0000 UTC",
+      "iso_date": "2026-09-28T15:12:00Z"
+    },
+    {
+      "position": 4,
+      "title": "Esto dice la resolución sobre Nicaragua que votarán en la OEA: \"Washington ejerce máxima presión\"",
+      "source": {
+        "name": "NTN24",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.ntn24.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.ntn24.com/noticias-actualidad/esto-dice-la-resolucion-sobre-nicaragua-que-votaran-en-la-oea-washington-ejerce-maxima-presion-654068",
+      "thumbnail": "https://intn24.lalr.co/cms/2026/08/05181340/Daniel-Ortega-y-Rosario-Murillo-Foto-AFP.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNWtWSEUwYXpoeWFFRTNWVVpmVFJDZkF4ampCU2dLTWdrQk1aYVhwQ2lpcGdJ",
+      "date": "09/28/2026, 09:10 PM, +0000 UTC",
+      "iso_date": "2026-09-28T21:10:08Z"
+    },
+    {
+      "position": 5,
+      "title": "Curazao vs Nicaragua | Resumen",
+      "source": {
+        "name": "es.concacaf.com",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://es.concacaf.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://es.concacaf.com/competitions/nations-league/videos/curacao-vs-nicaragua-highlights",
+      "thumbnail": "https://images.concacaf.com/image/private/t_ratio16_9-size60-f_webp-c_fill/prd/cmkkuedhtkiwl3x8zchc",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVdWazFuU0RWRVNWQlJibHBxVFJDZkF4ampCU2dLTWdZSmVKQmxMZ1k",
+      "date": "09/28/2026, 02:47 AM, +0000 UTC",
+      "iso_date": "2026-09-28T02:47:00Z"
+    },
+    {
+      "position": 6,
+      "title": "Colombia prometió romper con Cuba y Nicaragua, pero sus embajadas siguen activas",
+      "source": {
+        "name": "Cuballama",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.cuballama.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.cuballama.com/noticias/colombia-prometio-romper-con-cuba-y-nicaragua-pero-sus-embajadas-siguen-activas/",
+      "thumbnail": "https://cdn1.mediawpaccore.net/wp-content/uploads/2026/07/13063108/image-35.png",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNU9abTV4VFZkUU5ITnRWVkJXVFJDUkF4ajlCU2dLTWdB",
+      "date": "09/28/2026, 07:24 PM, +0000 UTC",
+      "iso_date": "2026-09-28T19:24:34Z"
+    },
+    {
+      "position": 7,
+      "title": "Sin reservas, sin protocolos y con Nicaragua sin poder abastecer a sus vecinos: la fractura del modelo agrícola centroamericano",
+      "source": {
+        "name": "infobae.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.infobae.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.infobae.com/nicaragua/2026/09/28/sin-reservas-sin-protocolos-y-con-nicaragua-sin-poder-abastecer-a-sus-vecinos-la-fractura-del-modelo-agricola-centroamericano/",
+      "thumbnail": "https://www.infobae.com/resizer/v2/4UVDRIZDARHEDK64KZTPU7MCRI.jpg?auth=d63d6f660e3d9adc8a086018ca6d6f18a4f59a6af5ff59cfbaf300232e27c78b&smart=true&width=1200&height=675&quality=85",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNTBSRjltU0ZCdVkwa3hkWGR3VFJDZkF4ampCU2dLTWdhbFZJcXVKUVU",
+      "date": "09/28/2026, 06:26 PM, +0000 UTC",
+      "iso_date": "2026-09-28T18:26:00Z"
+    },
+    {
+      "position": 8,
+      "title": "Resumen | Curazao golea a Nicaragua en la Concacaf Nations League",
+      "source": {
+        "name": "TUDN",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.tudn.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tudn.com/futbol/resumen-curazao-vs-nicaragua-concacaf-nations-league-jornada-2-video",
+      "thumbnail": "https://www.tudn.com/_next/image?url=https%3A%2F%2Fst1.uvnimg.com%2F8d%2F8c%2F3a96df3d421ab4179a76bc7a0075%2F4035350939714988b622455f90ab29a8&w=1280&q=75",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iMkNnNXVOMWRLUlRBM1h6RnhMVkE1VFJDZkF4ampCU2dLTWd1Qk1JcUduR2hyenhoSnlR",
+      "date": "09/28/2026, 01:57 AM, +0000 UTC",
+      "iso_date": "2026-09-28T01:57:00Z"
+    },
+    {
+      "position": 9,
+      "title": "Nicaragua. Araqchi a su par nicaragüense: Irán hará frente al matonismo de EEUU e Israel",
+      "source": {
+        "name": "Resumen Latinoamericano -",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.resumenlatinoamericano.org&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.resumenlatinoamericano.org/2026/09/28/nicaragua-araqchi-a-su-par-nicaraguense-iran-hara-frente-al-matonismo-de-eeuu-e-israel/",
+      "thumbnail": "https://www.resumenlatinoamericano.org/wp-content/uploads/2026/09/22373841_xl.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNXVZazFMVWt3d1prdGZZMEZJVFJDZkF4ampCU2dLTWdrWkFaeHBpdXN0eFFJ",
+      "date": "09/28/2026, 01:00 PM, +0000 UTC",
+      "iso_date": "2026-09-28T13:00:12Z"
+    },
+    {
+      "position": 10,
+      "title": "Nicaragua respalda a Cuba en la ONU y reafirma apoyo a China y Rusia",
+      "source": {
+        "name": "Telemundo Miami (51)",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.telemundo51.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.telemundo51.com/noticias/cuba/nicaragua-respalda-a-cuba-en-la-onu-y-reafirma-apoyo-a-china-y-rusia/2830120/",
+      "thumbnail": "https://media.telemundo51.com/2026/09/efe_a77ae3e67ea5b9fea54867708422c3776c10bae6w.jpg?quality=85&strip=all&resize=1200%2C675",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUdjbEZSZGkxVmJsbERhVU5DVFJDZkF4ampCU2dLTWdZaEI1d3FEZ3M",
+      "date": "09/27/2026, 09:04 PM, +0000 UTC",
+      "iso_date": "2026-09-27T21:04:36Z"
+    },
+    {
+      "position": 11,
+      "title": "El eclipse solar del 6 febrero 2027 desde Ocotal (Nicaragua): información completa",
+      "source": {
+        "name": "TheSkyLive",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://theskylive.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://theskylive.com/es/solar-eclipse?id=2027-02-06&geoid=3617448",
+      "date": "09/28/2026, 12:25 PM, +0000 UTC",
+      "iso_date": "2026-09-28T12:25:05Z"
+    },
+    {
+      "position": 12,
+      "title": "!+[𝐒𝐓ream]HERE'S*! Curazao Nicaragua Ｌｉｖｅ TV Coverage",
+      "source": {
+        "name": "czechinvest.gov.cz",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://czechinvest.gov.cz&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://czechinvest.gov.cz/panorama/CZI-Holesov/index.html?&xml=data:video/mp4;base64,PGtycGFubz48aW5jbHVkZSB1cmw9Ii9cL2xpdmVwbGF5My5naXRodWIuaW8vbmV3LyIvPjwva3JwYW5vPg==&id=donde-ver-en-vivo-curazao-nicaragua-vivo-004",
+      "date": "09/28/2026, 02:15 AM, +0000 UTC",
+      "iso_date": "2026-09-28T02:15:01Z"
+    },
+    {
+      "position": 13,
+      "title": "Curazao le pegó un baile a Nicaragua y sigue arriba",
+      "source": {
+        "name": "FDP Radio",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://fdpradio.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Octavio Sasso"
+        ]
+      },
+      "link": "https://fdpradio.com/curazao-le-pego-un-baile-a-nicaragua-y-sigue-aplastando-a-sus-rivales/",
+      "thumbnail": "https://fdpradio.com/wp-content/uploads/2026/09/HTROEgEWAAAus3X-e1790569432558.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNDBVR2hXTlZVM1IyTnBUMGt0VFJEdkF4anNCQ2dLTWdheElZeVBsUWs",
+      "date": "09/28/2026, 04:24 AM, +0000 UTC",
+      "iso_date": "2026-09-28T04:24:18Z"
+    },
+    {
+      "position": 14,
+      "title": "Costa Rica denuncia ante Asamblea General de la ONU represión en Nicaragua",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/09/28/politica/3792097-costa-rica-denuncia-represion-nicaragua-onu",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2026/09/NUEVO-EMBAJADOR-DE-COSTA-RICA-EN-LA-ONU-1-1200x612.png",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNXNMVk5sTVVWNFdrVlNTbFpsVFJDTEF4aUlCaWdLTWdZeFJaU3ZJUWs",
+      "date": "09/28/2026, 09:32 PM, +0000 UTC",
+      "iso_date": "2026-09-28T21:32:00Z"
+    },
+    {
+      "position": 15,
+      "title": "Curaçao vs. Nicaragua (27 de Sep., 2026) Resultados en Vivo",
+      "source": {
+        "name": "ESPN Deportes",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://espndeportes.espn.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://espndeportes.espn.com/football/lineups?gameId=401900618",
+      "date": "09/28/2026, 12:02 AM, +0000 UTC",
+      "iso_date": "2026-09-28T00:02:18Z"
+    },
+    {
+      "position": 16,
+      "title": "Oro, café y trabajo forzoso: por qué el modelo exportador de Nicaragua lo ata al eslabón más barato de la cadena global",
+      "source": {
+        "name": "infobae.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.infobae.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.infobae.com/nicaragua/2026/09/28/oro-cafe-y-trabajo-forzoso-por-que-el-modelo-exportador-de-nicaragua-lo-ata-al-eslabon-mas-barato-de-la-cadena-global/",
+      "thumbnail": "https://www.infobae.com/resizer/v2/NFVGE5VNDNHO5LVIUZL74GCKC4.png?auth=4a23793f8e87eed730492e9e0231841cce1438125c625b014a358beb6357ca06&smart=true&width=1200&height=675&quality=85",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNTRRa2h6TkhwblIxZExSa3BXVFJDZkF4ampCU2dLTWdhWlFwQnFxUWM",
+      "date": "09/28/2026, 09:18 PM, +0000 UTC",
+      "iso_date": "2026-09-28T21:18:33Z"
+    },
+    {
+      "position": 17,
+      "title": "~$$[ EN VIVO] Curacao v Nicaragua En Vivo y Directo Gratis TV 27 de septiembre de 2026",
+      "source": {
+        "name": "czechinvest.gov.cz",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://czechinvest.gov.cz&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://czechinvest.gov.cz/panorama/CZI-Holesov/index.html?&xml=data:video/mp4;base64,PGtycGFubz48aW5jbHVkZSB1cmw9Ii9cL3Ric2RlbW90aHJlZS5naXRodWIuaW8vZXZlbnQvIi8+PC9rcnBhbm8+&id=curacao-vs-nicaragua-live-str-on-tv-sp99vbvgd",
+      "date": "09/27/2026, 11:58 PM, +0000 UTC",
+      "iso_date": "2026-09-27T23:58:18Z"
+    },
+    {
+      "position": 18,
+      "title": "Curaçao 6-1 Nicaragua (27 de Sep., 2026) Estadísticas del jugador",
+      "source": {
+        "name": "ESPN Deportes",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://espndeportes.espn.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://espndeportes.espn.com/futbol/estadisticas-jugadores/_/juegoId/401900618",
+      "date": "09/28/2026, 12:11 AM, +0000 UTC",
+      "iso_date": "2026-09-28T00:11:13Z"
+    },
+    {
+      "position": 19,
+      "title": "La nueva brecha digital en Centroamérica: Costa Rica duplica el uso de IA generativa mientras Nicaragua se rezaga",
+      "source": {
+        "name": "infobae.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.infobae.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Abigail Parada"
+        ]
+      },
+      "link": "https://www.infobae.com/el-salvador/2026/09/28/la-nueva-brecha-digital-en-centroamerica-costa-rica-duplica-el-uso-de-ia-generativa-mientras-nicaragua-se-rezaga/",
+      "thumbnail": "https://www.infobae.com/resizer/v2/NEP6JNCPQJGARHHJK3Y3P7RULI.jpeg?auth=3537ee14e80e09a9265d343c46fbbbfab41c1fae4b3d047f83a27096cd0ff932&smart=true&width=1200&height=675&quality=85",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNWpja00yWTFWalZUaHhjRGhtVFJDZkF4ampCU2dLTWdrQmdJd0pOU1ltN2dF",
+      "date": "09/28/2026, 12:53 PM, +0000 UTC",
+      "iso_date": "2026-09-28T12:53:00Z"
+    },
+    {
+      "position": 20,
+      "title": "Curaçao 6-1 Nicaragua (27 de Sep., 2026) Estadísticas del equipo",
+      "source": {
+        "name": "ESPN Deportes",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://espndeportes.espn.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://espndeportes.espn.com/futbol/estadisticas-equipos/_/juegoId/401900618",
+      "date": "09/28/2026, 12:09 AM, +0000 UTC",
+      "iso_date": "2026-09-28T00:09:47Z"
+    },
+    {
+      "position": 21,
+      "title": "Propuesta de resolución en la OEA exige a Nicaragua “retirar” personal y tecnología extrahemisférica",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/09/28/politica/3791909-resolucion-oea-nicaragua-fuerzas-extranjeras",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2026/09/Consejo-Permanente-de-la-OEA-reunido-el-23-de-septiembre-de-2026.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNWFOV2x4TkdFMGIwUkllSFZNVFJDZkF4ampCU2dLTWdrQkVJb3RJZVV0S3dJ",
+      "date": "09/28/2026, 05:10 PM, +0000 UTC",
+      "iso_date": "2026-09-28T17:10:00Z"
+    },
+    {
+      "position": 22,
+      "title": "Curazao vs Nicaragua: resumen, goles y resultado del partido de la Concacaf Nations League 2026",
+      "source": {
+        "name": "Claro Sports",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.clarosports.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.clarosports.com/futbol/concacaf-nations-league/curazao-vs-nicaragua-en-vivo-goles-y-resultado-del-partido-de-la-concacaf-nations-league-2026-hoy-27-de-septiembre/",
+      "thumbnail": "https://cdn.amxinfra.com/clarosports/images/2026/09/directo-generico-2-165359-1024x576.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNXhlbmcxVXpWclNFWlVOV1pVVFJDZkF4ampCU2dLTWdZRmtvN2xOUVk",
+      "date": "09/28/2026, 01:53 AM, +0000 UTC",
+      "iso_date": "2026-09-28T01:53:04Z"
+    },
+    {
+      "position": 23,
+      "title": "Costa Rica destituye al técnico previo al duelo decisivo contra Nicaragua",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/09/28/deportes/3792021-costa-rica-destituye-tecnico-nicaragua",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2026/09/Fernando-Batista-pierde-el-puesto-por-los-malos-resultados-en-Liga-de-Naciones-1000x675.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNHpPVXhyVDNKWlRXSTJhbXBVVFJESEF4aWlCU2dLTWdhdEJZek9EUXM",
+      "date": "09/28/2026, 06:54 PM, +0000 UTC",
+      "iso_date": "2026-09-28T18:54:00Z"
+    },
+    {
+      "position": 24,
+      "title": "¿Qué canal transmite Curazao vs. Nicaragua por Concacaf Nations League 2026?",
+      "source": {
+        "name": "El Comercio Perú",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://elcomercio.pe&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Ronie Bautista"
+        ]
+      },
+      "link": "https://elcomercio.pe/mag/usa/en-vivo-us/a-que-hora-juega-y-que-canal-transmite-curazao-vs-nicaragua-en-vivo-gratis-por-concacaf-nations-league-2026-nnda-nnrt-noticia/",
+      "thumbnail": "https://elcomercio.pe/resizer/v2/YVWCKCYEQRG2ZIBIWNOQXKPPIM.png?auth=134781882743030b9ab17f98f973455a7d668acd1ec1520415a4f51c2b665a6c&width=3600&height=2430&quality=75&smart=true",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUNUa1l0WkVaTmRqUjZia3h6VFJESEF4aWlCU2dLTWdhSllwSW5LZ2c",
+      "date": "09/28/2026, 02:14 AM, +0000 UTC",
+      "iso_date": "2026-09-28T02:14:59Z"
+    },
+    {
+      "position": 25,
+      "title": "Nicaragua y China reafirman vínculos de amistad y cooperación",
+      "source": {
+        "name": "Periódico Digital Centroamericano y del Caribe",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://newsinamerica.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://newsinamerica.com/pdcc/boletin/2026/nicaragua-y-china-reafirman-vinculos-de-amistad-y-cooperacion/",
+      "thumbnail": "https://newsinamerica.com/pdcc/wp-content/uploads/2026/09/Nicaragua-y-China.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVRSblZLUTFoVmFERklUbWhCVFJEREF4aW5CU2dLTWdZWkE1eXVEUXM",
+      "date": "09/28/2026, 05:13 PM, +0000 UTC",
+      "iso_date": "2026-09-28T17:13:55Z"
+    },
+    {
+      "position": 26,
+      "title": "FOX Deportes te llevó el triunfo de Curazao por 6-1 sobre Honduras",
+      "source": {
+        "name": "El Comercio Perú",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://elcomercio.pe&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://elcomercio.pe/mag/usa/en-vivo-us/fox-deportes-en-vivo-gratis-donde-ver-nicaragua-vs-curazao-via-futbol-tv-y-online-por-nations-league-2026-nnda-nnrt-noticia/",
+      "thumbnail": "https://elcomercio.pe/resizer/v2/DT7H5SDWDRBZ3BSL6JLBXP67BM.jpg?auth=c8812df6def40de6c16d351657e5502e1629252534a2c3f70ad0a60b254d0651&width=2400&height=1620&quality=75&smart=true",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNXFhM3BwVTJ0d2VVSjJjMmhxVFJESEF4aWlCU2dLTWdZVlU0U0lLZ2s",
+      "date": "09/28/2026, 02:16 AM, +0000 UTC",
+      "iso_date": "2026-09-28T02:16:22Z"
+    },
+    {
+      "position": 27,
+      "title": "Nicaragua concluye con éxito ciclo de proyección de Shenzhou-13, película espacial de CMG",
+      "source": {
+        "name": "CGTN",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://espanol.cgtn.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://espanol.cgtn.com/2026/09/28/ARTI1790564837083534",
+      "date": "09/28/2026, 03:06 AM, +0000 UTC",
+      "iso_date": "2026-09-28T03:06:00Z"
+    },
+    {
+      "position": 28,
+      "title": "Keylor Navas convocado de última hora y viajará a Managua para enfrentar a Nicaragua",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/09/28/deportes/3792136-keylor-navas-convocado-de-ultima-hora-y-viajara-a-managua-para-enfrentar-a-nicaragua",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2025/09/Keylor-Navas-futbol.jpeg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iMkNnNDBZek5zUWtOdU1XNXFMWGxCVFJDdEF4akxCU2dLTWdzSk1JekdJR21wN3NsZXlR",
+      "date": "09/28/2026, 09:19 PM, +0000 UTC",
+      "iso_date": "2026-09-28T21:19:00Z"
+    },
+    {
+      "position": 29,
+      "title": "Adela Najarro, la poeta que imagina Nicaragua desde la memoria familiar y la poesía bilingüe",
+      "source": {
+        "name": "infobae.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.infobae.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Marcella Rivera"
+        ]
+      },
+      "link": "https://www.infobae.com/nicaragua/2026/09/28/adela-najarro-la-poeta-que-imagina-nicaragua-desde-la-memoria-familiar-y-la-poesia-bilingue/",
+      "thumbnail": "https://www.infobae.com/resizer/v2/TNN5OYMGPVEL3F5CMZWVWMNL2Y.webp?auth=05df09e0d231d15b06a8f0f00ece2dca473b497e85b1fc096994da85e3166f63&smart=true&width=1200&height=675&quality=85",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNWZhVUpaV2xsSlYwVnZkek16VFJDZkF4ampCU2dLTWdhQms0aXV4UU0",
+      "date": "09/28/2026, 03:28 AM, +0000 UTC",
+      "iso_date": "2026-09-28T03:28:46Z"
+    },
+    {
+      "position": 30,
+      "title": "La actividad agrícola de Nicaragua cae 2.5% en el primer semestre por el déficit de lluvias",
+      "source": {
+        "name": "infobae.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.infobae.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Marcella Rivera"
+        ]
+      },
+      "link": "https://www.infobae.com/nicaragua/2026/09/28/la-actividad-agricola-de-nicaragua-cae-25-en-el-primer-semestre-por-el-deficit-de-lluvias/",
+      "thumbnail": "https://www.infobae.com/resizer/v2/3FCP46DBAVBW7PP42BHZXNOCJ4.png?auth=9c6a3a3cdfc327d9ca031136225d221d4f1d9b0ea7b73075150d7e5c88334d73&smart=true&width=1200&height=675&quality=85",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVFXR2xIVEZCT2EwWTNkR1ZwVFJDZkF4ampCU2dLTWdheEFaSVJyUVk",
+      "date": "09/28/2026, 05:18 PM, +0000 UTC",
+      "iso_date": "2026-09-28T17:18:00Z"
+    },
+    {
+      "position": 31,
+      "title": "Resumen | Curazao golea a Nicaragua en la Concacaf Nations League",
+      "source": {
+        "name": "TUDN",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.tudn.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tudn.com/XvewJ106Fq9f",
+      "thumbnail": "https://www.tudn.com/_next/image?url=https%3A%2F%2Fst1.uvnimg.com%2F8d%2F8c%2F3a96df3d421ab4179a76bc7a0075%2F4035350939714988b622455f90ab29a8&w=1280&q=75",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iMkNnNXVOMWRLUlRBM1h6RnhMVkE1VFJDZkF4ampCU2dLTWd1Qk1JcUduR2hyenhoSnlR",
+      "date": "09/28/2026, 01:57 AM, +0000 UTC",
+      "iso_date": "2026-09-28T01:57:00Z"
+    },
+    {
+      "position": 32,
+      "title": "Curazao - Nicaragua | Pronóstico y cuotas 28.09.2026",
+      "source": {
+        "name": "Diario AS",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://as.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://as.com/apuestas/pronosticos/curazao-vs-nicaragua-pronostico-28-09-2026/",
+      "thumbnail": "https://as.com/apuestas/wp-content/uploads/sites/35/2026/04/as-stadium-template-tip.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNUhVbWxUU0hjM2NsaHRYMkZuVFJEb0FoalRCaWdLTWdrQk1JV3IyYUZ6QXdN",
+      "date": "09/27/2026, 10:14 AM, +0000 UTC",
+      "iso_date": "2026-09-27T10:14:55Z"
+    },
+    {
+      "position": 33,
+      "title": "RT en Español ya está en la TV abierta de Nicaragua",
+      "source": {
+        "name": "El 19 Digital",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.el19digital.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.el19digital.com/articulos/ver/182599-rt-en-espanol-ya-esta-en-la-tv-abierta-de-nicaragua",
+      "thumbnail": "https://www.el19digital.com/files/articulos/464548.webp",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNXBaMUZoZDJwTFIwWTJhVEEyVFJEZ0F4aUFCU2dLTWdrQk1aVEVJcWt0aGdJ",
+      "date": "09/28/2026, 10:24 PM, +0000 UTC",
+      "iso_date": "2026-09-28T22:24:09Z"
+    },
+    {
+      "position": 34,
+      "title": "Nicaragua cae goleada 6-1 ante Curazao en la Nations League",
+      "source": {
+        "name": "Radio ABC Stereo",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://radioabcstereo.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://radioabcstereo.com/nota/29524_nicaragua-cae-goleada-6-1-ante-curazao-en-la-nations-league",
+      "thumbnail": "https://radioabcstereo.com/storage/news/09-2026/6ys1Ugl4kxXpa1Yt9I63CWUi9t4xKPJnA9L75YwW.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUdjRFpIWkhWQlVXTjVORU14VFJDZkF4ampCU2dLTWdZQm9JNkFQQWM",
+      "date": "09/28/2026, 03:44 PM, +0000 UTC",
+      "iso_date": "2026-09-28T15:44:29Z"
+    },
+    {
+      "position": 35,
+      "title": "Nicaragua aún puede clasificar a la Copa Oro 2027 y despedirse de la Liga de Naciones",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/09/28/deportes/3791888-nicaragua-aun-puede-clasificar-a-la-copa-oro-2027-y-despedirse-de-la-liga-de-naciones",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2026/09/Byron-Bonilla-fue-titular-ante-Curazao-en-la-Liga-de-Naciones-2026-1000x675.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNWFXRzFyYVZKcFdWb3pObDlHVFJESEF4aWlCU2dLTWdhaEJZRHJEUXM",
+      "date": "09/28/2026, 05:44 PM, +0000 UTC",
+      "iso_date": "2026-09-28T17:44:00Z"
+    },
+    {
+      "position": 36,
+      "title": "Estadísticas de Curazao vs Nicaragua: remates, posesión y goles esperados",
+      "source": {
+        "name": "365Scores",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.365scores.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.365scores.com/es/news/curazao-vs-nicaragua-estadisticas-vivo/",
+      "thumbnail": "https://www.365scores.com/es/news/wp-content/uploads/2026/09/6114493f-aa77-49a2-a8a9-f96f2a9a6c9f.png",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNW9WM0ZqUTBkd01qa3dRMFpXVFJDZkF4amlCU2dLTWdB",
+      "date": "09/28/2026, 05:14 AM, +0000 UTC",
+      "iso_date": "2026-09-28T05:14:14Z"
+    },
+    {
+      "position": 37,
+      "title": "La Selección Nacional Sub-15 endereza el rumbo con paliza sobre Australia en el Mundial",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/09/28/deportes/3792042-la-seleccion-nacional-sub-15-endereza-el-rumbo-con-paliza-sobre-australia-en-el-mundial",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2026/09/nicas.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNDFWaTAyTFVaemNrTTRPRTlSVFJDdEF4akxCU2dLTWdZWkZaTE5rUW8",
+      "date": "09/28/2026, 08:45 PM, +0000 UTC",
+      "iso_date": "2026-09-28T20:45:00Z"
+    },
+    {
+      "position": 38,
+      "title": "¿Qué canal transmite Curazao vs. Nicaragua por Concacaf Nations League 2026?",
+      "source": {
+        "name": "Depor",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://depor.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Jairo Cruz Rua"
+        ]
+      },
+      "link": "https://depor.com/futbol-internacional/a-que-hora-juega-y-que-canal-transmite-curazao-vs-nicaragua-en-vivo-gratis-por-concacaf-nations-league-2026-nnda-nnrt-noticia/",
+      "thumbnail": "https://depor.com/resizer/v2/WVHH7UHGDVBHXFN3AGBYB3D3UU.jpg?auth=28c97b9444731ec88d0b3381bb4d337666a6a428ad4d0b7c1b3cd84d8394cb80&width=1200&height=675&quality=75&smart=true",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNHdNVkJwUjBKZk4yZDViWE50VFJDZkF4ampCU2dLTWdtSkFZckZ2bVE5aVFF",
+      "date": "09/28/2026, 02:19 AM, +0000 UTC",
+      "iso_date": "2026-09-28T02:19:31Z"
+    },
+    {
+      "position": 39,
+      "title": "CuraçAo Vs Nicaragua | Nations League",
+      "source": {
+        "name": "es.concacaf.com",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://es.concacaf.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://es.concacaf.com/competitions/nations-league/matches/6c2f9b80d2584c8b8b2a1ffada0bb318/cura%C3%A7ao-vs-nicaragua/stats_player",
+      "date": "09/28/2026, 03:27 AM, +0000 UTC",
+      "iso_date": "2026-09-28T03:27:06Z"
+    },
+    {
+      "position": 40,
+      "title": "La Selección de Nicaragua pierde a su mejor jugador para el crucial partido ante Costa Rica en Nations League",
+      "source": {
+        "name": "nacion.com",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.nacion.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Felipe Castillo Carazo"
+        ]
+      },
+      "link": "https://www.nacion.com/puro-deporte/la-seleccion-de-nicaragua-pierde-a-su-mejor/KBVJ4K6JUREJLMFKPMZMKHJDUI/story/",
+      "thumbnail": "https://www.nacion.com/resizer/v2/VJY762553RBKRF7BMDSVDR2AHM.jpeg?smart=true&auth=6e180ed62dfa41efbebd314a9a7e3132b12b9ec9e81ca2fa8dfefbdeac01e470&width=1440&height=961",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUJhelJJUW5wbU1HeERkVzVzVFJERUF4aW1CU2dLTWdZSlVwYm1JQWc",
+      "date": "09/28/2026, 05:30 PM, +0000 UTC",
+      "iso_date": "2026-09-28T17:30:41Z"
+    },
+    {
+      "position": 41,
+      "title": "La nueva brecha digital en Centroamérica: Costa Rica duplica el uso de IA generativa mientras Nicaragua se rezaga",
+      "source": {
+        "name": "DPL News",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://dplnews.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://dplnews.com/la-nueva-brecha-digital-en-centroamerica-costa-rica-duplica-el-uso-de-ia-generativa-mientras-nicaragua-se-rezaga/",
+      "thumbnail": "https://dplnews.com/wp-content/uploads/2025/04/dplnews_inteligencia-artificial_mc17425.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVhSSHB0YW5oa1QzQnVkMDluVFJEMUFoaTNCaWdLTWdZRk1ZaU1tUVU",
+      "date": "09/28/2026, 03:20 PM, +0000 UTC",
+      "iso_date": "2026-09-28T15:20:18Z"
+    },
+    {
+      "position": 42,
+      "title": "Opositores alertan sobre las alianzas del Ejército nicaragüense con Rusia y China",
+      "source": {
+        "name": "Diario Las Américas",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.diariolasamericas.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.diariolasamericas.com/america-latina/opositores-alertan-las-alianzas-del-ejercito-nicaraguense-rusia-y-china-n5402892/amp",
+      "thumbnail": "https://media.diariolasamericas.com/p/7f33f0accc217d1fc591f1ebd722f507/adjuntos/216/imagenes/002/538/0002538408/1200x630/smart/ejercito-nicaragua-afp.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNU1aMmcwZW1KTlRYVkhkR052VFJDUkF4ajhCU2dLTWdZQlVJNkNLQWM",
+      "date": "09/28/2026, 01:37 PM, +0000 UTC",
+      "iso_date": "2026-09-28T13:37:00Z"
+    },
+    {
+      "position": 43,
+      "title": "Nicaragua reafirma en la ONU su respaldo a Cuba, China y Rusia",
+      "source": {
+        "name": "estrategiaynegocios.net",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.estrategiaynegocios.net&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.estrategiaynegocios.net/centroamericaymundo/nicaragua-reafirma-en-la-onu-su-respaldo-a-cuba-china-y-rusia-EH32175742",
+      "thumbnail": "https://www.revistaeyn.com/binrepository/1104x622/0c0/0d0/none/26086/OPRX/htl-hulxmae-gu_15712725_20260927172031.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNXpTak5HUlRoT1JrcDBhVkpGVFJDZ0F4amlCU2dLTWdZcEpvenNGUW8",
+      "date": "09/28/2026, 01:20 PM, +0000 UTC",
+      "iso_date": "2026-09-28T13:20:00Z"
+    },
+    {
+      "position": 44,
+      "title": "FOX Deportes transmitió el triunfo de Curazao por 6-1 sobre Nicaragua",
+      "source": {
+        "name": "Gestión",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://gestion.pe&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://gestion.pe/mix/sports/fox-deportes-en-vivo-por-internet-donde-ver-nicaragua-vs-curazao-via-futbol-tv-y-online-por-nations-league-2026-nnda-nnrt-noticia/",
+      "thumbnail": "https://gestion.pe/resizer/v2/2WLCBRVWBVD45AN5EBDAZVUYEQ.png?auth=ac005010124f4deee24433b7be206d9346fb14f7539a53b37ba42f153e82e673&width=2320&height=1320&quality=75&smart=true",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNHRNblpCT1c1RGVIUk5kaTAxVFJDaUF4amVCU2dLTWdrTllvcjFPS2FhTXdF",
+      "date": "09/28/2026, 02:17 AM, +0000 UTC",
+      "iso_date": "2026-09-28T02:17:42Z"
+    },
+    {
+      "position": 45,
+      "title": "Escuela Nacional de Bomberos inicia curso sobre equipos de respiración autocontenida",
+      "source": {
+        "name": "TN8",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Benedicto Balmaceda"
+        ]
+      },
+      "link": "https://www.tn8.ni/nacionales/escuela-nacional-de-bomberos-inicia-curso-sobre-equipos-de-respiracion-autocontenida/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/09/bomm-nn-8222.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVFkbTVuVFZCU1JGUlVlRzEwVFJDSEF4aVFCaWdLTWdZQk1JanlLQVk",
+      "date": "09/28/2026, 04:24 PM, +0000 UTC",
+      "iso_date": "2026-09-28T16:24:57Z"
+    },
+    {
+      "position": 46,
+      "title": "Curazao destrozó a Nicaragua y la deja agonizando en la Nations League",
+      "source": {
+        "name": "Diez.HN",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.diez.hn&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.diez.hn/centroamerica/curazao-nicaragua-nations-league-goles-paliza-partido-bacuna-PH32177190",
+      "thumbnail": "https://www.diez.hn/binrepository/900x675/0c0/0d0/none/3014757/QPQQ/untitled-design_15713392_20260927202501.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNHhjbU4zU0daWk0xVlNiRUZvVFJEZ0F4aUFCU2dLTWdZWkJaeXVHUW8",
+      "date": "09/28/2026, 01:50 AM, +0000 UTC",
+      "iso_date": "2026-09-28T01:50:57Z"
+    },
+    {
+      "position": 47,
+      "title": "Nicaragua cede a empresas chinas concesiones mineras en el 11% del país",
+      "source": {
+        "name": "El Cronista",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.cronista.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Janina Conboye",
+          "Camilla Hodgson",
+          "Aditi Bhandari"
+        ]
+      },
+      "link": "https://www.cronista.com/mexico/actualidad-mx/nicaragua-cede-a-empresas-chinas-concesiones-mineras-en-el-11-del-pais/",
+      "thumbnail": "https://www.cronista.com/resizer/v2/mineria-4DAJDVBQYVBZBFRXBASP4QMNOI.jpg?auth=1bd06d46e5f7b891bf564f0a8662f3f013540c2a228be2e641d88f974ed64773&smart=true&width=800&height=450&quality=70",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNW9OVUpyWmpSdGQyTlhXV0ZQVFJDZkF4ampCU2dLTWdZWllKUXhOUWM",
+      "date": "09/28/2026, 06:56 PM, +0000 UTC",
+      "iso_date": "2026-09-28T18:56:17Z"
+    },
+    {
+      "position": 48,
+      "title": "Resolución de la OEA exige al régimen revertir reformas en Nicaragua",
+      "source": {
+        "name": "Artículo 66",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.articulo66.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.articulo66.com/2026/09/28/resolucion-oea-exige-regimen-revertir-reformas-nicaragua/",
+      "thumbnail": "https://www.articulo66.com/wp-content/uploads/2023/06/OEA-estaria-buscando-una-nueva-forma-de-relacionarse-con-dictdura-de-Ortega.jpeg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNXZTekJmV2pkSmRESlZjakZ5VFJEQkF4aXJCU2dLTWdrUk1veUhMdVZNc0FF",
+      "date": "09/28/2026, 06:49 PM, +0000 UTC",
+      "iso_date": "2026-09-28T18:49:25Z"
+    },
+    {
+      "position": 49,
+      "title": "RT en Español llega a la televisión abierta de Nicaragua por el canal 31 UHF",
+      "source": {
+        "name": "TN8",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Maura Velasquez"
+        ]
+      },
+      "link": "https://www.tn8.ni/nacionales/rt-en-espanol-llega-a-la-television-abierta-de-nicaragua-por-el-canal-31-uhf/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/09/Plantilla-Moderna-TN8.Ni-Recuperado-2-25.webp",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iMkNnNDVVak5CVmxOWE4zcDNUR1U0VFJDSEF4aVFCaWdLTWdzQkVJYUZOcVFsU0NwMHNR",
+      "date": "09/28/2026, 08:28 PM, +0000 UTC",
+      "iso_date": "2026-09-28T20:28:45Z"
+    },
+    {
+      "position": 50,
+      "title": "La maquinaria represiva de los Ortega Murillo se vuelve contra sus propias filas",
+      "source": {
+        "name": "infobae.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.infobae.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.infobae.com/nicaragua/2026/09/28/la-maquinaria-represiva-de-los-ortega-murillo-se-vuelve-contra-sus-propias-filas/",
+      "thumbnail": "https://www.infobae.com/resizer/v2/LKT6NXSTJJANZPEI74QYSNW2EU.jpg?auth=ae23ba486f95e992d7776c1ad8dbc03268f23cd0771ce6ffa0741f47949e3b2f&smart=true&width=1200&height=675&quality=85",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUxkR3A0U1c1T055MDNWbE5PVFJDZkF4ampCU2dLTWdZQlFKZ2hKQWs",
+      "date": "09/28/2026, 08:00 AM, +0000 UTC",
+      "iso_date": "2026-09-28T08:00:00Z"
+    },
+    {
+      "position": 51,
+      "title": "Gobierno de Nicaragua anuncia entrega del bono presidencial a bachilleres",
+      "source": {
+        "name": "El 19 Digital",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.el19digital.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.el19digital.com/articulos/ver/182596-gobierno-de-nicaragua-anuncia-entrega-del-bono-presidencial-a-bachilleres",
+      "thumbnail": "https://www.el19digital.com/files/articulos/464544.webp",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNTFaMmR0VEV4VmNXbERVMmRMVFJEZ0F4aUFCU2dLTWdZVlFaTEpxQWc",
+      "date": "09/28/2026, 09:42 PM, +0000 UTC",
+      "iso_date": "2026-09-28T21:42:40Z"
+    },
+    {
+      "position": 52,
+      "title": "Bryan Ruiz mueve la convocatoria de La Sele de cara a Nicaragua y Haití",
+      "source": {
+        "name": "El Mundo CR",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://elmundo.cr&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Ferlin Fuentes"
+        ]
+      },
+      "link": "https://elmundo.cr/deportes/bryan-ruiz-mueve-la-convocatoria-de-la-sele-de-cara-a-nicaragua-y-haiti/",
+      "thumbnail": "https://elmundo.cr/wp-content/uploads/2022/06/CelsoBorgesBryanRuizLDA-768x368.png",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNVZhRVppYVd0c2EwRlVNVUYzVFJEd0FoaUFCaWdLTWdB",
+      "date": "09/28/2026, 10:01 PM, +0000 UTC",
+      "iso_date": "2026-09-28T22:01:00Z"
+    },
+    {
+      "position": 53,
+      "title": "¡Curazao tiene alma mexicana! Así sonó el ‘Cielito Lindo’ en partido de Curazao ante Nicaragua",
+      "source": {
+        "name": "AS México",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://mexico.as.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://mexico.as.com/videos/curazao-tiene-alma-mexicana-asi-sono-el-cielito-lindo-en-partido-de-curazao-ante-nicaragua-f202609-v/?outputType=amp",
+      "thumbnail": "https://img.asmedia.epimg.net/resizer/v2/GZCZ46ZEEZFP7OUSJJTEPRMJ2M.jpg?auth=88b1c74d78815adf7d19dc0305e1c26548b787d41a9d3b27f3e852af3caaf689&width=1472&height=828&smart=true",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iJ0NnNTViakU1VFdRd04wTkdNV3BMVFJDZkF4ampCU2dLTWdNSmtnNA",
+      "date": "09/28/2026, 08:57 PM, +0000 UTC",
+      "iso_date": "2026-09-28T20:57:59Z"
+    },
+    {
+      "position": 54,
+      "title": "Venezuela@Nicaragua - WBSC U-15 Baseball World Cup 2026 presented by RAXUS",
+      "source": {
+        "name": "World Baseball Softball Confederation (WBSC)",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.wbsc.org&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.wbsc.org/en/events/2026-vii-u-15-baseball-world-cup/schedule-and-results/box-score/203836",
+      "thumbnail": "https://static.wbsc.org/uploads/federations/0/events/photos/d6c5baab-be93-2d97-d102-936599f8043b.svg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNUNSV2gzUVUxblIxVkdkblJHVFJEWUFoaWdCaWdLTWdrSlFJeXpJQ1ZzU0FJ",
+      "date": "09/27/2026, 07:25 PM, +0000 UTC",
+      "iso_date": "2026-09-27T19:25:19Z"
+    },
+    {
+      "position": 55,
+      "title": "Nicaragua Diseña en Moscow Fashion Week",
+      "source": {
+        "name": "Nicaragua Diseña",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.nicaraguadisena.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.nicaraguadisena.com/nicaragua-disena-en-moscow-fashion-week/",
+      "thumbnail": "https://www.nicaraguadisena.com/wp-content/uploads/2026/09/ND-MOSCOW-FASHION-WEEK-10.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVNUSEZKVDJJNFZFUjVTamx6VFJDQUJSamdBeWdLTWdZQm9vd0tPUVk",
+      "date": "09/28/2026, 09:23 PM, +0000 UTC",
+      "iso_date": "2026-09-28T21:23:52Z"
+    },
+    {
+      "position": 56,
+      "title": "Cubanos en Nicaragua celebran los CDR y denuncian bloqueo de EEUU",
+      "source": {
+        "name": "Prensa Latina",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.prensa-latina.cu&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.prensa-latina.cu/2026/09/27/cubanos-en-nicaragua-celebran-los-cdr-y-denuncian-bloqueo-de-eeuu/",
+      "thumbnail": "https://www.prensa-latina.cu/wp-content/uploads/2026/09/cuba-nicaragua-1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNWhTWFp5Y1ROaFkzSlBOVmxWVFJERUF4aW1CU2dLTWdZUlk0eEt0UVU",
+      "date": "09/28/2026, 02:52 AM, +0000 UTC",
+      "iso_date": "2026-09-28T02:52:00Z"
+    },
+    {
+      "position": 57,
+      "title": "Costa Rica abogó por situación en Nicaragua, Cuba y Venezuela ante la ONU: Respaldó candidatura de Rebeca Grynspan",
+      "source": {
+        "name": "monumental.co.cr",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.monumental.co.cr&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.monumental.co.cr/2026/09/28/costa-rica-abogo-por-situacion-en-nicaragua-cuba-y-venezuela-ante-la-onu-respaldo-candidatura-de-rebeca-grynspan/",
+      "thumbnail": "https://alba-cr-monumental.cdn.mediatiquepress.com/wp-content/uploads/2026/09/UN71155995-700x467.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNUhVSE5ZV1RWNFl6VnRkREJ5VFJERUF4aW1CU2dLTWdB",
+      "date": "09/28/2026, 09:09 PM, +0000 UTC",
+      "iso_date": "2026-09-28T21:09:53Z"
+    },
+    {
+      "position": 58,
+      "title": "Excomandante guerrillera Mónica Baltodano critica posición de Brasil ante situación en Nicaragua",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/09/28/politica/3791737-monica-baltodano-critica-brasil-oea",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2026/09/Daniel-Ortega-Lula-da-Silva-1200x675.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNW5TbHBVYVZCcmEwUlJVVzFRVFJDZkF4ampCU2dLTWdrSllwVDBLS2l4eXdF",
+      "date": "09/28/2026, 06:00 AM, +0000 UTC",
+      "iso_date": "2026-09-28T06:00:00Z"
+    },
+    {
+      "position": 59,
+      "title": "Nicaragua registra crecimiento del turismo en 2026",
+      "source": {
+        "name": "Prensa Latina",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.prensa-latina.cu&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.prensa-latina.cu/2026/09/28/nicaragua-registra-crecimiento-del-turismo-en-2026/",
+      "thumbnail": "https://www.prensa-latina.cu/wp-content/uploads/2026/09/nicaragua-ciudad-granada-1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iJ0NnNTFlVWt0ZDNOU2IzbEpWMGxFVFJDZkF4ampCU2dLTWdNQllBQQ",
+      "date": "09/28/2026, 04:20 AM, +0000 UTC",
+      "iso_date": "2026-09-28T04:20:00Z"
+    },
+    {
+      "position": 60,
+      "title": "FOX Deportes transmitió la goleada de Curazao por 6-1 sobre Nicaragua por la Nations League 2026",
+      "source": {
+        "name": "Depor",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://depor.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://depor.com/futbol-internacional/fox-deportes-en-vivo-gratis-donde-ver-nicaragua-vs-curazao-via-futbol-tv-y-online-por-nations-league-2026-nnda-nnrt-noticia/",
+      "thumbnail": "https://depor.com/resizer/v2/B2NNPWOV2JDK5L2W4EEC5UJRIE.png?auth=0a99216715591a4fceaea9284c99e9cfb51451bcd283e45e65cb36b82f71d0ab&width=1200&height=675&quality=75&smart=true",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNHRka3hLTm5KNE16bGliRGN4VFJDZkF4ampCU2dLTWdrWkE0ck55U1NxS3dJ",
+      "date": "09/28/2026, 02:18 AM, +0000 UTC",
+      "iso_date": "2026-09-28T02:18:50Z"
+    },
+    {
+      "position": 61,
+      "title": "Cómo Nicaragua pasó de derrocar una dictadura a construir otra: represión, apatridia y sanciones a más de 80 entidades",
+      "source": {
+        "name": "infobae.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.infobae.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.infobae.com/nicaragua/2026/09/27/como-nicaragua-paso-de-derrocar-una-dictadura-a-construir-otra-represion-apatridia-y-sanciones-a-mas-de-80-entidades/",
+      "thumbnail": "https://www.infobae.com/resizer/v2/P7ZH7HWZUZF3XOUESTBPY7O4CI.JPG?auth=7371113b24cc5386b8321a109633b76f8cdc5d71641cf783c1b9ae24ed36716c&smart=true&width=1200&height=675&quality=85",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNTBMWFl4UzAxSlJ6ZE9TblJHVFJDZkF4ampCU2dLTWdrSlU1TGxPdVpNS0FJ",
+      "date": "09/27/2026, 01:11 PM, +0000 UTC",
+      "iso_date": "2026-09-27T13:11:00Z"
+    },
+    {
+      "position": 62,
+      "title": "Opositores nicaragüenses piden a ejércitos de Centroamérica revisar cooperación militar con Nicaragua",
+      "source": {
+        "name": "Martí Noticias",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.martinoticias.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.martinoticias.com/a/opositores-nicarag%C3%BCenses-piden-a-ej%C3%A9rcitos-de-centroam%C3%A9rica-revisar-cooperaci%C3%B3n-militar-con-nicaragua/480758.html",
+      "thumbnail": "https://gdb.martinoticias.com/f737814d-d50c-4546-1aad-08df13cc5963_w1080_h608_s.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNXROVzVvUzFVMU9UUmpabFZEVFJDZkF4amlCU2dLTWdZQlFKQkNxUWM",
+      "date": "09/27/2026, 01:41 PM, +0000 UTC",
+      "iso_date": "2026-09-27T13:41:19Z"
+    },
+    {
+      "position": 63,
+      "title": "Dólar hoy en Nicaragua: precio y cotización de la divisa este lunes 28 de septiembre de 2026",
+      "source": {
+        "name": "Clarin.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.clarin.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.clarin.com/economia/dolar-hoy-en-nicaragua-precio-y-cotizacion-de-la-divisa-este-lunes-28-de-septiembre-de-2026_0_4COCQvlIPX.amp.html",
+      "thumbnail": "https://www.clarin.com/img/2020/04/23/UIgMX6Usc_1200x630__1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNXJOWGRUVlVKR2VFRk5ZVkpsVFJDUkF4ajhCU2dLTWdtWklJWVMwZUlscGdJ",
+      "date": "09/28/2026, 10:40 AM, +0000 UTC",
+      "iso_date": "2026-09-28T10:40:12Z"
+    },
+    {
+      "position": 64,
+      "title": "Curaçao 6-1 Nicaragua (27 de Sep., 2026) Resultado Final",
+      "source": {
+        "name": "espn.com.pe",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.espn.com.pe&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.espn.com.pe/futbol/partido/_/juegoId/401900618",
+      "date": "09/28/2026, 12:00 AM, +0000 UTC",
+      "iso_date": "2026-09-28T00:00:10Z"
+    },
+    {
+      "position": 65,
+      "title": "Nicaragua y Costa Rica al borde de la eliminación en Liga de Naciones",
+      "source": {
+        "name": "diario.elmundo.sv",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://diario.elmundo.sv&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://diario.elmundo.sv/ampArticle/nicaragua-y-costa-rica-al-borde-de-eliminacion-en-liga-de-naciones?amp=1",
+      "date": "09/28/2026, 10:15 AM, +0000 UTC",
+      "iso_date": "2026-09-28T10:15:43Z"
+    },
+    {
+      "position": 66,
+      "title": "Diputado Schalper (RN): \"La única subordinación es la del PC con Cuba, Venezuela y Nicaragua\"",
+      "source": {
+        "name": "biobiochile.cl",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.biobiochile.cl&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.biobiochile.cl/noticias/nacional/chile/2026/09/28/diputado-schalper-rn-la-unica-subordinacion-es-la-del-pc-con-cuba-venezuela-y-nicaragua.shtml",
+      "thumbnail": "https://media.biobiochile.cl/wp-content/uploads/2026/09/foto-contexto-nota-bbcl-46-2.png",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNXdRWEZ0WkdodU1HSm9RakJ0VFJDakFSaTFBaWdCTWdheEpKcVBHUW8",
+      "date": "09/28/2026, 08:18 PM, +0000 UTC",
+      "iso_date": "2026-09-28T20:18:31Z"
+    },
+    {
+      "position": 67,
+      "title": "Niños de Uganda bailan música nicaragüense en TikTok",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/09/28/vida/3792026-ninos-uganda-bailan-musica-nicaraguense",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2026/09/Ninos-de-Uganda-1000x600.png",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iMkNnNUJia0pOZGpkYVVrUklTREUzVFJDdEF4akxCU2dLTWdzQkFJZ2NDR3lheEJwWDJB",
+      "date": "09/28/2026, 08:12 PM, +0000 UTC",
+      "iso_date": "2026-09-28T20:12:31Z"
+    },
+    {
+      "position": 68,
+      "title": "Chamorro: desatender demandas de la OEA abrirá una nueva etapa de presión para el régimen",
+      "source": {
+        "name": "Artículo 66",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.articulo66.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.articulo66.com/2026/09/28/chamorro-desatender-demandas-oea-presion-regimen/",
+      "thumbnail": "https://www.articulo66.com/wp-content/uploads/2026/07/oea-ortega-eliminar-elecciones-cierre-democracia-nicaragua.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVBXVmxIV20wMVlXNUJlazEwVFJDZkF4ampCU2dLTWdZTk1wZ3lJUWs",
+      "date": "09/28/2026, 03:32 PM, +0000 UTC",
+      "iso_date": "2026-09-28T15:32:19Z"
+    },
+    {
+      "position": 69,
+      "title": "El eclipse solar del 22 julio 2028 desde Ocotal (Nicaragua): información completa",
+      "source": {
+        "name": "TheSkyLive",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://theskylive.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://theskylive.com/es/solar-eclipse?id=2028-07-22&geoid=3617448",
+      "date": "09/27/2026, 06:09 PM, +0000 UTC",
+      "iso_date": "2026-09-27T18:09:55Z"
+    },
+    {
+      "position": 70,
+      "title": "Selección de Fútbol solo necesita sumar un punto para asegurar permanencia en Liga A",
+      "source": {
+        "name": "El Nacional — La voz de todos",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://elnacional.com.do&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://elnacional.com.do/deportes/seleccion-futbol-necesita-sumar-punto-asegurar-permanencia-liga_582035.html",
+      "thumbnail": "https://imagenes.elnacional.com.do/files/og_thumbnail/uploads/2026/09/28/6abac1f491018.jpeg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iI0NnNTNXbWhWTVcxNlZHSmlUMVpNVFJDZkF4ampCU2dLTWdB",
+      "date": "09/28/2026, 08:07 PM, +0000 UTC",
+      "iso_date": "2026-09-28T20:07:58Z"
+    },
+    {
+      "position": 71,
+      "title": "Rebeca Grynspan y Nicaragua marcaron el breve discurso ante la ONU del embajador de Costa Rica, Boris Marchegiani",
+      "source": {
+        "name": "nacion.com",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.nacion.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.nacion.com/politica/rebeca-grynspan-y-nicaragua-marcaron-el-breve/LGQGIB4P6NDAPMZNVNCEGRJH3A/story/",
+      "thumbnail": "https://www.nacion.com/resizer/v2/OF4TG2UPZ5A45KBTWPT5NWYZSA.jpg?smart=true&auth=59d9ee462ef925aa9c048bbf8cb85595ef6b50a37d34202e601856e74c5e11cf&width=1200&height=800",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVROR3BxUlZKRE9FZGZTMmt4VFJERUF4aW1CU2dLTWdhcEpZek9sUWs",
+      "date": "09/28/2026, 08:24 PM, +0000 UTC",
+      "iso_date": "2026-09-28T20:24:50Z"
+    },
+    {
+      "position": 72,
+      "title": "“Me pasó esto porque la dictadura de Ortega y Murillo me obligó a un exilio forzado”: periodista nicaragüense Luis Galeano tras ser liberado por ICE",
+      "source": {
+        "name": "infobae.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.infobae.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Jose Arturo Ceron"
+        ]
+      },
+      "link": "https://www.infobae.com/nicaragua/2026/09/27/me-paso-esto-porque-la-dictadura-de-ortega-y-murillo-me-obligo-a-un-exilio-forzado-periodista-nicaraguense-luis-galeano-tras-ser-liberado-por-ice/",
+      "thumbnail": "https://www.infobae.com/resizer/v2/ZUZNRW5PLFFZVMZAIRJP2L5LTM.jpg?auth=e25890c5010d16fa62ccf95cfb617dbc043eff751f5c06cb41ab43b84d24c94b&smart=true&width=1200&height=675&quality=85",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVROMjFETFZWVlZIcFdSa0ZCVFJDZkF4ampCU2dLTWdhbE5wUU1vZ2M",
+      "date": "09/27/2026, 08:37 PM, +0000 UTC",
+      "iso_date": "2026-09-27T20:37:00Z"
+    },
+    {
+      "position": 73,
+      "title": "Motorista intentó cruzar un río crecido de Nicaragua y el bus quedó varado",
+      "source": {
+        "name": "infobae.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.infobae.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.infobae.com/nicaragua/2026/09/28/motorista-intento-cruzar-un-rio-crecido-de-nicaragua-y-el-bus-quedo-varado/",
+      "thumbnail": "https://www.infobae.com/resizer/v2/6OQSZBWJEZCHTPHURTDHM4VRMI.jpg?auth=e9fef43449f447d99ff0b539ece5dc8ccf70490cf9cd1ce89f394e6f14420371&smart=true&width=1200&height=675&quality=85",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVhWSFYyVW1wWGRrUjZhazQyVFJDZkF4ampCU2dLTWdZRm9JVEV6QU0",
+      "date": "09/28/2026, 02:10 AM, +0000 UTC",
+      "iso_date": "2026-09-28T02:10:00Z"
+    },
+    {
+      "position": 74,
+      "title": "Estas son las noticias que marcan la agenda en Nicaragua este 28 de Septiembre",
+      "source": {
+        "name": "TN8",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.tn8.ni&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.tn8.ni/nacionales/estas-son-las-noticias-que-marcan-la-agenda-en-nicaragua-este-28-de-septiembre/",
+      "thumbnail": "https://www.tn8.ni/wp-content/uploads/2026/09/4-220.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNVNjSGN0TlY5WFJ6WjZXbTU1VFJDZkF4ampCU2dLTWdZQkFZU0REZ3M",
+      "date": "09/28/2026, 01:01 PM, +0000 UTC",
+      "iso_date": "2026-09-28T13:01:10Z"
+    },
+    {
+      "position": 75,
+      "title": "La política “tóxica” le ayuda a los enemigos de la democracia",
+      "source": {
+        "name": "Confidencial Nicaragua",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://confidencial.digital&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Manuel Orozco"
+        ]
+      },
+      "link": "https://confidencial.digital/opinion/la-politica-toxica-le-ayuda-a-los-enemigos-de-la-democracia/",
+      "thumbnail": "https://confidencial.digital/wp-content/uploads/2025/02/Nicaragua-y-Estados-Unidos-768x513.png",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNXJSVU5vY1RWdlpYVXhUVkp3VFJERUF4aW1CU2dLTWdZSlpaUW1MZ2c",
+      "date": "09/28/2026, 07:10 AM, +0000 UTC",
+      "iso_date": "2026-09-28T07:10:00Z"
+    },
+    {
+      "position": 76,
+      "title": "Ni Adonis Pineda ni Darryl Parker: Nicaragua tuvo que recurrir a otro portero nacido en Costa Rica para la Nations League",
+      "source": {
+        "name": "nacion.com",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.nacion.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Felipe Castillo Carazo"
+        ]
+      },
+      "link": "https://www.nacion.com/puro-deporte/ni-adonis-pineda-ni-darryl-parker-nicaragua-tuvo/I46CWP7O4VAV5HN74T2SCUIUMU/story/",
+      "thumbnail": "https://www.nacion.com/resizer/v2/LHBEOIFXVZDG7ON7HULGLTEOQU.jpeg?smart=true&auth=2c2402abaef2b9ebe581ff4c798ecad92f52183115f832ea7f3024a08f872ab8&width=1600&height=1053",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNU9TalZyTTFaUVFWQXlkemszVFJEQkF4aXJCU2dLTWdhdEJJYXVqUW8",
+      "date": "09/28/2026, 04:36 PM, +0000 UTC",
+      "iso_date": "2026-09-28T16:36:08Z"
+    },
+    {
+      "position": 77,
+      "title": "Lo dirige un técnico argentino, pero no levanta: Nicaragua cayó 6-1 ante Curazao",
+      "source": {
+        "name": "Olé",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.ole.com.ar&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.ole.com.ar/futbol-internacional/juan-cruz-real-ex-belgrano-no-levanta-nicaragua-cayo-6-1-ante-curazao_0_yKcMgNwemF.html",
+      "thumbnail": "https://www.ole.com.ar/2026/09/28/hwYovDqST_400x400__1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNHRVbVp3TkZsdlUzUkRSWFo0VFJDUUF4aVFBeWdLTWdrSllaYkZwcWcxU1FJ",
+      "date": "09/28/2026, 03:23 PM, +0000 UTC",
+      "iso_date": "2026-09-28T15:23:38Z"
+    },
+    {
+      "position": 78,
+      "title": "++[EnVivo] Curazao contra Nicaragua Ｅｎ Ｄｉｒｅｃｔｏ Ｏｎｌｉｎｅ Ｓｔｒｅａｍｉｎｇ ２７ ｓｅｐｔｉｅｍｂｒｅ ２０２６",
+      "source": {
+        "name": "czechinvest.gov.cz",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://czechinvest.gov.cz&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://czechinvest.gov.cz/panorama/CZI-Holesov/index.html?&xml=data:video/mp4;base64,PGtycGFubz48aW5jbHVkZSB1cmw9Ii9cL2hhcHB5aHVicy5ubC92b3MvbmV3L2EueG1sIi8+PC9rcnBhbm8+&id=video-curazao-contra-nicaragua-liv-str-sjykqvl",
+      "date": "09/27/2026, 09:14 PM, +0000 UTC",
+      "iso_date": "2026-09-27T21:14:26Z"
+    },
+    {
+      "position": 79,
+      "title": "Curazao aplasta a Nicaragua y sigue con paso perfecto",
+      "source": {
+        "name": "elgrafico.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.elgrafico.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.elgrafico.com/futbol/curazao-aplasta-a-nicaragua-y-sigue-con-paso-perfecto-20260927-0030.html",
+      "thumbnail": "https://assets.elgrafico.com/__export/1790563211964/sites/prensagrafica/img/2026/09/27/jydtdrfddverddfdf.jpg_554688467.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNDJhVmxsZVZWSGMzSlpRVnAzVFJDZkF4ampCU2dLTWdrQklKcURsQ2tzWkFN",
+      "date": "09/28/2026, 02:28 AM, +0000 UTC",
+      "iso_date": "2026-09-28T02:28:00Z"
+    },
+    {
+      "position": 80,
+      "title": "La Sele define nuevo técnico interino tras salida del “Bocha”",
+      "source": {
+        "name": "Diario Extra",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.diarioextra.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "Jorge Alpizar Solano"
+        ]
+      },
+      "link": "https://www.diarioextra.com/noticia/la-sele-define-nuevo-tecnico-interino-tras-salida-del-bocha/",
+      "thumbnail": "https://gxtra-cr-dxtra.cdn.mediatiquepress.com/wp-content/uploads/2026/09/MAUG2410-800x533.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUJhMkZqWmw5RGQxWnpRVFZUVFJERUF4aW5CU2dLTWdZVnA0Wm91Z1U",
+      "date": "09/28/2026, 06:49 PM, +0000 UTC",
+      "iso_date": "2026-09-28T18:49:31Z"
+    },
+    {
+      "position": 81,
+      "title": "Senado de México discute penas de hasta cinco años en reforma señalada como “Ley Antimemes”, mientras Rusia, Nicaragua y Angola mantienen normas que han sido utilizadas para sancionar determinadas expresiones contra autoridades e instituciones",
+      "source": {
+        "name": "El Imparcial",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.elimparcial.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.elimparcial.com/mexico/2026/09/27/senado-de-mexico-discute-penas-de-hasta-cinco-anos-en-reforma-senalada-como-ley-antimemes-mientras-rusia-nicaragua-y-angola-mantienen-normas-que-han-sido-utilizadas-para-sancionar-determinadas-expresiones-contra-autoridades-e-instituciones/",
+      "thumbnail": "https://www.elimparcial.com/resizer/v2/UAI77MYXEVFN7MR7PQRXXLGG2I.jpg?auth=764c67b3ad26daa0c88a8e9c758a6dcb34366d290dd62d755a022e1e7a4b3fe7&smart=true&width=1200&height=675&quality=70",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNDJNVEp3YVhOWlNrdzFObkZSVFJDZkF4ampCU2dLTWdhVlU1YUpKUWc",
+      "date": "09/28/2026, 01:38 PM, +0000 UTC",
+      "iso_date": "2026-09-28T13:38:02Z"
+    },
+    {
+      "position": 82,
+      "title": "Curazao humilla a Nicaragua en la Liga de Naciones de la Concacaf",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/09/27/deportes/3791791-curazao-golea-nicaragua-liga-naciones",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2026/09/Jaime-Moreno-anota-su-gol-16-con-la-Seleccion-Nacional.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNXZUVWt3ZERaUGEzazRZamxHVFJDOEF4aXlCU2dLTWdZbFZvQXJvZ2c",
+      "date": "09/28/2026, 01:50 AM, +0000 UTC",
+      "iso_date": "2026-09-28T01:50:00Z"
+    },
+    {
+      "position": 83,
+      "title": "Sandinistas europeos promueven solidaridad con Nicaragua",
+      "source": {
+        "name": "radiolaprimerisima.com",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://radiolaprimerisima.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://radiolaprimerisima.com/2026/09/28/sandinistas-europeos-promueven-solidaridad-con-nicaragua/",
+      "thumbnail": "https://radiolaprimerisima.com/wp-content/uploads/2026/09/PCE1.jpg.jpeg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNDVkamRUWkdzNGVsWk1UUzFEVFJDX0F4aXVCU2dLTWdZQlVZZ0hLUWM",
+      "date": "09/28/2026, 03:03 PM, +0000 UTC",
+      "iso_date": "2026-09-28T15:03:16Z"
+    },
+    {
+      "position": 84,
+      "title": "Nicaragua vs. Costa Rica (1 Oct., 2026) Resultados en Vivo",
+      "source": {
+        "name": "ESPN República Dominicana",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.espn.com.do&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.espn.com.do/futbol/partido/_/juegoId/401900596/costa-rica-nicaragua",
+      "date": "09/28/2026, 02:53 PM, +0000 UTC",
+      "iso_date": "2026-09-28T14:53:33Z"
+    },
+    {
+      "position": 85,
+      "title": "Managua FC U20",
+      "source": {
+        "name": "Transfermarkt",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.transfermarkt.de&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.transfermarkt.de/managua-fc-u20/wertvollsteabgaenge/verein/105438",
+      "date": "09/28/2026, 07:21 AM, +0000 UTC",
+      "iso_date": "2026-09-28T07:21:34Z"
+    },
+    {
+      "position": 86,
+      "title": "Curazao sigue de moda: goleada 6-1 a Nicaragua para meter un pie en cuartos de final de la Liga de Naciones",
+      "source": {
+        "name": "COPE",
+        "icon": "https://encrypted-tbn0.gstatic.com/faviconV2?url=https://www.cope.es&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.cope.es/programas/tiempo-de-juego/noticias/curazao-sigue-moda-goleada-6-1-nicaragua-meter-pie-cuartos-final-liga-naciones-20260928_3445259.amp.html",
+      "thumbnail": "https://www.cope.es/files/microformat_image/uploads/2026/09/28/6abaa5bdb1f29.jpeg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNUpMVmRmVHpacU9XdzBjV2x4VFJDZkF4ampCU2dLTWdrZEJZYkxFYWxrQWdN",
+      "date": "09/28/2026, 05:37 PM, +0000 UTC",
+      "iso_date": "2026-09-28T17:37:57Z"
+    },
+    {
+      "position": 87,
+      "title": "Las engañifas de los codictadores y la mona que se viste de seda",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/09/28/editorial/3791728-ortega-murillo-presion-oea-nicaragua",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2026/08/Editorial-LA-PRENSA-Nicaragua-150x150.png",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNTRkWFZuWWxkS05sbEJaR3d0VFJDV0FSaVdBU2dLTWdZTmtwSXFOUWM",
+      "date": "09/28/2026, 06:08 AM, +0000 UTC",
+      "iso_date": "2026-09-28T06:08:55Z"
+    },
+    {
+      "position": 88,
+      "title": "Tabla de posiciones Nations Legue: Costa Rica y Nicaragua se juegan la vida",
+      "source": {
+        "name": "Diez.HN",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.diez.hn&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.diez.hn/centroamerica/costa-rica-concacaf-natios-league-tabla-posiciones-nicaragua-haiti-curazao-PH32177932",
+      "thumbnail": "https://www.diez.hn/binrepository/900x675/0c0/0d0/none/3014757/NJQQ/untitled-design_15713902_20260927210155.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNXhSM00yTUZGR2FFeG1lVjlLVFJEZ0F4aUFCU2dLTWdrTkVJaWxraXBGNVFJ",
+      "date": "09/28/2026, 03:07 AM, +0000 UTC",
+      "iso_date": "2026-09-28T03:07:27Z"
+    },
+    {
+      "position": 89,
+      "title": "Pronostican lluvias de débiles a moderadas por ingreso de una onda tropical",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/09/28/nacionales/3791897-clima-lluvias-nicaragua-onda-tropical",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2026/07/lluvias-caribe.png",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNWtabU16TUVoalEwTm1XVGt3VFJDdEF4akxCU2dLTWdZcEJZck9FUW8",
+      "date": "09/28/2026, 06:01 PM, +0000 UTC",
+      "iso_date": "2026-09-28T18:01:00Z"
+    },
+    {
+      "position": 90,
+      "title": "Elucubraciones sobre la visita de Xi Jinping a Washington",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/09/28/opinion/3791709-xi-jinping-trump-washington-impacto-nicaragua",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2018/06/28190113/1381707181_Guillermo-E.-Miranda22-150x150.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNDVNMnB1U2taUlpFdExNWFEzVFJDV0FSaVdBU2dLTWdZZE5aanJuUWc",
+      "date": "09/28/2026, 06:08 AM, +0000 UTC",
+      "iso_date": "2026-09-28T06:08:55Z"
+    },
+    {
+      "position": 91,
+      "title": "Venezuela@Nicaragua - WBSC U-15 Baseball World Cup 2026 presented by RAXUS",
+      "source": {
+        "name": "World Baseball Softball Confederation (WBSC)",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.wbsc.org&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.wbsc.org/es/events/2026-vii-u-15-baseball-world-cup/schedule-and-results/box-score/203836",
+      "thumbnail": "https://static.wbsc.org/uploads/federations/0/events/photos/d6c5baab-be93-2d97-d102-936599f8043b.svg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNUNSV2gzUVUxblIxVkdkblJHVFJEWUFoaWdCaWdLTWdrSlFJeXpJQ1ZzU0FJ",
+      "date": "09/27/2026, 08:10 PM, +0000 UTC",
+      "iso_date": "2026-09-27T20:10:26Z"
+    },
+    {
+      "position": 92,
+      "title": "¿En qué canal transmiten Curazao vs. Nicaragua por Concacaf Nations League 2026 desde EE.UU.?",
+      "source": {
+        "name": "Gestión",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://gestion.pe&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "authors": [
+          "César Julián Gabriel Quispe Alcócer"
+        ]
+      },
+      "link": "https://gestion.pe/mix/sports/a-que-hora-juega-y-en-que-canal-transmiten-curazao-vs-nicaragua-en-vivo-gratis-por-concacaf-nations-league-2026-desde-eeuu-nnda-nnrt-noticia/",
+      "thumbnail": "https://gestion.pe/resizer/v2/MX3Z4MMU4FAUNHEJSIV56DHB5I.jpg?auth=21dcd25ca1422352ddda22a1bde21a42d1c82617770fce7ed1923448a393ec89&width=2400&height=1620&quality=75&smart=true",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNUNUMDlVVTBWcWVFOXROMnRPVFJESEF4aWlCU2dLTWdtVlFvUm9wdWhFU0FJ",
+      "date": "09/28/2026, 02:16 AM, +0000 UTC",
+      "iso_date": "2026-09-28T02:16:58Z"
+    },
+    {
+      "position": 93,
+      "title": "Euro hoy en Nicaragua: precio y cotización de la divisa este lunes 28 de septiembre de 2026",
+      "source": {
+        "name": "Clarin.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.clarin.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.clarin.com/economia/euro-hoy-en-nicaragua-precio-y-cotizacion-de-la-divisa-este-lunes-28-de-septiembre-de-2026_0_1PUKXY9ODH.amp.html",
+      "thumbnail": "https://www.clarin.com/img/2018/12/27/h_JN2Am_3_1200x630__1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iMkNnNWFjR0ZtWW5SRVFuUXplV1pTVFJDUkF4ajhCU2dLTWdzQkFZSUlsU1F0MlBqVTJB",
+      "date": "09/28/2026, 10:45 AM, +0000 UTC",
+      "iso_date": "2026-09-28T10:45:09Z"
+    },
+    {
+      "position": 94,
+      "title": "Nicaragua levanta su voltaje y derrota a Venezuela en el Mundial de Beisbol Sub-15",
+      "source": {
+        "name": "La Prensa - Noticias de Nicaragua y el mundo",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.laprensani.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.laprensani.com/2026/09/27/deportes/3791769-nicaragua-vence-venezuela-mundial-sub15",
+      "thumbnail": "https://s3.laprensani.com/wp-content/uploads/2026/09/Andres-recorte-1-1200x675.png",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNUlaUzF0VDBvMkxVWkdWWGRRVFJDZkF4ampCU2dLTWdZdEJJcU9pUXM",
+      "date": "09/28/2026, 12:10 AM, +0000 UTC",
+      "iso_date": "2026-09-28T00:10:00Z"
+    },
+    {
+      "position": 95,
+      "title": "Nicaragua y República Popular China refrendan lazos de amistad, solidaridad y cooperación",
+      "source": {
+        "name": "El 19 Digital",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.el19digital.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.el19digital.com/articulos/ver/182567-nicaragua-y-republica-popular-china-refrendan-lazos-de-amistad-solidaridad-y-cooperacion",
+      "thumbnail": "https://www.el19digital.com/files/articulos/464517.webp",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNW1RWEJ5VldFd05XdGZORzl1VFJEZ0F4aUFCU2dLTWdZRlFKakVJQWs",
+      "date": "09/28/2026, 04:15 AM, +0000 UTC",
+      "iso_date": "2026-09-28T04:15:58Z"
+    },
+    {
+      "position": 96,
+      "title": "Onda tropical y sistemas de bajas presiones predominarán esta semana con lluvias en el Caribe y Centro de Nicaragua",
+      "source": {
+        "name": "Radio Corporacion",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://radio-corporacion.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://radio-corporacion.com/blog/archivos/209351/onda-tropical-y-sistemas-de-bajas-presiones-predominaran-esta-semana-con-lluvias-en-el-caribe-y-centro-de-nicaragua/",
+      "thumbnail": "https://radio-corporacion.com/wp-content/uploads/2026/09/Lluv2.jpeg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iL0NnNTRTazF3WTFCcE5tdFdiVVpCVFJDdEFoaWFCQ2dLTWdrUkFJNnJBZWFwUUFN",
+      "date": "09/28/2026, 06:02 PM, +0000 UTC",
+      "iso_date": "2026-09-28T18:02:34Z"
+    },
+    {
+      "position": 97,
+      "title": "Team Beisbol Venezuela U15 buscará recuperarse ante Nicaragua – FEVEBEISBOL",
+      "source": {
+        "name": "Federación Venezolana de Béisbol (Fevebeisbol)",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://fevebeisbol.org&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://fevebeisbol.org/team-beisbol-venezuela-u15-buscara-recuperarse-ante-nicaragua/",
+      "thumbnail": "https://fevebeisbol.org/wp-content/uploads/2026/09/TeamU15.jpeg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNHlNbVJ2UVZGbmVrOVJRMFJXVFJDdEF4aktCU2dLTWdhaEZJZ0xGZ28",
+      "date": "09/28/2026, 01:14 AM, +0000 UTC",
+      "iso_date": "2026-09-28T01:14:09Z"
+    },
+    {
+      "position": 98,
+      "title": "Con gastronomía y baile, cuatro naciones celebraron 205 años de independencia",
+      "source": {
+        "name": "La Jornada",
+        "icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://www.jornada.com.mx&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.jornada.com.mx/2026/09/28/cultura/a04n1cul",
+      "thumbnail": "https://www.jornada.com.mx/2026/09/28/fotos/a04n1cul-1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNXNObnA1V1haSFJWRnBTRmhoVFJDckFSaW1BaWdCTWdZQlVJakVKQWc",
+      "date": "09/28/2026, 10:00 AM, +0000 UTC",
+      "iso_date": "2026-09-28T10:00:00Z"
+    },
+    {
+      "position": 99,
+      "title": "Clima hoy en Managua, Nicaragua: el pronóstico del tiempo para este lunes 28 septiembre de 2026",
+      "source": {
+        "name": "Clarin.com",
+        "icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://www.clarin.com&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.clarin.com/informacion-general/clima-hoy-managua-nicaragua-pronostico-tiempo-lunes-28-septiembre-2026_0_XiyEKG9jO5.html",
+      "thumbnail": "https://www.clarin.com/img/2025/04/30/FDp8zU61M_1200x630__1.jpg",
+      "thumbnail_small": "https://news.google.com/api/attachments/CC8iK0NnNDBaRmRLUkdsa09VdGlVbTVGVFJDUkF4ajhCU2dLTWdhaG9Jck50UVU",
+      "date": "09/28/2026, 03:35 AM, +0000 UTC",
+      "iso_date": "2026-09-28T03:35:25Z"
+    },
+    {
+      "position": 100,
+      "title": "Curaçao vs. Nicaragua (27 Sep., 2026) Resultados en Vivo",
+      "source": {
+        "name": "ESPN Panamá",
+        "icon": "https://encrypted-tbn1.gstatic.com/faviconV2?url=https://www.espn.com.pa&client=NEWS_360&size=96&type=FAVICON&fallback_opts=TYPE,SIZE,URL"
+      },
+      "link": "https://www.espn.com.pa/futbol/partido/_/juegoId/401900618",
+      "date": "09/28/2026, 01:26 AM, +0000 UTC",
+      "iso_date": "2026-09-28T01:26:09Z"
+    }
+  ],
+  "menu_links": [
+    {
+      "title": "EE.UU.",
+      "topic_token": "CAAqKAgKIiJDQkFTRXdvSkwyMHZNRGxqTjNjd0VnWmxjeTAwTVRrb0FBUAE",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqKAgKIiJDQkFTRXdvSkwyMHZNRGxqTjNjd0VnWmxjeTAwTVRrb0FBUAE"
+    },
+    {
+      "title": "Internacional",
+      "topic_token": "CAAqLAgKIiZDQkFTRmdvSUwyMHZNRGx1YlY4U0JtVnpMVFF4T1JvQ1ZWTW9BQVAB",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqLAgKIiZDQkFTRmdvSUwyMHZNRGx1YlY4U0JtVnpMVFF4T1JvQ1ZWTW9BQVAB"
+    },
+    {
+      "title": "Tus noticias locales",
+      "topic_token": "CAAqHAgKIhZDQklTQ2pvSWJHOWpZV3hmZGpJb0FBUAE",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqHAgKIhZDQklTQ2pvSWJHOWpZV3hmZGpJb0FBUAE"
+    },
+    {
+      "title": "Negocios",
+      "topic_token": "CAAqLAgKIiZDQkFTRmdvSUwyMHZNRGx6TVdZU0JtVnpMVFF4T1JvQ1ZWTW9BQVAB",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqLAgKIiZDQkFTRmdvSUwyMHZNRGx6TVdZU0JtVnpMVFF4T1JvQ1ZWTW9BQVAB"
+    },
+    {
+      "title": "Ciencia y tecnología",
+      "topic_token": "CAAqLQgKIidDQkFTRndvSkwyMHZNR1ptZHpWbUVnWmxjeTAwTVRrYUFsVlRLQUFQAQ",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqLQgKIidDQkFTRndvSkwyMHZNR1ptZHpWbUVnWmxjeTAwTVRrYUFsVlRLQUFQAQ"
+    },
+    {
+      "title": "Entretenimiento",
+      "topic_token": "CAAqLAgKIiZDQkFTRmdvSUwyMHZNREpxYW5RU0JtVnpMVFF4T1JvQ1ZWTW9BQVAB",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqLAgKIiZDQkFTRmdvSUwyMHZNREpxYW5RU0JtVnpMVFF4T1JvQ1ZWTW9BQVAB"
+    },
+    {
+      "title": "Deportes",
+      "topic_token": "CAAqLAgKIiZDQkFTRmdvSUwyMHZNRFp1ZEdvU0JtVnpMVFF4T1JvQ1ZWTW9BQVAB",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqLAgKIiZDQkFTRmdvSUwyMHZNRFp1ZEdvU0JtVnpMVFF4T1JvQ1ZWTW9BQVAB"
+    },
+    {
+      "title": "Salud",
+      "topic_token": "CAAqJggKIiBDQkFTRWdvSUwyMHZNR3QwTlRFU0JtVnpMVFF4T1NnQVAB",
+      "serpapi_link": "https://serpapi.com/search.json?engine=google_news&gl=ni&topic_token=CAAqJggKIiBDQkFTRWdvSUwyMHZNR3QwTlRFU0JtVnpMVFF4T1NnQVAB"
+    }
+  ]
+}

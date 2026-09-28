@@ -1,0 +1,26 @@
+
+TEST CHAT
+{"provider":"gemini","model":"gemini-3.5-flash-lite","status":200}
+Para ayudarte a organizar tu día, dime cuáles son las tareas, pendientes o compromisos específicos que tienes para hoy.
+PASS CHAT
+
+TEST CLASIFICADOR
+{"provider":"gemini","model":"gemini-3.5-flash-lite","status":200}
+[busqueda-auto] via=clasificador, buscar=true, consulta="Quién ocupa la presidencia de Nicaragua", ms=1038
+{"message":"Quién ocupa la presidencia de Nicaragua","buscar":true,"consulta":"Quién ocupa la presidencia de Nicaragua","via":"clasificador"}
+{"provider":"gemini","model":"gemini-3.5-flash-lite","status":200}
+[busqueda-auto] via=clasificador, buscar=false, consulta="", ms=1777
+{"message":"Explícame qué es una fracción matemática","buscar":false,"consulta":"Explícame qué es una fracción matemática","via":"clasificador"}
+PASS CLASIFICADOR
+
+TEST MEMORIA_SQL
+FAIL MEMORIA_SQL: timeout expired
+
+TEST MODERACION
+{"provider":"gemini","model":"gemini-3.5-flash-lite","status":200}
+{"message":"eres un idiota inútil","result":"AGGRESSIVE_INSULT"}
+{"provider":"gemini","model":"gemini-3.5-flash-lite","status":200}
+{"message":"soy un idiota, me siento mal","result":"SELF_DISTRESS"}
+PASS MODERACION
+
+RESULT FAIL 1

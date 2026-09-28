@@ -1,0 +1,47 @@
+
+TEST MEMORIA_SQL
+PostgreSQL conectado para prueba temporal.
+{"provider":"gemini","model":"gemini-3.5-flash-lite","status":200}
+{
+  "saved": [
+    {
+      "id": 1,
+      "memory_text": "Se llama Lucía.",
+      "category": "personal"
+    },
+    {
+      "id": 2,
+      "memory_text": "Trabaja como arquitecta.",
+      "category": "personal"
+    },
+    {
+      "id": 3,
+      "memory_text": "Prefiere respuestas breves.",
+      "category": "preferencia"
+    }
+  ],
+  "readBack": [
+    {
+      "id": 3,
+      "memory_text": "Prefiere respuestas breves.",
+      "category": "preferencia",
+      "updated_at": "2026-09-28T23:54:31.513Z"
+    },
+    {
+      "id": 2,
+      "memory_text": "Trabaja como arquitecta.",
+      "category": "personal",
+      "updated_at": "2026-09-28T23:54:28.652Z"
+    },
+    {
+      "id": 1,
+      "memory_text": "Se llama Lucía.",
+      "category": "personal",
+      "updated_at": "2026-09-28T23:54:26.391Z"
+    }
+  ]
+}
+Persistencia SQL real comprobada en tabla temporal; ninguna memoria de usuarios modificada.
+PASS MEMORIA_SQL
+
+RESULT PASS MEMORIA_SQL
